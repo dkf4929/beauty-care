@@ -1,3 +1,7 @@
 spring:
   application:
     name: beauty-care
+
+springdoc:
+  swagger-ui:
+    path: /beauty-care/swagger.html
