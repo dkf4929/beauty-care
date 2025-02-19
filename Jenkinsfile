@@ -47,14 +47,9 @@ pipeline {
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
-                            echo "Stopping existing containers..."
                             docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
-
-                            echo "Starting new containers..."
                             cd ${DEPLOY_DIR}
                             docker-compose up -d
-
-                            echo "Deployment completed!"
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
@@ -66,10 +61,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment to EC2 successful!'
+            echo '배포 성공'
         }
         failure {
-            echo 'Deployment to EC2 failed!'
+            echo '배포 실패'
         }
     }
 }
