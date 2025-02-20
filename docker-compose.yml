@@ -20,14 +20,13 @@ services:
       timeout: 5s
 
   app:
-    image: openjdk:21-jdk-slim
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: beauty-care-app
     container_name: beauty-care-app-container
-    working_dir: /app
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-    command: ["java", "-jar", "/app/app.jar"]
-    volumes:
-      - ./app.jar:/app/app.jar
     depends_on:
       db:
         condition: service_healthy
