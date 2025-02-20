@@ -1,0 +1,32 @@
+package com.project.beauty_care.global.security;
+
+import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.member.MemberRepository;
+import com.project.beauty_care.global.security.dto.AppUser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CustomUserDetailsService implements UserDetailsService {
+    private final MemberRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+        Member member = repository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsernameNotFoundException("등록된 사용자가 아닙니다."));
+
+        // 인증용 객체로 변환
+        return AppUser.builder()
+                .memberId(member.getId())
+                .loginId(member.getLoginId())
+                .name(member.getName())
+                .role(member.getRole())
+                .build();
+    }
+}

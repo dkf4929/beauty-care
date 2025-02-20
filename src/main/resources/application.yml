@@ -5,3 +5,6 @@ spring:
 springdoc:
   swagger-ui:
     path: /beauty-care/swagger.html
+
+jwt:
+  secret: secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey
