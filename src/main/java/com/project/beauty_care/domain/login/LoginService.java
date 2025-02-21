@@ -5,7 +5,9 @@ import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.RequestInvalidException;
+import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,26 +20,34 @@ public class LoginService {
     private final MemberRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public Member login(LoginRequestDto loginRequestDto) {
+    public AppUser login(LoginRequestDto loginRequestDto) {
         String loginId = loginRequestDto.getLoginId();
         String password = loginRequestDto.getPassword();
 
         // 회원 검색
         Member findMember = repository.findByLoginId(loginId)
-                .orElseThrow(() -> new RequestInvalidException(Errors.LOGIN_FAIL));
+                .orElseThrow(() -> new RequestInvalidException(Errors.ANONYMOUS_USER));
 
-        // 패스워드 일치여부 검사
-        boolean passwordMatch
-                = passwordEncoder.matches(password, findMember.getPassword());
+        // 패스워드 일치 여부 검사
+        validPassword(password, findMember);
+        updateLastLoginDateTime(findMember);
 
-        // 불일치
-        if (!passwordMatch)
-            throw new RequestInvalidException(Errors.LOGIN_FAIL);
+        return AppUser.builder()
+                .memberId(findMember.getId())
+                .loginId(findMember.getLoginId())
+                .name(findMember.getName())
+                .role(findMember.getRole())
+                .build();
+    }
 
-        // 현재 시간으로 로그인 시간 업데이트
-        findMember.updateLastLoginDateTime(LocalDateTime.now());
+    private void validPassword(String password, Member findMember) {
+        if (!passwordEncoder.matches(password, findMember.getPassword())) {
+            throw new RequestInvalidException(Errors.PASSWORD_MISS_MATCH);
+        }
+    }
 
-        return findMember;
+    @Transactional
+    protected void updateLastLoginDateTime(Member loginMember) {
+        loginMember.updateLastLoginDateTime(LocalDateTime.now());
     }
 }

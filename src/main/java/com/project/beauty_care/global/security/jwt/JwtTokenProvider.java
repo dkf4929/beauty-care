@@ -95,16 +95,20 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        // 클레임에서 권한을 꺼내온다.
-        String role = (String) claims.get(AUTHORITIES_KEY);
+        String role = Claim.AUTHORITIES.getClaimValueString(claims);
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = AppUser.builder()
                 .memberId(Claim.ID.getClaimValueLong(claims))
                 .loginId(Claim.LOGIN_ID.getClaimValueString(claims))
+                .name(Claim.NAME.getClaimValueString(claims))
+                .role(role)
                 .build();
 
-        return new UsernamePasswordAuthenticationToken(principal, "", List.of(new SimpleGrantedAuthority(role)));
+        return new UsernamePasswordAuthenticationToken(
+                principal,
+                "",
+                List.of(new SimpleGrantedAuthority(role)));
     }
 
     // 토큰 검증

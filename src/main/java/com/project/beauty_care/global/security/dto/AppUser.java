@@ -15,11 +15,11 @@ public class AppUser implements UserDetails {
     private Long memberId;
     private String loginId;
     private String name;
-    private Role role;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(this.role));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class AppUser implements UserDetails {
     }
 
     @Builder
-    public AppUser(Long memberId, String loginId, String name, Role role) {
+    public AppUser(Long memberId, String loginId, String name, String role) {
         this.memberId = memberId;
         this.loginId = loginId;
         this.name = name;

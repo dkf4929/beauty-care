@@ -60,15 +60,7 @@ public class LoginController {
     @PostMapping
     public com.project.beauty_care.global.ApiResponse<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         // 로그인 인증 처리
-        Member loginMember = service.login(loginRequestDto);
-
-        // USER 인증 dto
-        AppUser appUser = AppUser.builder()
-                .memberId(loginMember.getId())
-                .loginId(loginMember.getLoginId())
-                .name(loginMember.getName())
-                .role(loginMember.getRole())
-                .build();
+        AppUser appUser = service.login(loginRequestDto);
 
         // 인증 객체 생성
         Authentication authentication =
@@ -77,9 +69,11 @@ public class LoginController {
         // accessToken 및 refreshToken 생성
         JwtTokenDto jwtTokenDto = jwtTokenProvider.generateToken(authentication);
 
-        LoginResponseDto loginResponseDto = LoginResponseDto.of(jwtTokenDto.getAccessToken(),
+        LoginResponseDto loginResponseDto = LoginResponseDto.of(
+                jwtTokenDto.getAccessToken(),
                 jwtTokenDto.getAccessTokenExpiresIn(),
-                JwtTokenProvider.TOKEN_TYPE);
+                JwtTokenProvider.TOKEN_TYPE
+        );
 
         return com.project.beauty_care.global.ApiResponse.success(
                 SuccessResult.LOGIN_SUCCESS,
