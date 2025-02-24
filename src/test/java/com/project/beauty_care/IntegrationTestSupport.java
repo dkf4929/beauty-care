@@ -1,6 +1,6 @@
 package com.project.beauty_care;
 
-import com.project.beauty_care.global.config.DynamicActiveProfilesResolver;
+import com.project.beauty_care.config.DynamicActiveProfilesResolver;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 

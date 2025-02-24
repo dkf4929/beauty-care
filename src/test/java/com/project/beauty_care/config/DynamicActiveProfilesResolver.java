@@ -1,4 +1,4 @@
-package com.project.beauty_care.global.config;
+package com.project.beauty_care.config;
 
 import org.springframework.test.context.ActiveProfilesResolver;
 
