@@ -15,3 +15,16 @@ spring:
 
 token:
   access: 31536000000
+
+#springdoc:
+#  swagger-ui:
+#    path: /eng/swagger.html
+
+#init:
+#  password: a1234567890
+#
+#jwt:
+#  secret: secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey
+#
+#token:
+#  access: 31536000000
