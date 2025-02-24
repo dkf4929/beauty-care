@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 class MemberRepositoryTest extends IntegrationTestSupport {
@@ -21,9 +20,7 @@ class MemberRepositoryTest extends IntegrationTestSupport {
     @Test
     void findByLoginId() {
         //given
-        Member member = createMember("user1", Role.USER, "user1", "1234");
-
-        repository.save(member);
+        createMember();
 
         //when
         Member findMember = repository.findByLoginId("user1")
@@ -31,17 +28,17 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 
         assertThat(findMember)
                 .extracting("name", "role", "loginId")
-                .contains(
-                        tuple("user1", Role.USER.getValue(), "user1")
-                );
+                .containsExactly("user1", Role.USER.getValue(), "user1");
     }
 
-    private Member createMember(String name, Role role, String loginId, String password) {
-        return Member.builder()
-                .name(name)
-                .role(role)
-                .loginId(loginId)
-                .password(password)
+    private void createMember() {
+        Member member = Member.builder()
+                .name("user1")
+                .role(Role.USER)
+                .loginId("user1")
+                .password("1234")
                 .build();
+
+        repository.save(member);
     }
 }
