@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.member;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.RepositoryTestSupport;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.RequestInvalidException;
@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-class MemberRepositoryTest extends IntegrationTestSupport {
+class MemberRepositoryTest extends RepositoryTestSupport {
     @Autowired
     private MemberRepository repository;
 
