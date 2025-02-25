@@ -20,7 +20,7 @@ pipeline {
     }
 
     stages {
-        stage('메인 브랜치 체크아웃') {
+        stage('메인 브렌치 체크아웃') {
             steps {
                 withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
@@ -33,24 +33,13 @@ pipeline {
             }
         }
 
-        stage('Gradle 캐시 삭제 및 빌드') {
-            steps {
-                sh '''
-                    cd beauty-care
-                    rm -rf ~/.gradle/caches
-                    chmod +x ./gradlew
-                    ./gradlew clean build
-                '''
-            }
-        }
-
         stage('도커 빌드') {
             steps {
                 sh 'cd beauty-care && docker build -t beauty-care-app .'
             }
         }
 
-        stage('EC2에 Docker 컨테이너 실행') {
+        stage('ec2에 docker container 실행') {
             steps {
                 sshagent([SSH_KEY_ID]) {
                     script {
