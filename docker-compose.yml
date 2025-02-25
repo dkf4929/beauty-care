@@ -4,6 +4,7 @@ services:
   db:
     image: mysql:8.0
     container_name: beauty-care-db-container
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: qwer1234
       MYSQL_DATABASE: beauty_care
@@ -24,6 +25,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: beauty-care-app
+    restart: always
     container_name: beauty-care-app-container
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -34,6 +36,7 @@ services:
       - beauty_care_network
     ports:
       - 8080:8080
+    command: ["/bin/sh", "-c", "until nc -z db 3306; do sleep 1; done; java -jar /app.jar"]
 
 networks:
   beauty_care_network:
