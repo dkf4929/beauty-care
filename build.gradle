@@ -37,6 +37,8 @@ dependencies {
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
+	implementation 'com.mysql:mysql-connector-j:9.2.0'
+
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
