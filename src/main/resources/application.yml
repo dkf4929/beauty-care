@@ -28,6 +28,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    defer-datasource-initialization: true
 
 token:
   access: 31536000000
@@ -49,6 +50,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    defer-datasource-initialization: true
 
 token:
   access: 31536000000
@@ -59,7 +61,7 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: jdbc:mysql://beauty-care-db-container:3306/beauty_care
+    url: jdbc:mysql://localhost:3306/beauty_care
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qwer1234
