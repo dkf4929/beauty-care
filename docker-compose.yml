@@ -19,9 +19,6 @@ services:
       retries: 10
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: beauty-care-app
     container_name: beauty-care-app-container
     environment:
