@@ -33,12 +33,17 @@ pipeline {
             }
         }
 
+        stage('도커 빌드') {
+            steps {
+                sh 'cd beauty-care && docker build -t beauty-care-app .'
+            }
+        }
+
         stage('ec2에 docker container 실행') {
             steps {
                 sshagent([SSH_KEY_ID]) {
                     script {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
