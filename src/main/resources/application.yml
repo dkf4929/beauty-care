@@ -59,7 +59,7 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: spring.datasource.url=jdbc:mysql://host.docker.internal:3306/beauty_care
+    url: jdbc:mysql://beauty-care-db-container:3306/beauty_care
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qwer1234
