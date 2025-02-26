@@ -17,7 +17,7 @@ pipeline {
         GIT_REPO = 'https://github.com/dkf4929/beauty-care.git'
         GIT_CREDENTIALS_ID = 'git-token'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        DB_HOST = 'localhost'
+        DB_HOST = '52.79.55.156'
         DB_PORT = '3306'
         DB_USER = 'root'
         DB_PASSWORD = 'qwer1234'
