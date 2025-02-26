@@ -24,7 +24,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
-                        echo ${GIT_PASSWORD}
+                        echo GIT_PASSWORD > git_password.txt
+                        cat git_password.txt
                         rm -rf beauty-care  # 기존 배포 디렉토리를 삭제한다.
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/dkf4929/beauty-care.git beauty-care
                         cd beauty-care
