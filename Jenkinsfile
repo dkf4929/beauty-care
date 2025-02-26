@@ -17,11 +17,6 @@ pipeline {
         GIT_REPO = 'https://github.com/dkf4929/beauty-care.git'
         GIT_CREDENTIALS_ID = 'git-token'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        DB_HOST = '52.79.55.156'
-        DB_PORT = '3306'
-        DB_USER = 'root'
-        DB_PASSWORD = 'qwer1234'
-        DB_NAME = 'beauty_care'
     }
 
     stages {
@@ -35,30 +30,6 @@ pipeline {
                         git checkout main
                     """
                 }
-            }
-        }
-
-        stage('데이터베이스 연결 테스트') {
-                    steps {
-                        script {
-                            // 데이터베이스 연결 테스트 스크립트 실행
-                            sh '''
-                            #!/bin/bash
-                            echo "데이터베이스 연결 테스트를 시작합니다..."
-                            mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASSWORD} -e "USE ${DB_NAME}; SELECT 1;"
-                            if [ $? -ne 0 ]; then
-                                echo "데이터베이스에 연결할 수 없습니다."
-                                exit 1
-                            fi
-                            echo "데이터베이스 연결에 성공했습니다."
-                            '''
-                        }
-                    }
-                }
-
-        stage('도커 빌드') {
-            steps {
-                sh 'cd beauty-care && docker build -t beauty-care-app .'
             }
         }
 

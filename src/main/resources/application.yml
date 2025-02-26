@@ -61,7 +61,7 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: jdbc:mysql://52.79.55.156:3306/beauty_care
+    url: jdbc:mysql://beauty-care-db-container:3306/beauty_care
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qwer1234
