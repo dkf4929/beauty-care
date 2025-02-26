@@ -7,14 +7,15 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: qwer1234
       MYSQL_DATABASE: beauty_care
+      MYSQL_ROOT_HOST: "%"
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - beauty_care_network
     ports:
-      - 3306:3306
+      - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "beauty-care-db-container"]
       interval: 10s
       retries: 5
       timeout: 5s
@@ -27,13 +28,14 @@ services:
     container_name: beauty-care-app-container
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://beauty-care-db-container:3306/beauty_care
     depends_on:
       db:
         condition: service_healthy
     networks:
       - beauty_care_network
     ports:
-      - 8080:8080
+      - "8080:8080"
 
 networks:
   beauty_care_network:
