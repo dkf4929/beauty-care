@@ -48,9 +48,8 @@ pipeline {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         def dockerDeployScript = """#!/bin/bash
-                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
-                            cd ${DEPLOY_DIR}
-                            docker-compose up -d
+                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down --remove-orphans
+                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml up -d
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
