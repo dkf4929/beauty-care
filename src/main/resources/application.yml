@@ -62,7 +62,7 @@ spring:
       on-profile: test
   datasource:
     url: jdbc:tc:mysql:8.0:///beauty_care
-    driver-class-name:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     username: root
     password: qwer1234
   jpa:
@@ -73,6 +73,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+    defer-datasource-initialization: true
 
 token:
   access: 31536000000
