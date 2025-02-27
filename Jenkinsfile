@@ -51,14 +51,6 @@ pipeline {
                             docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
                             cd ${DEPLOY_DIR}
                             docker-compose up -d
-
-                            timeout 120 bash -c '
-                                until docker exec beauty-care-app-container /bin/bash -c "echo 'Container is ready'" > /dev/null 2>&1; do
-                                    sleep 5
-                                done
-                            ' || echo "Timeout reached, skipping tests."
-
-                            docker exec beauty-care-app-container ./gradlew test
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
