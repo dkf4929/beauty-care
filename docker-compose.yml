@@ -1,15 +1,39 @@
 version: '3.8'
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: beauty-care-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: qwer1234
+      MYSQL_DATABASE: beauty_care
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - beauty_care_network
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
   app:
     image: beauty-care-app
     container_name: beauty-care-app-container
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - beauty_care_network
     ports:
       - 8080:8080
+
+networks:
+  beauty_care_network:
 
 volumes:
   db_data:
