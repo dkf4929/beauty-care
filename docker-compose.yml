@@ -45,6 +45,7 @@ services:
 
 networks:
   beauty_care_network:
+    name: beauty_care_network
 
 volumes:
   db_data:
