@@ -6,8 +6,6 @@ services:
     container_name: beauty-care-app-container
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      - db
     networks:
       - beauty_care_network
     ports:
