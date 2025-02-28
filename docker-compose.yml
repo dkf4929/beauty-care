@@ -24,12 +24,11 @@ services:
     container_name: beauty-care-gradle
     build:
       context: .
-      dockerfile: Dockerfile
     volumes:
       - .:/app
     networks:
       - beauty_care_network
-    command: ["gradle", "clean", "build", "--no-daemon"]
+    command: ["gradle", "clean", "build", "test", "--no-daemon"]  # 빌드와 테스트를 동시에 실행
 
   app:
     image: beauty-care-app
@@ -43,6 +42,8 @@ services:
       - beauty_care_network
     ports:
       - 8080:8080
+    volumes:
+      - ./build/libs:/app/libs  # Gradle 빌드 결과로 생성된 .jar 파일을 app 컨테이너로 복사
 
 networks:
   beauty_care_network:

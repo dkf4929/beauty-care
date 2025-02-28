@@ -35,13 +35,7 @@ pipeline {
             }
         }
 
-        stage('도커 빌드') {
-            steps {
-                sh 'cd beauty-care && docker build -t beauty-care-app .'
-            }
-        }
-
-        stage('ec2에 docker container 실행') {
+        stage('도커 컨테이너 실행 및 빌드') {
             steps {
                 sshagent([SSH_KEY_ID]) {
                     script {
@@ -49,10 +43,11 @@ pipeline {
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
-                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
                             cd ${DEPLOY_DIR}
-                            docker-compose up -d
-                            docker exec beauty-care-app-container ./gradlew test
+                            # Gradle 빌드와 테스트를 동시에 실행
+                            docker-compose up --build gradle
+                            # 빌드 후 .jar 파일을 app 컨테이너로 복사하고 실행
+                            docker-compose up -d app
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
