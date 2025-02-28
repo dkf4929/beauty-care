@@ -47,14 +47,15 @@ pipeline {
                     script {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
-                        // EC2에서 docker-compose로 Gradle 빌드를 실행하고 앱을 실행
+                        // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
-                                                    cd ${DEPLOY_DIR}
-                                                    docker-compose up --build --force-recreate -d
-                                                    exit 0
-                                                """
-
-                        sh "echo \"${dockerDeployScript}\" | ssh -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
+                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
+                            cd ${DEPLOY_DIR}
+                            docker-compose up -d
+                            docker exec beauty-care-app-container ./gradlew test
+                            exit 0
+                        """
+                        sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
                     }
                 }
             }
