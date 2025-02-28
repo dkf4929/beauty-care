@@ -24,8 +24,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
-                        echo GIT_PASSWORD > git_password.txt
-                        cat git_password.txt
                         rm -rf beauty-care  # 기존 배포 디렉토리를 삭제한다.
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/dkf4929/beauty-care.git beauty-care
                         cd beauty-care
@@ -44,11 +42,11 @@ pipeline {
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
-                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
-                            cd ${DEPLOY_DIR}
-                            docker-compose up -d
-                            exit 0
-                        """
+                                                    docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
+                                                    cd ${DEPLOY_DIR}
+                                                    docker-compose up -d
+                                                    exit 0
+                                                """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
                     }
                 }
