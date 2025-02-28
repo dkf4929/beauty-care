@@ -40,15 +40,12 @@ pipeline {
                 sshagent([SSH_KEY_ID]) {
                     script {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
+                            docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
                             cd ${DEPLOY_DIR}
-                            # Gradle 빌드와 테스트를 동시에 실행
-                            docker-compose up --build gradle
-                            # 빌드 후 .jar 파일을 app 컨테이너로 복사하고 실행
-                            docker-compose up -d app
+                            docker-compose up -d
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
