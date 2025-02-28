@@ -37,6 +37,8 @@ services:
 
 networks:
   beauty_care_network:
+    name: beauty_care_network
+    driver: bridge
 
 volumes:
   db_data:
