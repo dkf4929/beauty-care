@@ -33,22 +33,23 @@ pipeline {
             }
         }
 
+        stage('도커 빌드') {
+                steps {
+                    sh 'cd beauty-care && docker build -t beauty-care-app .'
+            }
+        }
+
         stage('도커 컨테이너 실행 및 빌드') {
             steps {
                 sshagent([SSH_KEY_ID]) {
                     script {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/gradlew ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/gradlew.bat ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/settings.gradle ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
-                        sh "scp -o StrictHostKeyChecking=no beauty-care/build.gradle ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
                                                     docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
                                                     cd ${DEPLOY_DIR}
-                                                    docker-compose up -d --build
+                                                    docker-compose up -d
                                                     exit 0
                                                 """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"

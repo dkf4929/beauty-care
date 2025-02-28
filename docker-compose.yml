@@ -20,9 +20,6 @@ services:
       timeout: 5s
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: beauty-care-app
     container_name: beauty-care-app-container
     environment:
