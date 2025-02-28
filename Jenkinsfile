@@ -45,7 +45,7 @@ pipeline {
                         def dockerDeployScript = """#!/bin/bash
                             docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
                             cd ${DEPLOY_DIR}
-                            docker-compose up -d
+                            docker-compose up -d --build
                             exit 0
                         """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
