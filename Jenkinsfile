@@ -41,6 +41,8 @@ pipeline {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
                         sh "scp -o StrictHostKeyChecking=no beauty-care/gradlew ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
                         sh "scp -o StrictHostKeyChecking=no beauty-care/gradlew.bat ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
+                        sh "scp -o StrictHostKeyChecking=no beauty-care/settings.gradle ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
+                        sh "scp -o StrictHostKeyChecking=no beauty-care/build.gradle ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         // EC2에서 Docker Compose로 애플리케이션 실행
                         def dockerDeployScript = """#!/bin/bash
