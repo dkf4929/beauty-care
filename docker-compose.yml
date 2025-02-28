@@ -24,6 +24,7 @@ services:
     container_name: beauty-care-gradle
     build:
       context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/app
     networks:
