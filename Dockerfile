@@ -1,7 +1,6 @@
-FROM openjdk:21
+FROM openjdk:21-alpine
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y gradle
+RUN apk update && apk add gradle
 
 # .jar 파일을 실행하는 명령
 CMD ["java", "-jar", "app.jar"]
