@@ -19,6 +19,18 @@ services:
       retries: 5
       timeout: 5s
 
+  gradle:
+    image: gradle:8.12.1-jdk21
+    container_name: beauty-care-gradle
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    networks:
+      - beauty_care_network
+    command: ["gradle", "clean", "build", "--no-daemon"]
+
   app:
     image: beauty-care-app
     container_name: beauty-care-app-container
