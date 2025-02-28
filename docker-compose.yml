@@ -21,6 +21,9 @@ services:
 
   app:
     image: beauty-care-app
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: beauty-care-app-container
     environment:
       - SPRING_PROFILES_ACTIVE=prod
