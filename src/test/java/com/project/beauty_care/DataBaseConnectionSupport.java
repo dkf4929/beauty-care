@@ -11,15 +11,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ActiveProfiles("test")
 public abstract class DataBaseConnectionSupport {
-    static Network network = Network.newNetwork();
+//    static Network network = Network.newNetwork();
 
     @Container
     static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("beauty_care")
             .withUsername("root")
-            .withPassword("qwer1234")
-            .withNetwork(network)
-            .withNetworkAliases("beauty_care");
+            .withPassword("qwer1234");
 
     @DynamicPropertySource
     public static void overrideProps(DynamicPropertyRegistry dynamicPropertyRegistry) {
