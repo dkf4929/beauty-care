@@ -33,6 +33,12 @@ pipeline {
             }
         }
 
+        stage('Test Docker') {
+            steps {
+                sh 'docker --version'
+            }
+        }
+
         stage('도커 빌드') {
                 steps {
                     sh 'cd beauty-care && docker build -t beauty-care-app .'
