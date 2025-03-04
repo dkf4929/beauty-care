@@ -3,8 +3,9 @@ FROM gradle:8.12.1-jdk21 AS build
 WORKDIR /app
 COPY . .
 
-#RUN gradle clean build --no-daemon
-RUN gradle clean build -x test --no-daemon
+RUN gradle clean build --no-daemon
+#RUN gradle clean build -x test --no-daemon
+
 
 FROM openjdk:21
 WORKDIR /app
