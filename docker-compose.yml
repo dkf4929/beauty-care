@@ -34,7 +34,6 @@ services:
 
 networks:
   beauty_care_network:
-    external: true
     name: beauty_care_network
     driver: bridge
 
