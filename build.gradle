@@ -39,6 +39,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
 	implementation 'com.mysql:mysql-connector-j:9.2.0'
 
+	// https://mvnrepository.com/artifact/com.github.docker-java/docker-java
+	implementation 'com.github.docker-java:docker-java:3.4.1'
 
 	compileOnly 'org.projectlombok:lombok'
 //	runtimeOnly 'com.mysql:mysql-connector-j'
