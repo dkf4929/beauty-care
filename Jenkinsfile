@@ -33,22 +33,28 @@ pipeline {
             }
         }
 
-        stage('Gradle 캐시 삭제 및 빌드') {
-            steps {
-                sh '''
-                    cd beauty-care
-                    rm -rf ~/.gradle/caches
-                    chmod +x ./gradlew
-                    ./gradlew clean build
-                '''
-            }
-        }
-
         stage('도커 빌드') {
-                steps {
-                    sh 'chmod +x ./gradlew'
-                    sh './gradlew clean build'
-                    sh 'cd beauty-care && docker build -t beauty-care-app .'
+            steps {
+                script {
+                    // 도커 빌드를 위한 설정: gradle:8.12.1-jdk21 이미지를 사용하여 빌드 진행
+                    sh """
+                        docker build <<EOF
+                        FROM gradle:8.12.1-jdk21 AS build
+
+                        WORKDIR /app
+                        COPY . .
+
+                        RUN gradle clean build
+
+                        FROM openjdk:21-jdk-alpine
+                        WORKDIR /app
+                        COPY --from=build /app/build/libs/*.jar app.jar
+
+                        CMD ["java", "-jar", "app.jar"]
+                        EOF
+                        -t beauty-care-app .
+                    """
+                }
             }
         }
 
