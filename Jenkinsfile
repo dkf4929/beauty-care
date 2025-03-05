@@ -33,6 +33,20 @@ pipeline {
             }
         }
 
+        stage('접속한 사용자 확인') {
+            steps {
+                script {
+                    // whoami를 사용하여 접속한 사용자 확인
+                    def user = sh(script: 'whoami', returnStdout: true).trim()
+                    echo "현재 접속한 사용자: ${user}"
+
+                    // id 명령어로 사용자 그룹 확인
+                    def userGroups = sh(script: 'id', returnStdout: true).trim()
+                    echo "사용자 그룹: ${userGroups}"
+                }
+            }
+        }
+
         stage('도커 빌드') {
                 steps {
                     sh 'cd beauty-care && docker build -t beauty-care-app .'
