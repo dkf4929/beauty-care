@@ -63,6 +63,8 @@ pipeline {
 
         stage('도커 빌드') {
                 steps {
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew clean build'
                     sh 'cd beauty-care && docker build -t beauty-care-app .'
             }
         }
