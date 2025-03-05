@@ -1,9 +1,10 @@
 pipeline {
     agent {
-            docker {
-                args '-v /var/run/docker.sock:/var/run/docker.sock'  // Docker 소켓 공유
-            }
+        docker {
+            image 'docker:19.03.12'  // Docker 이미지를 지정
+            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Docker 소켓 공유
         }
+    }
 
     triggers {
         githubPush() // main push
