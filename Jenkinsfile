@@ -47,6 +47,20 @@ pipeline {
             }
         }
 
+        stage('도커 환경 확인') {
+            steps {
+                script {
+                    // /var/run/docker.sock에 접근할 수 있는지 확인
+                    def dockerSocketStatus = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
+                    echo "Docker socket 상태: ${dockerSocketStatus}"
+
+                    // Docker 정보 확인 (Docker가 제대로 실행되고 있는지 확인)
+                    def dockerInfo = sh(script: 'docker info', returnStdout: true).trim()
+                    echo "Docker 정보: ${dockerInfo}"
+                }
+            }
+        }
+
         stage('도커 빌드') {
                 steps {
                     sh 'cd beauty-care && docker build -t beauty-care-app .'
