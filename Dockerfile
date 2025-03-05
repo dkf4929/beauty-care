@@ -3,6 +3,10 @@ FROM gradle:8.12.1-jdk21 AS build
 WORKDIR /app
 COPY . .
 
+ENV TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
+STOPSIGNAL SIGKILL
+VOLUME /var/run/docker.sock:/var/run/docker.sock
+
 RUN gradle clean build --no-daemon --info
 #RUN gradle clean build -x test --no-daemon
 
