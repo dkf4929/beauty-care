@@ -33,31 +33,14 @@ pipeline {
             }
         }
 
-        stage('접속한 사용자 확인') {
+        stage('Gradle 캐시 삭제 및 빌드') {
             steps {
-                script {
-                    // whoami를 사용하여 접속한 사용자 확인
-                    def user = sh(script: 'whoami', returnStdout: true).trim()
-                    echo "현재 접속한 사용자: ${user}"
-
-                    // id 명령어로 사용자 그룹 확인
-                    def userGroups = sh(script: 'id', returnStdout: true).trim()
-                    echo "사용자 그룹: ${userGroups}"
-                }
-            }
-        }
-
-        stage('도커 환경 확인') {
-            steps {
-                script {
-                    // /var/run/docker.sock에 접근할 수 있는지 확인
-                    def dockerSocketStatus = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
-                    echo "Docker socket 상태: ${dockerSocketStatus}"
-
-                    // Docker 정보 확인 (Docker가 제대로 실행되고 있는지 확인)
-                    def dockerInfo = sh(script: 'docker info', returnStdout: true).trim()
-                    echo "Docker 정보: ${dockerInfo}"
-                }
+                sh '''
+                    cd beauty-care
+                    rm -rf ~/.gradle/caches
+                    chmod +x ./gradlew
+                    ./gradlew clean build
+                '''
             }
         }
 
