@@ -115,6 +115,7 @@ pipeline {
         GIT_CREDENTIALS_ID = 'git-token'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         DOCKER_HOST = 'unix:///var/run/docker.sock'
+        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk'
     }
 
     agent {
