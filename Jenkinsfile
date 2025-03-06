@@ -57,6 +57,7 @@ pipeline {
                 sshagent([SSH_KEY_ID]) {
                     script {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/docker-compose.yml ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
+                        sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         def dockerDeployScript = """#!/bin/bash
                                                     docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
