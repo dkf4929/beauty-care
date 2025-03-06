@@ -57,11 +57,8 @@ pipeline {
                 sshagent([SSH_KEY_ID]) {
                     script {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
-                                cd ${DEPLOY_DIR}
-                                docker-compose down || true
-                                docker-compose up -d --build
-                            EOF
+                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} 'cd ${DEPLOY_DIR} && docker-compose down'
+                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} 'cd ${DEPLOY_DIR} && docker-compose up -d --build'
                         """
                     }
                 }
