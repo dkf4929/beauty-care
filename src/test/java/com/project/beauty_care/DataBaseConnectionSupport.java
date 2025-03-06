@@ -21,6 +21,7 @@ public abstract class DataBaseConnectionSupport {
             .withUsername("root")
             .withPassword("qwer1234")
             .withNetwork(network)
+            .withEnv("DOCKER_HOST", "unix:///var/run/docker.sock")
             .withNetworkAliases("beauty_care");
 
     @DynamicPropertySource

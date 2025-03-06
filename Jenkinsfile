@@ -17,7 +17,6 @@ pipeline {
         GIT_REPO = 'https://github.com/dkf4929/beauty-care.git'
         GIT_CREDENTIALS_ID = 'git-token'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        DOCKER_HOST = 'unix:///var/run/docker.sock'
     }
 
     stages {
