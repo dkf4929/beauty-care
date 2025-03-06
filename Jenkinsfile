@@ -98,8 +98,14 @@
 //     }
 // }
 pipeline {
+    agent any
+
     triggers {
         githubPush() // main push
+    }
+
+    tools {
+        jdk 'jdk-21'
     }
 
     environment {
@@ -111,19 +117,8 @@ pipeline {
         GIT_CREDENTIALS_ID = 'git-token'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         DOCKER_HOST = 'unix:///var/run/docker.sock'
-        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk'
     }
 
-    agent {
-        docker {
-            image 'gradle:8.12.1-jdk21'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-
-            environment {
-                JAVA_HOME = '/usr/lib/jvm/java-21-openjdk' // Docker 컨테이너에서 JAVA_HOME 설정
-            }
-        }
-    }
     stages {
         stage('메인 브렌치 체크아웃') {
             steps {
