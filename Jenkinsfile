@@ -102,10 +102,6 @@ pipeline {
         githubPush() // main push
     }
 
-    tools {
-        jdk 'jdk-21'
-    }
-
     environment {
         EC2_USER = 'ubuntu'
         EC2_HOST = '52.79.55.156'
@@ -122,6 +118,10 @@ pipeline {
         docker {
             image 'gradle:8.12.1-jdk21'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
+
+            environment {
+                JAVA_HOME = '/usr/lib/jvm/java-21-openjdk' // Docker 컨테이너에서 JAVA_HOME 설정
+            }
         }
     }
     stages {
