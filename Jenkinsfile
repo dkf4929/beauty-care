@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
-                        rm -rf beauty-care  # 기존 배포 디렉토리를 삭제한다.
+                        rm -rf beauty-care  # 기존 디렉토리 삭제
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/dkf4929/beauty-care.git beauty-care
                         cd beauty-care
                         git checkout main
@@ -30,16 +30,51 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Gradle Build') {
             steps {
                 script {
                     sh """
                         cd beauty-care
                         chmod +x ./gradlew
-                        ./gradlew clean build -i
+                        ./gradlew clean build
                     """
                 }
             }
+        }
+
+        stage('JAR 파일 배포') {
+            steps {
+                sshagent([SSH_KEY_ID]) {
+                    sh """
+                        scp -o StrictHostKeyChecking=no beauty-care/build/libs/beauty-care-0.0.1-SNAPSHOT.jar ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/app.jar
+                    """
+                }
+            }
+        }
+
+        stage('EC2에서 컨테이너 실행') {
+            steps {
+                sshagent([SSH_KEY_ID]) {
+                    script {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
+                                cd ${DEPLOY_DIR}
+                                docker-compose down || true
+                                docker-compose up -d --build
+                            EOF
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 배포 성공'
+        }
+        failure {
+            echo '🚨 배포 실패'
         }
     }
 }
