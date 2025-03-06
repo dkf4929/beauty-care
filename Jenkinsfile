@@ -5,10 +5,6 @@ pipeline {
         githubPush() // main push
     }
 
-    tools {
-        jdk 'jdk-21'
-    }
-
     environment {
         EC2_USER = 'ubuntu'
         EC2_HOST = '52.79.55.156'
