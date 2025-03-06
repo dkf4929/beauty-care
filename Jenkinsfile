@@ -6,7 +6,7 @@ pipeline {
     }
 
     tools {
-        jdk ("jdk21")
+        jdk 'jdk-21'
     }
 
     environment {
