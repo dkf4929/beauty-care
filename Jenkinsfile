@@ -33,28 +33,37 @@ pipeline {
             }
         }
 
-        stage('도커 빌드') {
+        stage('접속한 사용자 확인') {
             steps {
                 script {
-                    // 도커 빌드를 위한 설정: gradle:8.12.1-jdk21 이미지를 사용하여 빌드 진행
-                    sh """
-                        docker build <<EOF
-                        FROM gradle:8.12.1-jdk21 AS build
+                    // whoami를 사용하여 접속한 사용자 확인
+                    def user = sh(script: 'whoami', returnStdout: true).trim()
+                    echo "현재 접속한 사용자: ${user}"
 
-                        WORKDIR /app
-                        COPY . .
-
-                        RUN gradle clean build
-
-                        FROM openjdk:21-jdk-alpine
-                        WORKDIR /app
-                        COPY --from=build /app/build/libs/*.jar app.jar
-
-                        CMD ["java", "-jar", "app.jar"]
-                        EOF
-                        -t beauty-care-app .
-                    """
+                    // id 명령어로 사용자 그룹 확인
+                    def userGroups = sh(script: 'id', returnStdout: true).trim()
+                    echo "사용자 그룹: ${userGroups}"
                 }
+            }
+        }
+
+        stage('도커 환경 확인') {
+            steps {
+                script {
+                    // /var/run/docker.sock에 접근할 수 있는지 확인
+                    def dockerSocketStatus = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
+                    echo "Docker socket 상태: ${dockerSocketStatus}"
+
+                    // Docker 정보 확인 (Docker가 제대로 실행되고 있는지 확인)
+                    def dockerInfo = sh(script: 'docker info', returnStdout: true).trim()
+                    echo "Docker 정보: ${dockerInfo}"
+                }
+            }
+        }
+
+        stage('도커 빌드') {
+                steps {
+                    sh 'cd beauty-care && docker build -t beauty-care-app .'
             }
         }
 
