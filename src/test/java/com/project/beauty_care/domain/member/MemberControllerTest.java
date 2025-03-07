@@ -90,52 +90,43 @@ class MemberControllerTest extends ControllerTestSupport {
 
     private static Stream<Arguments> validProvider() {
         return Stream.of(
-                Arguments.of(
-                        new MemberCreateRequest("admin", "qwer1234", "admin"),
-                        new MemberCreateRequest("user", "qwer12345", "user"),
-                        new MemberCreateRequest("user1", "qwer123456", "user1")
-                )
+                Arguments.of(new MemberCreateRequest("admin", "qwer1234", "admin")),
+                Arguments.of(new MemberCreateRequest("user", "qwer12345", "user")),
+                Arguments.of(new MemberCreateRequest("user1", "qwer123456", "user1"))
         );
     }
 
     private static Stream<Arguments> invalidPasswordPatternProvider() {
         return Stream.of(
-                Arguments.of(
-                        // 최소 8글자
-                        new MemberCreateRequest("admin", "12345", "admin"),
-                        // 영문 + 숫자 조합
-                        new MemberCreateRequest("admin", "12345678", "admin"),
-                        // 최대 16글자
-                        new MemberCreateRequest("admin", "12345678123456789", "admin")
-                )
+                // 최소 8글자
+                Arguments.of(new MemberCreateRequest("admin", "12345", "admin")),
+                // 영문 + 숫자 조합
+                Arguments.of(new MemberCreateRequest("admin", "12345678", "admin")),
+                // 최대 16글자
+                Arguments.of(new MemberCreateRequest("admin", "12345678123456789", "admin"))
         );
     }
 
+
     private static Stream<Arguments> emptyFieldProvider() {
         return Stream.of(
-                Arguments.of(
-                        new MemberCreateRequest("", "", "")
-                )
+                Arguments.of(new MemberCreateRequest("", "", ""))
         );
     }
 
     private static Stream<Arguments> invalidLoginIdProvider() {
         return Stream.of(
-                Arguments.of(
-                        // ID 최소 4
-                        new MemberCreateRequest("dd", "qwer1234", "user"),
-                        // ID 최대 10
-                        new MemberCreateRequest("ddddddddddd", "qwer1234", "user")
-                )
+                // ID 최소 4
+                Arguments.of(new MemberCreateRequest("dd", "qwer1234", "user")),
+                // ID 최대 10
+                Arguments.of(new MemberCreateRequest("ddddddddddd", "qwer1234", "user"))
         );
     }
 
     private static Stream<Arguments> invalidNameProvider() {
         return Stream.of(
-                Arguments.of(
-                        new MemberCreateRequest("user", "qwer1234", "d"),
-                        new MemberCreateRequest("user", "qwer1234", "ddddddddddddddddddddd")
-                )
+                Arguments.of(new MemberCreateRequest("user", "qwer1234", "d")),
+                Arguments.of(new MemberCreateRequest("user", "qwer1234", "ddddddddddddddddddddd"))
         );
     }
 }
