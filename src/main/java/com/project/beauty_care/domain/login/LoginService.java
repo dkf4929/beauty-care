@@ -1,13 +1,12 @@
 package com.project.beauty_care.domain.login;
 
-import com.project.beauty_care.domain.login.dto.LoginRequestDto;
+import com.project.beauty_care.domain.login.dto.LoginRequest;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,9 @@ public class LoginService {
     private final MemberRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public AppUser login(LoginRequestDto loginRequestDto) {
-        String loginId = loginRequestDto.getLoginId();
-        String password = loginRequestDto.getPassword();
+    public AppUser login(LoginRequest loginRequest) {
+        String loginId = loginRequest.getLoginId();
+        String password = loginRequest.getPassword();
 
         // 회원 검색
         Member findMember = repository.findByLoginId(loginId)

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LoginRequestDto {
+public class LoginRequest {
     @NotNull
     @Schema(description = "로그인 ID", example = "admin")
     private String loginId;
@@ -19,7 +19,7 @@ public class LoginRequestDto {
     private String password;
 
     @Builder
-    public LoginRequestDto(String loginId, String password) {
+    public LoginRequest(String loginId, String password) {
         this.loginId = loginId;
         this.password = password;
     }

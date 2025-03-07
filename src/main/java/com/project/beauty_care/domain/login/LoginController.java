@@ -1,8 +1,8 @@
 package com.project.beauty_care.domain.login;
 
-import com.project.beauty_care.domain.login.dto.LoginRequestDto;
-import com.project.beauty_care.domain.login.dto.LoginResponseDto;
-import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.login.dto.LoginRequest;
+import com.project.beauty_care.domain.login.dto.LoginResponse;
+import com.project.beauty_care.global.ApiRs;
 import com.project.beauty_care.global.enums.SuccessResult;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.JwtTokenDto;
@@ -38,7 +38,7 @@ public class LoginController {
                     description = "로그인 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponseDto.class)
+                            schema = @Schema(implementation = LoginResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
@@ -58,9 +58,9 @@ public class LoginController {
                     schema = @Schema(example = "{ \"result\": \"1\", \"code\": \"9999\", \"message\": \"INTERNAL SERVER ERROR\" }"))),
     })
     @PostMapping
-    public com.project.beauty_care.global.ApiResponse<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+    public ApiRs<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         // 로그인 인증 처리
-        AppUser appUser = service.login(loginRequestDto);
+        AppUser appUser = service.login(loginRequest);
 
         // 인증 객체 생성
         Authentication authentication =
@@ -69,16 +69,16 @@ public class LoginController {
         // accessToken 및 refreshToken 생성
         JwtTokenDto jwtTokenDto = jwtTokenProvider.generateToken(authentication);
 
-        LoginResponseDto loginResponseDto = LoginResponseDto.of(
+        LoginResponse loginResponse = LoginResponse.of(
                 jwtTokenDto.getAccessToken(),
                 jwtTokenDto.getAccessTokenExpiresIn(),
                 JwtTokenProvider.TOKEN_TYPE
         );
 
-        return com.project.beauty_care.global.ApiResponse.success(
+        return ApiRs.success(
                 SuccessResult.LOGIN_SUCCESS,
                 HttpStatus.OK,
-                loginResponseDto
+                loginResponse
         );
     }
 }

@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.ControllerTestSupport;
-import com.project.beauty_care.domain.login.dto.LoginRequestDto;
+import com.project.beauty_care.domain.login.dto.LoginRequest;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessResult;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -22,7 +22,7 @@ class LoginControllerTest extends ControllerTestSupport {
     @Test
     void loginTest() throws Exception {
         // given
-        LoginRequestDto request = LoginRequestDto.builder()
+        LoginRequest request = LoginRequest.builder()
                 .loginId("admin")
                 .password("abc123")
                 .build();
@@ -33,7 +33,7 @@ class LoginControllerTest extends ControllerTestSupport {
                 .role(Role.ADMIN.getValue())
                 .build();
 
-        when(loginService.login(any(LoginRequestDto.class))).thenReturn(appUser);
+        when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);
         when(jwtTokenProvider.generateToken(any()))
                 .thenReturn(
                         new JwtTokenDto("accessToken", "ej1234....", 100L)
@@ -51,7 +51,7 @@ class LoginControllerTest extends ControllerTestSupport {
     @DisplayName("로그인할 때 아이디, 비밀번호 필수 입력")
     @Test
     void loginWithoutRequest() throws Exception {
-        LoginRequestDto request = LoginRequestDto.builder()
+        LoginRequest request = LoginRequest.builder()
                 .build();
 
         mockMvc.perform(
