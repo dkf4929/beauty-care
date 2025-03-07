@@ -3,7 +3,6 @@ package com.project.beauty_care.domain.member;
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.global.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,5 +44,4 @@ public class Member extends BaseEntity {
         this.role = role.getValue();
         this.lastLoginDateTime = lastLoginDateTime;
     }
-
 }
