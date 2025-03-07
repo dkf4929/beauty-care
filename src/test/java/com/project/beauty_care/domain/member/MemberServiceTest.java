@@ -3,7 +3,6 @@ package com.project.beauty_care.domain.member;
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.global.enums.UniqueConstraint;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +57,6 @@ class MemberServiceTest extends IntegrationTestSupport {
     }
 
     private MemberCreateRequest createMemberRequest() {
-        return MemberCreateRequest.builder()
-                .loginId("user")
-                .name("user")
-                .password("12345abc")
-                .build();
+        return new MemberCreateRequest("user", "qwer1234", "user");
     }
 }
