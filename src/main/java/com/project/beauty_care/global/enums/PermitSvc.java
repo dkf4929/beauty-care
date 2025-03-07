@@ -11,6 +11,7 @@ public enum PermitSvc {
     SWAGGER_RESOURCE("/swagger-resources/**", "/swagger-resources.*", "swagger resource"),
     SWAGGER_API("/v3/api-docs/**", "/v3/api-docs.*", "swagger api"),
     LOGIN("/login", "", "로그인"),
+    CREATE_MEMBER("/member", "", "회원가입"),
     HEALTH("/health", "", "health check"),
     ;
 
