@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class ErrorResponse {
-    private final ErrorCodes code;
+    private final String code;
     private final String message;
 
     public static ErrorResponse of(Errors errors) {
@@ -21,7 +21,7 @@ public class ErrorResponse {
                 .build();
     }
 
-    public static ErrorResponse of(ErrorCodes code, String message) {
+    public static ErrorResponse of(String code, String message) {
         return ErrorResponse.builder()
                 .code(code)
                 .message(message)

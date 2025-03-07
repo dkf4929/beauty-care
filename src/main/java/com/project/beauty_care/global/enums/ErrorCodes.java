@@ -1,8 +1,10 @@
 package com.project.beauty_care.global.enums;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Getter
 public enum ErrorCodes {
     // jwt
     UNAUTHORIZED_TOKEN_SIGNATURE_INVALID("J001"),
@@ -14,6 +16,9 @@ public enum ErrorCodes {
 
     // DB
     DB_UNSATISFIED_CONSTRAINT("D001"),
+
+    // valid
+    API_REQUEST_INVALID_VALUE("R001")
     ;
 
     private final String errorCode;

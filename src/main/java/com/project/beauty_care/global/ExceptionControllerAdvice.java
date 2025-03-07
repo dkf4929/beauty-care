@@ -10,11 +10,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +28,22 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity handlerCustomException(CustomException e) {
         return handleException(e, e.getErrors());
+    }
+
+    //@Valid, @Validated
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<String> errorMessages = new ArrayList<>();
+
+        e.getBindingResult().getFieldErrors()
+                .stream()
+                .forEach(fieldError -> errorMessages.add(fieldError.getDefaultMessage()));
+
+        ErrorResponse errorResponse = ErrorResponse.of(Errors.BAD_REQUEST_INVALID_VALUE.getErrorCode(), String.join(", ", errorMessages));
+        log.error(e.toString());
+        log.error(Arrays.toString(e.getStackTrace()));
+
+        return ResponseEntity.status(Errors.BAD_REQUEST_INVALID_VALUE.getHttpStatus()).body(errorResponse);
     }
 
     // 제약조건
@@ -50,9 +69,8 @@ public class ExceptionControllerAdvice {
 
     private ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
         String errorMessage = Optional.ofNullable(e.getLocalizedMessage()).orElse(error.getMessage());
-        ErrorCodes errorCode = error.getErrorCode();
         HttpStatus statusCode = error.getHttpStatus();
-        ErrorResponse errorResponse = ErrorResponse.of(errorCode, errorMessage);
+        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), errorMessage);
 
         return ResponseEntity.status(statusCode).body(errorResponse);
     }
