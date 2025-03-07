@@ -5,18 +5,19 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class ApiResponse<T> {
+// 스웨거 어노테이션 중복으로, 명칭 변경
+public class ApiRs<T> {
     private SuccessResult successResult;
     private HttpStatus httpStatus;
     private T data;
 
-    public ApiResponse(SuccessResult successResult, HttpStatus httpStatus, T data) {
+    public ApiRs(SuccessResult successResult, HttpStatus httpStatus, T data) {
         this.successResult = successResult;
         this.httpStatus = httpStatus;
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> success(SuccessResult successResult, HttpStatus httpStatus, T data) {
-        return new ApiResponse<>(successResult, httpStatus, data);
+    public static <T> ApiRs<T> success(SuccessResult successResult, HttpStatus httpStatus, T data) {
+        return new ApiRs<>(successResult, httpStatus, data);
     }
 }
