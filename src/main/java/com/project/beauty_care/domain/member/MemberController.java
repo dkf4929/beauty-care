@@ -1,7 +1,5 @@
 package com.project.beauty_care.domain.member;
 
-import com.project.beauty_care.domain.login.dto.LoginRequest;
-import com.project.beauty_care.domain.login.dto.LoginResponse;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.global.ApiRs;
 import com.project.beauty_care.global.enums.SuccessResult;
@@ -53,7 +51,7 @@ public class MemberController {
                     schema = @Schema(example = "{ \"result\": \"1\", \"code\": \"9999\", \"message\": \"INTERNAL SERVER ERROR\" }"))),
     })
     @PostMapping
-    public ApiRs<Long> login(@Valid @RequestBody MemberCreateRequest request) {
+    public ApiRs<Long> createMember(@Valid @RequestBody MemberCreateRequest request) {
         Member savedMember = service.createMember(request);
         return ApiRs.success(SuccessResult.MEMBER_SAVE_SUCCESS, HttpStatus.OK, savedMember.getId());
     }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.beauty_care.config.TestSecurityConfig;
 import com.project.beauty_care.domain.login.LoginController;
 import com.project.beauty_care.domain.login.LoginService;
+import com.project.beauty_care.domain.member.MemberController;
+import com.project.beauty_care.domain.member.MemberService;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,7 +15,8 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
-        LoginController.class
+        LoginController.class,
+        MemberController.class
 })
 // 컨트롤러 -> security 비활성화
 @SpringJUnitConfig(TestSecurityConfig.class)
@@ -30,4 +33,7 @@ public class ControllerTestSupport {
 
     @MockitoBean
     protected JwtTokenProvider jwtTokenProvider;
+
+    @MockitoBean
+    protected MemberService memberService;
 }
