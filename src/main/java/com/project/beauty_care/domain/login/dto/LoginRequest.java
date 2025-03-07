@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.login.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,11 +11,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class LoginRequest {
-    @NotNull
+    @NotBlank(message = "ID는 필수입니다")
     @Schema(description = "로그인 ID", example = "admin")
     private String loginId;
 
-    @NotNull
+    @NotBlank(message = "비밀번호는 필수입니다")
     @Schema(description = "비밀번호", example = "qwer1234")
     private String password;
 
