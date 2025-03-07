@@ -2,14 +2,18 @@ package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.login.dto.LoginRequest;
+import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessResult;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.JwtTokenDto;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LoginControllerTest extends ControllerTestSupport {
     @DisplayName("ID, PASSWORD를 입력해, 로그인한다.")
     @Test
-    void loginTest() throws Exception {
+    void login() throws Exception {
         // given
         LoginRequest request = LoginRequest.builder()
                 .loginId("admin")
@@ -40,11 +44,10 @@ class LoginControllerTest extends ControllerTestSupport {
                 );
 
         // 로그인 요청 테스트
-        mockMvc.perform(post("/login")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(request)))
+        performLogin(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.successResult").value(SuccessResult.LOGIN_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(SuccessResult.LOGIN_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.code").value(SuccessResult.LOGIN_SUCCESS.getCode()))
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
@@ -54,13 +57,20 @@ class LoginControllerTest extends ControllerTestSupport {
         LoginRequest request = LoginRequest.builder()
                 .build();
 
-        mockMvc.perform(
-                        post("/login")
-                                .content(objectMapper.writeValueAsString(request))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+        performLogin(request)
                 .andDo(print())
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", containsString("비밀번호는 필수입니다")))
+                .andExpect(jsonPath("$.message", containsString("ID는 필수입니다")))
+                .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()));
         ;
+    }
+
+    private ResultActions performLogin(LoginRequest request) throws Exception {
+        return mockMvc.perform(
+                post("/login")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
     }
 }
