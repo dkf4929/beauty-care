@@ -7,8 +7,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum SuccessResult {
     // login
-    LOGIN_SUCCESS(1001, "로그인 성공");
+    LOGIN_SUCCESS("L001", "로그인 성공"),
+    SAVE_SUCCESS("S001", "저장이 완료 되었습니다."),
+    DELETE_SUCCESS("D001", "삭제 되었습니다."),
 
-    private final int code;
+    // member
+    MEMBER_SAVE_SUCCESS("M001", "회원가입이 완료 되었습니다.");
+
+    private final String code;
     private final String message;
 }

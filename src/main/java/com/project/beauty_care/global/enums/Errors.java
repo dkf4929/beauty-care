@@ -18,7 +18,10 @@ public enum Errors {
 
     // jwt
     TOKEN_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED_TOKEN_SIGNATURE_INVALID, "Token Signature Invalid"),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED_TOKEN_EXPIRED, "Token Expired"),;
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED_TOKEN_EXPIRED, "Token Expired"),
+
+    // db
+    DB_UNSATISFIED_CONSTRAINT(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT, "");
 
     private final HttpStatus httpStatus;
     private final ErrorCodes errorCode;

@@ -10,7 +10,11 @@ public enum ErrorCodes {
 
     // 로그인 / 권한
     UNAUTHORIZED("U001"),
-    FORBIDDEN("U002");
+    FORBIDDEN("U002"),
+
+    // DB
+    DB_UNSATISFIED_CONSTRAINT("D001"),
+    ;
 
     private final String errorCode;
 }
