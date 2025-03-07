@@ -1,14 +1,13 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.IntegrationTestSupport;
-import com.project.beauty_care.domain.login.dto.LoginRequestDto;
+import com.project.beauty_care.domain.login.dto.LoginRequest;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.security.dto.AppUser;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Transactional
 class LoginServiceTest extends IntegrationTestSupport {
     @Autowired
-    protected LoginService loginService;
+    private LoginService service;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,24 +28,19 @@ class LoginServiceTest extends IntegrationTestSupport {
     @Autowired
     private MemberRepository memberRepository;
 
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAllInBatch();
-    }
-
     @DisplayName("유효한 아이디와 패스워드를 사용하여 로그인이 성공한다")
     @Test
     void login() {
         //given
         Member member = createMember("admin", Role.ADMIN, "qwer1234", "admin");
 
-        LoginRequestDto request = LoginRequestDto.builder()
+        LoginRequest request = LoginRequest.builder()
                 .loginId("admin")
                 .password("qwer1234")
                 .build();
 
         // when
-        AppUser loginMember = loginService.login(request);
+        AppUser loginMember = service.login(request);
 
         // then
         assertThat(loginMember)
@@ -60,13 +54,13 @@ class LoginServiceTest extends IntegrationTestSupport {
         // given
         final String anonymousLoginId = "anonymousLoginId";
 
-        LoginRequestDto request = LoginRequestDto.builder()
+        LoginRequest request = LoginRequest.builder()
                 .loginId(anonymousLoginId)
                 .password("1234")
                 .build();
 
         // when, then
-        assertThatThrownBy(() -> loginService.login(request))
+        assertThatThrownBy(() -> service.login(request))
                 .isInstanceOf(RequestInvalidException.class)
                 .extracting("errors.message")
                 .isEqualTo(Errors.ANONYMOUS_USER.getMessage());
@@ -77,14 +71,15 @@ class LoginServiceTest extends IntegrationTestSupport {
     void loginWithInvalidPassword() {
         // given
         Member member = createMember("admin", Role.ADMIN, "qwer1234", "admin");
+        final String invalidPassword = "1234";
 
-        LoginRequestDto request = LoginRequestDto.builder()
-                .loginId("admin")
-                .password("1234")
+        LoginRequest request = LoginRequest.builder()
+                .loginId(member.getLoginId())
+                .password(invalidPassword)
                 .build();
 
         // when, then
-        assertThatThrownBy(() -> loginService.login(request))
+        assertThatThrownBy(() -> service.login(request))
                 .isInstanceOf(RequestInvalidException.class)
                 .extracting("errors.message")
                 .isEqualTo(Errors.PASSWORD_MISS_MATCH.getMessage());
