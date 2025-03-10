@@ -16,12 +16,12 @@ class MemberRepositoryTest extends RepositoryTestSupport {
 
     @DisplayName("로그인 아이디와 일치하는 멤버를 조회한다.")
     @Test
-    void findByLoginId() {
+    void findByLoginIdAndIsUseIsTrue() {
         //given
         createMember();
 
         //when
-        Member findMember = repository.findByLoginId("user1")
+        Member findMember = repository.findByLoginIdAndIsUseIsTrue("user1")
                 .orElseThrow(() -> new RequestInvalidException(Errors.ANONYMOUS_USER));
 
         assertThat(findMember)

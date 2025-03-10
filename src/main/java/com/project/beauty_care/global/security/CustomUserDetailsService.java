@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        Member member = repository.findByLoginId(loginId)
+        Member member = repository.findByLoginIdAndIsUseIsTrue(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException("등록된 사용자가 아닙니다."));
 
         // 인증용 객체로 변환

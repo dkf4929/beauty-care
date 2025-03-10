@@ -22,7 +22,10 @@ public enum Errors {
 
     // db
     DB_UNSATISFIED_CONSTRAINT(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT.getErrorCode(), ""),
-    BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "요청 값이 잘못되었습니다.");
+    BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "요청 값이 잘못되었습니다."),
+
+    // NOT FOUND ENTITY
+    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

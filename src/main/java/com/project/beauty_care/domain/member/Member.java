@@ -30,6 +30,8 @@ public class Member extends BaseEntity {
 
     private String role;
 
+    private Boolean isUse;
+
     private LocalDateTime lastLoginDateTime;
 
     public void updateLastLoginDateTime(LocalDateTime lastLoginDateTime) {
@@ -42,6 +44,9 @@ public class Member extends BaseEntity {
         this.password = password;
         this.name = name;
         this.role = role.getValue();
+        this.isUse = Boolean.TRUE;
         this.lastLoginDateTime = lastLoginDateTime;
     }
+
+    public void deleteMember() {this.isUse = Boolean.FALSE;}
 }

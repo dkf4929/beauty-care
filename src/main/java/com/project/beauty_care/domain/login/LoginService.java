@@ -24,7 +24,7 @@ public class LoginService {
         String password = loginRequest.getPassword();
 
         // 회원 검색
-        Member findMember = repository.findByLoginId(loginId)
+        Member findMember = repository.findByLoginIdAndIsUseIsTrue(loginId)
                 .orElseThrow(() -> new RequestInvalidException(Errors.ANONYMOUS_USER));
 
         // 패스워드 일치 여부 검사
