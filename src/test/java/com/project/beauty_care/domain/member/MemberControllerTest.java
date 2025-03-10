@@ -35,7 +35,7 @@ class MemberControllerTest extends ControllerTestSupport {
     @DisplayName("사용자 정보를 입력하지 않고, 회원가입 시도하면, 예외가 발생한다.")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#emptyFieldProvider")
-    void createMemberWithBlankRequest(MemberCreateRequest request) throws Exception {
+    void createMemberWithEmptyRequest(MemberCreateRequest request) throws Exception {
         // when, then
         performPost("/member", request)
                 .andExpect(status().isBadRequest())
