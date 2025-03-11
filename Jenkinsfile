@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
-                        rm -rf beauty-care  # 기존 디렉토리 삭제
+                        rm -rf beauty-care
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/dkf4929/beauty-care.git beauty-care
                         cd beauty-care
                         git checkout main
@@ -60,12 +60,11 @@ pipeline {
                         sh "scp -o StrictHostKeyChecking=no beauty-care/Dockerfile ${EC2_USER}@${EC2_HOST}:${DEPLOY_DIR}/"
 
                         def dockerDeployScript = """#!/bin/bash
-                                                    docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down || true
+                                                    set -e  # 실패 시 즉시 종료
+                                                    docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down
                                                     cd ${DEPLOY_DIR}
                                                     docker-compose up -d --build
-                                                    exit 0
                                                 """
-
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
                     }
                 }
