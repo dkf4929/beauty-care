@@ -2,10 +2,11 @@ package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.UniqueConstraint;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
@@ -95,7 +97,65 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .containsExactly(Errors.NOT_FOUND_MEMBER.getMessage(), Errors.NOT_FOUND_MEMBER.getErrorCode());
     }
 
+    @DisplayName("사용자 조회(ALL)")
+    @Test
+    void findAllMembers() {
+        // given
+        Member member1 = createMember("test1");
+        Member member2 = createMember("test2");
+        Member member3 = createMember("test3");
+
+        repository.saveAll(List.of(member1, member2, member3));
+        // when
+        List<MemberResponse> members = service.findAllMembers();
+
+        // then
+        assertThat(members)
+                .hasSize(3)
+                .extracting("loginId", "name", "role")
+                .containsExactly(
+                        tuple("test1", "test", Role.USER.getValue()),
+                        tuple("test2", "test", Role.USER.getValue()),
+                        tuple("test3", "test", Role.USER.getValue())
+                );
+    }
+
+    @DisplayName("특정 사용자 조회")
+    @Test
+    void findMemberById() {
+        // given
+        Member member = createMember("test");
+        repository.save(member);
+
+        // when
+        MemberResponse findMember = service.findMemberById(member.getId());
+
+        // then
+        assertThat(findMember)
+                .extracting("loginId", "name", "role")
+                .containsExactly(member.getLoginId(), member.getName(), member.getRole());
+    }
+
+    @DisplayName("존재하지 않는 사용자 조회 시, 예외 발생")
+    @Test
+    void findMemberByNotPresentId() {
+        // given, when, then
+        assertThatThrownBy(() -> service.findMemberById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .extracting("errors.message", "errors.errorCode")
+                .containsExactly(Errors.NOT_FOUND_MEMBER.getMessage(), Errors.NOT_FOUND_MEMBER.getErrorCode());
+    }
+
     private MemberCreateRequest createMemberRequest() {
         return new MemberCreateRequest("user", "qwer1234", "user");
+    }
+
+    private Member createMember(String loginId) {
+        return Member.builder()
+                .name("test")
+                .loginId(loginId)
+                .role(Role.USER)
+                .password("qwer1234")
+                .build();
     }
 }
