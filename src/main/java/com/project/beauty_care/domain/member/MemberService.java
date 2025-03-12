@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain.member;
 
+import com.project.beauty_care.domain.mapper.MemberMapper;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.enums.Errors;
@@ -35,30 +36,14 @@ public class MemberService {
         List<Member> memberList = repository.findAll();
 
         return memberList.stream()
-                .map(member -> {
-                    return MemberResponse.builder()
-                            .id(member.getId())
-                            .loginId(member.getLoginId())
-                            .name(member.getName())
-                            .isUse(member.getIsUse())
-                            .lastLoginDateTime(member.getLastLoginDateTime())
-                            .role(member.getRole())
-                            .build();
-                })
+                .map(MemberMapper.INSTANCE::toDto)
                 .toList();
     }
 
     public MemberResponse findMemberById(Long id) {
         Member member = findById(id);
 
-        return MemberResponse.builder()
-                .id(member.getId())
-                .loginId(member.getLoginId())
-                .name(member.getName())
-                .isUse(member.getIsUse())
-                .lastLoginDateTime(member.getLastLoginDateTime())
-                .role(member.getRole())
-                .build();
+        return MemberMapper.INSTANCE.toDto(member);
     }
 
     @Transactional
