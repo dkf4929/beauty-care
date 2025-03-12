@@ -50,7 +50,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 
     @DisplayName("동일한 로그인 아이디로 회원가입 시도하면, 예외 발생")
     @Test
-    void createMemberWithIdenticalPassword() {
+    void createMemberWithIdenticalLoginId() {
         // given
         MemberCreateRequest request = createMemberRequest();
         MemberCreateRequest duplicatedRequest = createMemberRequest();
