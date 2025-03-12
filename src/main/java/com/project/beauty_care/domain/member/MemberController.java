@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.ApiRs;
 import com.project.beauty_care.global.enums.SuccessResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,10 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,5 +54,11 @@ public class MemberController {
     public ApiRs<Long> createMember(@Valid @RequestBody MemberCreateRequest request) {
         Member savedMember = service.createMember(request);
         return ApiRs.success(SuccessResult.MEMBER_SAVE_SUCCESS, HttpStatus.OK, savedMember.getId());
+    }
+
+    @GetMapping
+    public ApiRs<List<MemberResponse>> findAllMembers() {
+        List<MemberResponse> members = service.findAllMembers();
+        return ApiRs.success(SuccessResult.RETRIEVE_SUCCESS, HttpStatus.OK, members);
     }
 }
