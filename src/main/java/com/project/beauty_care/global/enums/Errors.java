@@ -25,7 +25,9 @@ public enum Errors {
     BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "요청 값이 잘못되었습니다."),
 
     // NOT FOUND ENTITY
-    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다.");
+    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다."),
+
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "서버에 오류가 발생했습니다. 관리자에게 문의하세요.");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

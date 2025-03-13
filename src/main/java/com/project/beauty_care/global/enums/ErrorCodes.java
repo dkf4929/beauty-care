@@ -18,7 +18,9 @@ public enum ErrorCodes {
     DB_UNSATISFIED_CONSTRAINT("D001"),
 
     // valid
-    API_REQUEST_INVALID_VALUE("R001")
+    API_REQUEST_INVALID_VALUE("R001"),
+
+    INTERNAL_SERVER_ERROR("S001"),
     ;
 
     private final String errorCode;

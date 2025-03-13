@@ -1,19 +1,22 @@
 package com.project.beauty_care.global;
 
-import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.UniqueConstraint;
 import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.dto.ErrorResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +27,7 @@ import java.util.regex.Pattern;
 
 @RestControllerAdvice
 @Log4j2
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ExceptionControllerAdvice {
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity handlerCustomException(CustomException e) {
@@ -46,8 +50,13 @@ public class ExceptionControllerAdvice {
         return ResponseEntity.status(Errors.BAD_REQUEST_INVALID_VALUE.getHttpStatus()).body(errorResponse);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ErrorResponse> handlerHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return handleException(e, Errors.BAD_REQUEST_INVALID_VALUE);
+    }
+
     // 제약조건
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    @ExceptionHandler(DataIntegrityViolationException.class)
     protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         String constraintName = extractConstraint(e.getMessage());
         Errors errors = Errors.DB_UNSATISFIED_CONSTRAINT;
@@ -67,22 +76,24 @@ public class ExceptionControllerAdvice {
         return ResponseEntity.status(errors.getHttpStatus()).body(errorResponse);
     }
 
-    private ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
-        String errorMessage = Optional.ofNullable(e.getLocalizedMessage()).orElse(error.getMessage());
-        HttpStatus statusCode = error.getHttpStatus();
-        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), errorMessage);
-
-        return ResponseEntity.status(statusCode).body(errorResponse);
-    }
-
     private String extractConstraint(String message) {
         Pattern pattern = Pattern.compile("for key '(.+?)'");
         Matcher matcher = pattern.matcher(message);
 
         if (matcher.find()) {
-            return matcher.group(1);
+            String constraint = matcher.group(1);
+            String[] parts = constraint.split("\\.");
+            return parts[parts.length - 1];
         }
 
         return "";
+    }
+
+    protected ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
+        String errorMessage = Optional.ofNullable(e.getLocalizedMessage()).orElse(error.getMessage());
+        HttpStatus statusCode = error.getHttpStatus();
+        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), errorMessage);
+
+        return ResponseEntity.status(statusCode).body(errorResponse);
     }
 }
