@@ -1,11 +1,10 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.domain.login.dto.LoginRequest;
-import com.project.beauty_care.domain.login.dto.LoginResponse;
-import com.project.beauty_care.global.ApiRs;
-import com.project.beauty_care.global.enums.SuccessResult;
+import com.project.beauty_care.global.SuccessResponse;
+import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
-import com.project.beauty_care.global.security.dto.JwtTokenDto;
+import com.project.beauty_care.global.security.dto.LoginResponse;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,31 +33,31 @@ public class LoginController {
     @Operation(summary = "로그인", description = "아이디와 패스워드를 입력하여 로그인 합니다.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "S001",
                     description = "로그인 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiRs.class)
+                            schema = @Schema(implementation = LoginResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"4002\",\"message\": \"올바른 입력값을 입력하세요.\" }"))),
+                            example = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"))),
             @ApiResponse(responseCode = "401", description = "PASSWORD MISS MATCH", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"1002\", \"message\": \"비밀번호가 일치하지 않습니다.\" }"))),
+                            example = "{ \"code\": \"E003\", \"message\": \"비밀번호가 일치하지 않습니다.\" }"))),
             @ApiResponse(responseCode = "404", description = "ENTITY NOT FOUND", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"2001\", \"message\": \"등록된 회원이 아닙니다.\" }"))),
+                            example = "{ \"code\": \"E006\", \"message\": \"등록된 사용자가 아닙니다.\" }"))),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(example = "{ \"result\": \"1\", \"code\": \"9999\", \"message\": \"INTERNAL SERVER ERROR\" }"))),
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @PostMapping
-    public ApiRs<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public SuccessResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         // 로그인 인증 처리
         AppUser appUser = service.login(loginRequest);
 
@@ -67,16 +66,10 @@ public class LoginController {
                 new UsernamePasswordAuthenticationToken(appUser, appUser.getLoginId(), appUser.getAuthorities());
 
         // accessToken 및 refreshToken 생성
-        JwtTokenDto jwtTokenDto = jwtTokenProvider.generateToken(authentication);
+        LoginResponse loginResponse = jwtTokenProvider.generateToken(authentication);
 
-        LoginResponse loginResponse = LoginResponse.of(
-                jwtTokenDto.getAccessToken(),
-                jwtTokenDto.getAccessTokenExpiresIn(),
-                JwtTokenProvider.TOKEN_TYPE
-        );
-
-        return ApiRs.success(
-                SuccessResult.LOGIN_SUCCESS,
+        return SuccessResponse.success(
+                SuccessCodes.LOGIN_SUCCESS,
                 HttpStatus.OK,
                 loginResponse
         );

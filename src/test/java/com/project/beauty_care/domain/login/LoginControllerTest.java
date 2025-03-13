@@ -4,10 +4,9 @@ import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.login.dto.LoginRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Role;
-import com.project.beauty_care.global.enums.SuccessResult;
+import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
-import com.project.beauty_care.global.security.dto.JwtTokenDto;
-import org.jetbrains.annotations.NotNull;
+import com.project.beauty_care.global.security.dto.LoginResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -40,14 +39,14 @@ class LoginControllerTest extends ControllerTestSupport {
         when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);
         when(jwtTokenProvider.generateToken(any()))
                 .thenReturn(
-                        new JwtTokenDto("accessToken", "ej1234....", 100L)
+                        new LoginResponse("accessToken", "ej1234....", 100L)
                 );
 
         // 로그인 요청 테스트
         performLogin(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessResult.LOGIN_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.code").value(SuccessResult.LOGIN_SUCCESS.getCode()))
+                .andExpect(jsonPath("$.message").value(SuccessCodes.LOGIN_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.code").value(SuccessCodes.LOGIN_SUCCESS.getCode()))
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 

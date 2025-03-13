@@ -3,7 +3,7 @@ package com.project.beauty_care.domain.member;
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
-import com.project.beauty_care.global.enums.SuccessResult;
+import com.project.beauty_care.global.enums.SuccessCodes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,8 +28,8 @@ class MemberControllerTest extends ControllerTestSupport {
         // when, then
         performPost("/member", request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessResult.MEMBER_SAVE_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.code").value(SuccessResult.MEMBER_SAVE_SUCCESS.getCode()));
+                .andExpect(jsonPath("$.message").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.code").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getCode()));
     }
 
     @DisplayName("사용자 정보를 입력하지 않고, 회원가입 시도하면, 예외가 발생한다.")
