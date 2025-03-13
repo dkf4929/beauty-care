@@ -1,7 +1,7 @@
 package com.project.beauty_care.global.security.jwt;
 
 import com.project.beauty_care.global.security.dto.AppUser;
-import com.project.beauty_care.global.security.dto.JwtTokenDto;
+import com.project.beauty_care.global.security.dto.LoginResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public JwtTokenDto generateToken(Authentication authentication) {
+    public LoginResponse generateToken(Authentication authentication) {
         long now = (new Date()).getTime();
 
         // Access Token 생성
@@ -79,7 +79,7 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
-        return JwtTokenDto.builder()
+        return LoginResponse.builder()
                 .grantType(TOKEN_TYPE)
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
