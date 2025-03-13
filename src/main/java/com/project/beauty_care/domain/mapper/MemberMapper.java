@@ -16,9 +16,9 @@ public interface MemberMapper {
     @Mapping(target = "role", source = "role")
     @Mapping(target = "lastLoginDateTime", source = "lastLoginDateTime")
     @Mapping(target = "isUse", source = "isUse")
-    @Mapping(target = "createdDateTime", expression = "java(member.getUpdatedDateTime())")
-    @Mapping(target = "updatedDateTime", expression = "java(member.getUpdatedDateTime())")
-    @Mapping(target = "createdBy", expression = "java(member.getCreatedBy())")
-    @Mapping(target = "updatedBy", expression = "java(member.getUpdatedBy())")
+    @Mapping(target = "createdDateTime", source = "createdDateTime")
+    @Mapping(target = "updatedDateTime", source = "updatedDateTime")
+    @Mapping(target = "createdBy", source = "createdBy")
+    @Mapping(target = "updatedBy", source = "updatedBy")
     MemberResponse toDto(Member member);
 }
