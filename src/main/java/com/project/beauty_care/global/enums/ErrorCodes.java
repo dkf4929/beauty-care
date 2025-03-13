@@ -7,20 +7,20 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum ErrorCodes {
     // jwt
-    UNAUTHORIZED_TOKEN_SIGNATURE_INVALID("J001"),
-    UNAUTHORIZED_TOKEN_EXPIRED("J002"),
+    UNAUTHORIZED_TOKEN_SIGNATURE_INVALID("E001"),
+    UNAUTHORIZED_TOKEN_EXPIRED("E002"),
 
     // 로그인 / 권한
-    UNAUTHORIZED("U001"),
-    FORBIDDEN("U002"),
+    UNAUTHORIZED("E0003"),
+    FORBIDDEN("E0004"),
 
     // DB
-    DB_UNSATISFIED_CONSTRAINT("D001"),
+    DB_UNSATISFIED_CONSTRAINT("E005"),
 
     // valid
-    API_REQUEST_INVALID_VALUE("R001"),
+    API_REQUEST_INVALID_VALUE("E006"),
 
-    INTERNAL_SERVER_ERROR("S001"),
+    INTERNAL_SERVER_ERROR("E007"),
     ;
 
     private final String errorCode;
