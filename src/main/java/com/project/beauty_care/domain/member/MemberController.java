@@ -26,26 +26,18 @@ public class MemberController {
 
     @Operation(summary = "회원가입", description = "사용자 정보를 입력하여 회원가입 합니다.")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "회원가입 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Long.class)
-                    )
-            ),
+            @ApiResponse(responseCode = "200", description = "회원가입 완료", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"message\": \"회원가입이 완료 되었습니다.\", \"code\": \"M001\",\"data\": \"1\" }"))),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"4002\",\"message\": \"올바른 입력값을 입력하세요.\" }"))),
-            @ApiResponse(responseCode = "401", description = "PASSWORD MISS MATCH", content = @Content(
+                            example = "{ \"code\": \"R001\",\"message\": \"Request Invalid Message\" }"))),
+            @ApiResponse(responseCode = "409", description = "Duplicated", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"1002\", \"message\": \"비밀번호가 일치하지 않습니다.\" }"))),
-            @ApiResponse(responseCode = "404", description = "ENTITY NOT FOUND", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            example = "{ \"result\": \"1\", \"code\": \"2001\", \"message\": \"등록된 회원이 아닙니다.\" }"))),
+                            example = "{ \"code\": \"D001\", \"message\": \"이미 존재하는 아이디 입니다.\" }"))),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(example = "{ \"result\": \"1\", \"code\": \"9999\", \"message\": \"INTERNAL SERVER ERROR\" }"))),

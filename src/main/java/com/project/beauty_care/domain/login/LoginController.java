@@ -38,7 +38,7 @@ public class LoginController {
                     description = "로그인 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class)
+                            schema = @Schema(implementation = ApiRs.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
