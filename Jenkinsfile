@@ -64,6 +64,7 @@ pipeline {
                                                     docker-compose -f ${DEPLOY_DIR}/docker-compose.yml down
                                                     cd ${DEPLOY_DIR}
                                                     docker-compose up -d --build
+                                                    docker image prune -af
                                                 """
                         sh "echo \"${dockerDeployScript}\" | ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST}"
                     }
