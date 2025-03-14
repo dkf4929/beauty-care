@@ -27,9 +27,9 @@ class MemberControllerTest extends ControllerTestSupport {
 
         // when, then
         performPost("/member", request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.code").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getCode()));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.successMessage").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.successCode").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getCode()));
     }
 
     @DisplayName("사용자 정보를 입력하지 않고, 회원가입 시도하면, 예외가 발생한다.")

@@ -45,8 +45,8 @@ class LoginControllerTest extends ControllerTestSupport {
         // 로그인 요청 테스트
         performLogin(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessCodes.LOGIN_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.code").value(SuccessCodes.LOGIN_SUCCESS.getCode()))
+                .andExpect(jsonPath("$.successMessage").value(SuccessCodes.LOGIN_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.successCode").value(SuccessCodes.LOGIN_SUCCESS.getCode()))
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
