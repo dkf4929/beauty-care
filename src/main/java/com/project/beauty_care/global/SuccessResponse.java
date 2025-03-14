@@ -6,21 +6,21 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@Schema(name = "ApiResponse", description = "공통 API 응답")
+@Schema(description = "공통 API 응답")
 // 스웨거 어노테이션 중복으로, 명칭 변경
 public class SuccessResponse<T> {
-    @Schema(description = "응답 메시지")
-    private String message;
-
     @Schema(description = "응답 코드")
-    private String code;
+    private int successCode;
 
-    @Schema(description = "응답 데이터")
+    @Schema(description = "응답 메시지")
+    private String successMessage;
+
+    @Schema(description = "응답 데이터", implementation = Object.class)
     private T data;
 
-    public SuccessResponse(SuccessCodes successCodes, HttpStatus httpStatus, T data) {
-        this.message = successCodes.getMessage();
-        this.code = successCodes.getCode();
+    public SuccessResponse(SuccessCodes successCodes, HttpStatus successCode, T data) {
+        this.successMessage = successCodes.getMessage();
+        this.successCode = successCode.value();
         this.data = data;
     }
 

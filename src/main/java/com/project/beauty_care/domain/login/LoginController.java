@@ -17,10 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class LoginController {
     @Operation(summary = "로그인", description = "아이디와 패스워드를 입력하여 로그인 합니다.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "S001",
+                    responseCode = "200",
                     description = "로그인 성공",
                     content = @Content(
                             mediaType = "application/json",
