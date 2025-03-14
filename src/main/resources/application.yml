@@ -1,4 +1,7 @@
 spring:
+  messages:
+    basename: messages
+    encoding: UTF-8
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
   application:
