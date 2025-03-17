@@ -56,7 +56,7 @@ spring:
     defer-datasource-initialization: true
 
 token:
-  access: 31536000000
+  access: 3600000  # 1시간
 
 ---
 spring:
@@ -69,4 +69,4 @@ spring:
 
 
 token:
-  access: 31536000000
+  access: 3600000  # 1시간
