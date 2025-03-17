@@ -19,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "LOGIN REST API", description = "로그인 API")
@@ -63,7 +65,8 @@ public class LoginController {
                 new UsernamePasswordAuthenticationToken(appUser, appUser.getLoginId(), appUser.getAuthorities());
 
         // accessToken 및 refreshToken 생성
-        LoginResponse loginResponse = jwtTokenProvider.generateToken(authentication);
+        LoginResponse loginResponse =
+                jwtTokenProvider.generateToken(authentication, (new Date()).getTime());
 
         return SuccessResponse.success(
                 SuccessCodes.LOGIN_SUCCESS,
