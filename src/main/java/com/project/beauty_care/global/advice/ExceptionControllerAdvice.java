@@ -1,4 +1,4 @@
-package com.project.beauty_care.global;
+package com.project.beauty_care.global.advice;
 
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.UniqueConstraint;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

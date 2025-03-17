@@ -1,4 +1,4 @@
-package com.project.beauty_care.domain.login.dto;
+package com.project.beauty_care.global.login.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

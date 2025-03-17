@@ -1,6 +1,7 @@
-package com.project.beauty_care.domain.login;
+package com.project.beauty_care.global.login.controller;
 
-import com.project.beauty_care.domain.login.dto.LoginRequest;
+import com.project.beauty_care.global.login.service.LoginService;
+import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;

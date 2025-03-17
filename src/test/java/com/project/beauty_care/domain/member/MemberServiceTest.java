@@ -3,6 +3,8 @@ package com.project.beauty_care.domain.member;
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.UniqueConstraint;

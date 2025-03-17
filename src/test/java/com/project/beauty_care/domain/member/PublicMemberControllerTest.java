@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class MemberControllerTest extends ControllerTestSupport {
+class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("사용자 정보를 입력해서, 회원가입 한다.")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#validProvider")

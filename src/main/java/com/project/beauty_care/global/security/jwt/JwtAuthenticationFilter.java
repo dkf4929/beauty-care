@@ -50,7 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isPermitPath(String requestURI) {
-        return Arrays.stream(PermitSvc.toArrayPath())
-                .anyMatch(permitPath -> pathMatcher.match(permitPath, requestURI));
+        return Arrays.stream(PermitSvc.values())
+                .anyMatch(permitSvc -> pathMatcher.match(permitSvc.getRegex(), requestURI) ||
+                        permitSvc.getPath().equals(requestURI));
     }
 }

@@ -1,5 +1,6 @@
-package com.project.beauty_care.domain.member;
+package com.project.beauty_care.domain.member.repository;
 
+import com.project.beauty_care.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

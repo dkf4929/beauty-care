@@ -1,9 +1,10 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.IntegrationTestSupport;
-import com.project.beauty_care.domain.login.dto.LoginRequest;
+import com.project.beauty_care.global.login.service.LoginService;
+import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.MemberRepository;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.RequestInvalidException;

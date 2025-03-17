@@ -1,7 +1,7 @@
 package com.project.beauty_care.global.security;
 
 import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.MemberRepository;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

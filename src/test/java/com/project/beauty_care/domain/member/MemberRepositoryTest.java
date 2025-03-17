@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.RepositoryTestSupport;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.RequestInvalidException;

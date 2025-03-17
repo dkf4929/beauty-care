@@ -1,5 +1,6 @@
-package com.project.beauty_care.global;
+package com.project.beauty_care.global.advice;
 
+import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;

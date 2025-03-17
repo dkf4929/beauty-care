@@ -1,6 +1,8 @@
-package com.project.beauty_care.domain.member;
+package com.project.beauty_care.domain.member.service;
 
 import com.project.beauty_care.domain.mapper.MemberMapper;
+import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.enums.Errors;

@@ -95,7 +95,6 @@ public class SwaggerConfig {
 
         for (Field field : type.getDeclaredFields()) {
             field.setAccessible(true);
-            Schema<Object> objectSchema = new Schema<>();
 
             switch (requestMethod) {
                 case GET:

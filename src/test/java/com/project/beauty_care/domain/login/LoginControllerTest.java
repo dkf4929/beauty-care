@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.ControllerTestSupport;
-import com.project.beauty_care.domain.login.dto.LoginRequest;
+import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;

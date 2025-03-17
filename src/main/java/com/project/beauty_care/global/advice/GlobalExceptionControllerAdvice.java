@@ -1,4 +1,4 @@
-package com.project.beauty_care.global;
+package com.project.beauty_care.global.advice;
 
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.dto.ErrorResponse;

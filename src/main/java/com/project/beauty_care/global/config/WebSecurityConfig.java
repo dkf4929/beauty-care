@@ -41,6 +41,7 @@ public class WebSecurityConfig {
                     auth.requestMatchers("/admin/**").hasAnyRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(PermitSvc.toArrayPath()).permitAll();
+                    auth.requestMatchers(PermitSvc.toRegex()).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .logout(logout -> logout.disable())
