@@ -15,6 +15,7 @@ public enum Errors {
     NOT_LOGIN_USER(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED.getErrorCode(), "로그인 후 진행하세요."),
     PASSWORD_MISS_MATCH(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED.getErrorCode(), "비밀번호가 일치하지 않습니다."),
     ANONYMOUS_USER(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED.getErrorCode(), "가입된 회원이 아닙니다."),
+    NO_AUTHORITY_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "권한이 부여되지 않은 사용자입니다."),
 
     // jwt
     TOKEN_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED_TOKEN_SIGNATURE_INVALID.getErrorCode(), "Token Signature Invalid"),
