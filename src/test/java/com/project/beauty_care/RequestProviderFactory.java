@@ -5,7 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
-public class ControllerRequestProviderFactory {
+public class RequestProviderFactory {
     // MemberController
     public static Stream<Arguments> validProvider() {
         return Stream.of(
@@ -38,6 +38,7 @@ public class ControllerRequestProviderFactory {
         );
     }
 
+    // token test
     public static Stream<Arguments> invalidNameProvider() {
         return Stream.of(
                 Arguments.of(new MemberCreateRequest("user", "qwer1234", "d")),

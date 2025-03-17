@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MemberControllerTest extends ControllerTestSupport {
     @DisplayName("사용자 정보를 입력해서, 회원가입 한다.")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#validProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#validProvider")
     void createMember(MemberCreateRequest request) throws Exception {
         // given
         when(memberService.createMember(any(MemberCreateRequest.class))).thenReturn(new Member());
@@ -34,7 +34,7 @@ class MemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("사용자 정보를 입력하지 않고, 회원가입 시도하면, 예외가 발생한다.")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#emptyFieldProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#emptyFieldProvider")
     void createMemberWithEmptyRequest(MemberCreateRequest request) throws Exception {
         // when, then
         performPost("/member", request)
@@ -48,7 +48,7 @@ class MemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("잘못된 비밀번호 패턴으로 회원가입 시도하면, 예외가 발생한다.")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#invalidPasswordPatternProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidPasswordPatternProvider")
     void createMemberWithInvalidPassword(MemberCreateRequest request) throws Exception {
         // when, then
         performPost("/member", request)
@@ -59,7 +59,7 @@ class MemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("로그인 ID 4~10 자리의 문자")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#invalidLoginIdProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidLoginIdProvider")
     void createMemberWithInvalidLoginId(MemberCreateRequest request) throws Exception {
         // when, then
         performPost("/member", request)
@@ -70,7 +70,7 @@ class MemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("로그인 ID 4~10 자리의 문자")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.ControllerRequestProviderFactory#invalidNameProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidNameProvider")
     void createMemberWithInvalidName(MemberCreateRequest request) throws Exception {
         // when, then
         performPost("/member", request)
