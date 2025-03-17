@@ -1,5 +1,9 @@
 package com.project.beauty_care.global.security.jwt;
 
+import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.enums.Role;
+import com.project.beauty_care.global.exception.NoAuthorityMember;
+import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
 import io.jsonwebtoken.*;
@@ -16,13 +20,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -33,24 +35,17 @@ public class JwtTokenProvider {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String TOKEN_SCHEME = "Bearer ";
     @Value("${token.access}")
-    private String accessTokenProperty;
     private long accessTokenValidTime;
 
     private final Key key;
-
-    @PostConstruct
-    protected void init() {
-        accessTokenValidTime = accessTokenProperty != null ? Long.parseLong(accessTokenProperty) :  60 * 60 * 1000L;
-    }
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public LoginResponse generateToken(Authentication authentication) {
-        long now = (new Date()).getTime();
-
+    public LoginResponse generateToken(Authentication authentication,
+                                       long now) {
         // Access Token 생성
         Date accessTokenExpiresIn = new Date(now + accessTokenValidTime);
 
@@ -61,9 +56,10 @@ public class JwtTokenProvider {
         String authority = appUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
-                .orElseThrow(() -> {
-                    throw new RuntimeException("권한이 부여되지 않은 사용자 입니다.");
-                });
+                .orElseThrow(() -> new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER));
+
+        // 유효한 권한인지 확인
+        checkAuthority(authority);
 
         // accessToken 생성
         String accessToken = Jwts.builder()
@@ -118,14 +114,17 @@ public class JwtTokenProvider {
             return Boolean.TRUE;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
+            throw e;
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
+            throw new TokenExpiredException(Errors.TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
+            throw e;
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
+            throw e;
         }
-        return Boolean.FALSE;
     }
 
     // authorizationHeader 에서, 토큰을 추출한다.
@@ -184,5 +183,12 @@ public class JwtTokenProvider {
         }
         private Boolean getClaimValueBoolean(Claims claims) { return claims.get(this.getValue(), Boolean.class); }
 
+    }
+
+    private void checkAuthority(String authority) {
+        Arrays.stream(Role.values())
+                .filter(role -> role.getValue().equals(authority))
+                .findFirst()
+                .orElseThrow(() -> new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER));
     }
 }

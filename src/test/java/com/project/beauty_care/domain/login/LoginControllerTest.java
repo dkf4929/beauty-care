@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,7 +38,7 @@ class LoginControllerTest extends ControllerTestSupport {
                 .build();
 
         when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);
-        when(jwtTokenProvider.generateToken(any()))
+        when(jwtTokenProvider.generateToken(any(), anyLong()))
                 .thenReturn(
                         new LoginResponse("accessToken", "ej1234....", 100L)
                 );
@@ -62,7 +63,6 @@ class LoginControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.message", containsString("비밀번호는 필수입니다")))
                 .andExpect(jsonPath("$.message", containsString("ID는 필수입니다")))
                 .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()));
-        ;
     }
 
     private ResultActions performLogin(LoginRequest request) throws Exception {
