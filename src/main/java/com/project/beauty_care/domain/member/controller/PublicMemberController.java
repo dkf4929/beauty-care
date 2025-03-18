@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequiredArgsConstructor
-@Tag(name = "MEMBER REST API", description = "사용자 API")
+@Tag(name = "MEMBER REST API(FOR PUBLIC)", description = "사용자 API")
 @RequestMapping("/public/member")
+@RequiredArgsConstructor
+@RestController
 public class PublicMemberController {
     private final MemberService service;
 
