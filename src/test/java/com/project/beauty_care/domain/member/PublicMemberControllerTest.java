@@ -26,7 +26,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
         when(memberService.createMember(any(MemberCreateRequest.class))).thenReturn(new Member());
 
         // when, then
-        performPost("/member", request)
+        performPost("/public/member", request)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.successMessage").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.successCode").value(SuccessCodes.MEMBER_SAVE_SUCCESS.getCode()));
@@ -37,7 +37,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @MethodSource("com.project.beauty_care.RequestProviderFactory#emptyFieldProvider")
     void createMemberWithEmptyRequest(MemberCreateRequest request) throws Exception {
         // when, then
-        performPost("/member", request)
+        performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("비밀번호는 필수입니다")))
                 .andExpect(jsonPath("$.message", containsString("비밀번호는 8~16자의 영문 + 숫자 조합이어야 합니다")))
@@ -51,7 +51,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidPasswordPatternProvider")
     void createMemberWithInvalidPassword(MemberCreateRequest request) throws Exception {
         // when, then
-        performPost("/member", request)
+        performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("비밀번호는 8~16자의 영문 + 숫자 조합이어야 합니다"))
                 .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()));
@@ -62,7 +62,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidLoginIdProvider")
     void createMemberWithInvalidLoginId(MemberCreateRequest request) throws Exception {
         // when, then
-        performPost("/member", request)
+        performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("아이디는 4~10자리의 문자 형태로 입력해야 합니다")))
                 .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()));
@@ -73,7 +73,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidNameProvider")
     void createMemberWithInvalidName(MemberCreateRequest request) throws Exception {
         // when, then
-        performPost("/member", request)
+        performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("이름은 2~20자리의 문자 형태로 입력해야 합니다")))
                 .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()));

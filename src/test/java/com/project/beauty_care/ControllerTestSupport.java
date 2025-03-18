@@ -1,25 +1,26 @@
 package com.project.beauty_care;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.beauty_care.config.TestSecurityConfig;
+import com.project.beauty_care.domain.member.controller.AdminMemberController;
+import com.project.beauty_care.domain.member.controller.PublicMemberController;
+import com.project.beauty_care.domain.member.controller.UserMemberController;
+import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.login.controller.LoginController;
 import com.project.beauty_care.global.login.service.LoginService;
-import com.project.beauty_care.domain.member.controller.PublicMemberController;
-import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
         LoginController.class,
-        PublicMemberController.class
+        PublicMemberController.class,
+        UserMemberController.class,
+        AdminMemberController.class
 })
-// 컨트롤러 -> security 비활성화
-@SpringJUnitConfig(TestSecurityConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class ControllerTestSupport {
     @Autowired
