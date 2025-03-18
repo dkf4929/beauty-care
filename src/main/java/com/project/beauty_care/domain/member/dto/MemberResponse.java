@@ -3,12 +3,12 @@ package com.project.beauty_care.domain.member.dto;
 import com.project.beauty_care.domain.dto.BaseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor
 public class MemberResponse extends BaseDto {
     @Schema(description = "사용자 ID", example = "1")
     private Long id;
@@ -27,4 +27,14 @@ public class MemberResponse extends BaseDto {
 
     @Schema(description = "마지막 로그인 시간", example = "2025-01-01 00:00:00")
     private LocalDateTime lastLoginDateTime;
+
+    @Builder
+    public MemberResponse(Long id, String loginId, String name, String role, boolean isUse, LocalDateTime lastLoginDateTime) {
+        this.id = id;
+        this.loginId = loginId;
+        this.name = name;
+        this.role = role;
+        this.isUse = isUse;
+        this.lastLoginDateTime = lastLoginDateTime;
+    }
 }
