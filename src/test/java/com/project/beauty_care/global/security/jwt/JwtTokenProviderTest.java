@@ -85,8 +85,6 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @DisplayName("토큰 만료시간 체크 시나리오")
     @TestFactory
     Collection<DynamicTest> validateTokenDynamicTest() {
-        final long now = System.currentTimeMillis();
-
         return List.of(
                 DynamicTest.dynamicTest("토큰 만료 시 예외가 발생한다(과거 시점)", () -> {
                     // given : expired -> 만료(과거일)
@@ -106,7 +104,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                 // 경계값 test 1
                 DynamicTest.dynamicTest("토큰 만료 +1초 -> 예외 발생", () -> {
                     // given: expired -> 만료 1초 전
-                    final long expired1SecBefore = now - accessTokenValidTime - 1000;
+                    final long expired1SecBefore = System.currentTimeMillis() - accessTokenValidTime - 1000;
 
                     LoginResponse loginResponse = generateToken(expired1SecBefore, Role.USER.getValue());
 
@@ -119,7 +117,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                 // 경계값 test 2
                 DynamicTest.dynamicTest("토큰 만료 시점과 현재 시각 일치 시, 예외 발생", () -> {
                     // given: expired -> 만료시점 동일
-                    final long expiredEquals = now - accessTokenValidTime;
+                    final long expiredEquals = System.currentTimeMillis() - accessTokenValidTime;
 
                     LoginResponse loginResponse = generateToken(expiredEquals, Role.USER.getValue());
 
@@ -132,7 +130,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                 // 정상 : 유효한 토큰 (현재 시간 이후(+1s)의 만료 시간)
                 DynamicTest.dynamicTest("토큰 만료 -1초 -> 정상 case", () -> {
                     // given
-                    long validTime = now - accessTokenValidTime + 1000;
+                    long validTime = System.currentTimeMillis() - accessTokenValidTime + 1000;
 
                     LoginResponse loginResponse = generateToken(validTime, Role.USER.getValue());
 
