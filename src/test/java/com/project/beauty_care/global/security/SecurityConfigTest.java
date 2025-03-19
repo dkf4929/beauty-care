@@ -9,7 +9,8 @@ import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,77 +44,75 @@ public class SecurityConfigTest extends IntegrationTestSupport {
     @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 
-    @DisplayName("어드민 권한으로 모든 사용자 조회")
-    @Test
-    void findAllMembersWithAdminAuthentication() throws Exception {
-        // given
-        when(memberService.findAllMembers())
-                .thenReturn(buildAllMembers());
+    @DisplayName("권한에 따른 멤버 조회 API 호출 시나리오")
+    @TestFactory
+    Collection<DynamicTest> createMemberWithAuthentication() throws Exception {
+        return List.of(
+                DynamicTest.dynamicTest("어드민 권한 => API 호출 성공", () -> {
+                    // given
+                    when(memberService.findAllMembers())
+                            .thenReturn(buildAllMembers());
 
-        when(jwtTokenProvider.resolveToken(any()))
-                .thenReturn("Bearer token");
+                    when(jwtTokenProvider.resolveToken(any()))
+                            .thenReturn("Bearer token");
 
-        when(jwtTokenProvider.validateToken(anyString()))
-                .thenReturn(Boolean.TRUE);
+                    when(jwtTokenProvider.validateToken(anyString()))
+                            .thenReturn(Boolean.TRUE);
 
-        when(jwtTokenProvider.getAuthentication(anyString()))
-                .thenReturn(buildAuthentication("admin", "admin", Role.ADMIN));
+                    when(jwtTokenProvider.getAuthentication(anyString()))
+                            .thenReturn(buildAuthentication("admin", "admin", Role.ADMIN));
 
-        // when, then
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get("/admin/member")
-                )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.successCode").value("200"))
-                .andExpect(jsonPath("$.successMessage").value(RETRIEVE_SUCCESS_MESSAGE))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(2))
-                .andExpect(jsonPath("$.data[0].id").value(1))
-                .andExpect(jsonPath("$.data[1].id").value(2))
-                .andExpect(jsonPath("$.data[0].loginId").value("admin"))
-                .andExpect(jsonPath("$.data[1].loginId").value("user"));
+                    // when, then
+                    mockMvc.perform(
+                                    MockMvcRequestBuilders
+                                            .get("/admin/member")
+                            )
+                            .andDo(print())
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.successCode").value("200"))
+                            .andExpect(jsonPath("$.successMessage").value(RETRIEVE_SUCCESS_MESSAGE))
+                            .andExpect(jsonPath("$.data").isArray())
+                            .andExpect(jsonPath("$.data.length()").value(2))
+                            .andExpect(jsonPath("$.data[0].id").value(1))
+                            .andExpect(jsonPath("$.data[1].id").value(2))
+                            .andExpect(jsonPath("$.data[0].loginId").value("admin"))
+                            .andExpect(jsonPath("$.data[1].loginId").value("user"));
 
-        verify(memberService, times(1)).findAllMembers();
-    }
+                    verify(memberService, times(1)).findAllMembers();
+                }),
+                DynamicTest.dynamicTest("사용자 권한 API 호출 시도 => FORBIDDEN", () -> {
+                    when(jwtTokenProvider.resolveToken(any()))
+                            .thenReturn("Bearer token");
 
-    @DisplayName("사용자 권한으로 API 호출 시도 -> 예외 발생")
-    @Test
-    @WithMockCustomUser(role = "USER")
-    void findAllMembersWithUserAuthentication() throws Exception {
-        when(jwtTokenProvider.resolveToken(any()))
-                .thenReturn("Bearer token");
+                    when(jwtTokenProvider.validateToken(anyString()))
+                            .thenReturn(Boolean.TRUE);
 
-        when(jwtTokenProvider.validateToken(anyString()))
-                .thenReturn(Boolean.TRUE);
+                    when(jwtTokenProvider.getAuthentication(anyString()))
+                            .thenReturn(buildAuthentication("user", "user", Role.USER));
 
-        when(jwtTokenProvider.getAuthentication(anyString()))
-                .thenReturn(buildAuthentication("user", "user", Role.USER));
+                    // when, then
+                    mockMvc.perform(
+                                    MockMvcRequestBuilders
+                                            .get("/admin/member")
+                            )
+                            .andDo(print())
+                            .andExpect(status().isForbidden())
+                            .andExpect(jsonPath("$.code").value(ErrorCodes.FORBIDDEN.getErrorCode()))
+                            .andExpect(jsonPath("$.message").value(Errors.AUTHORITY_NOT.getMessage()));
+                }),
+                DynamicTest.dynamicTest("로그인 하지 않고, API 호출 시도 => UNAUTHORIZED", () -> {
+                    when(jwtTokenProvider.resolveToken(any())).thenReturn(null);
 
-        // when, then
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get("/admin/member")
-                )
-                .andDo(print())
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(ErrorCodes.FORBIDDEN.getErrorCode()))
-                .andExpect(jsonPath("$.message").value(Errors.AUTHORITY_NOT.getMessage()));
-    }
-
-    @DisplayName("로그인 하지 않고, API 호출 시도 -> 예외 발생")
-    @Test
-    void findAllMembersWithNoAuthentication() throws Exception {
-        // when, then
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get("/admin/member")
-                )
-                .andDo(print())
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value(ErrorCodes.UNAUTHORIZED.getErrorCode()))
-                .andExpect(jsonPath("$.message").value(Errors.NOT_LOGIN_USER.getMessage()));
+                    mockMvc.perform(
+                                    MockMvcRequestBuilders
+                                            .get("/admin/member")
+                            )
+                            .andDo(print())
+                            .andExpect(status().isUnauthorized())
+                            .andExpect(jsonPath("$.code").value(ErrorCodes.UNAUTHORIZED.getErrorCode()))
+                            .andExpect(jsonPath("$.message").value(Errors.NOT_LOGIN_USER.getMessage()));
+                })
+        );
     }
 
 
