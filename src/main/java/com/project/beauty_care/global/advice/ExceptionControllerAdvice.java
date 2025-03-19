@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 @Log4j2
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ExceptionControllerAdvice {
+    final String REQUEST_INVALID_MESSAGE = "요청값이 잘못되었습니다.";
+
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity handlerCustomException(CustomException e) {
         return handleException(e, e.getErrors());
@@ -88,9 +90,9 @@ public class ExceptionControllerAdvice {
     }
 
     protected ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
-        String errorMessage = Optional.ofNullable(e.getLocalizedMessage()).orElse(error.getMessage());
+        log.error(e);
         HttpStatus statusCode = error.getHttpStatus();
-        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), errorMessage);
+        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), REQUEST_INVALID_MESSAGE);
 
         return ResponseEntity.status(statusCode).body(errorResponse);
     }

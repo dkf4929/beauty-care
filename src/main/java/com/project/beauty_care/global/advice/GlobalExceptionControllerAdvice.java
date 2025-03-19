@@ -22,6 +22,7 @@ public class GlobalExceptionControllerAdvice {
     }
 
     protected ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
+        log.error(e);
         String errorMessage = Optional.ofNullable(e.getLocalizedMessage()).orElse(error.getMessage());
         HttpStatus statusCode = error.getHttpStatus();
         ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), errorMessage);
