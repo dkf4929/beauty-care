@@ -7,9 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class MemberCreateRequest {
+public class PublicMemberCreateRequest {
     @NotBlank(message = "로그인 ID는 필수입니다")
     @Size(min = 4, max = 10, message = "아이디는 4~10자리의 문자 형태로 입력해야 합니다")
     @Schema(description = "로그인 아이디", example = "user")
@@ -27,4 +26,11 @@ public class MemberCreateRequest {
     @Size(min = 2, max = 20, message = "이름은 2~20자리의 문자 형태로 입력해야 합니다")
     @Schema(description = "사용자명", example = "user")
     private String name;
+
+    @Builder
+    public PublicMemberCreateRequest(String loginId, String password, String name) {
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+    }
 }

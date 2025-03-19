@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.ControllerTestSupport;
-import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +21,9 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("사용자 정보를 입력해서, 회원가입 한다.")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#validProvider")
-    void createMember(MemberCreateRequest request) throws Exception {
+    void createMember(PublicMemberCreateRequest request) throws Exception {
         // given
-        when(memberService.createMember(any(MemberCreateRequest.class))).thenReturn(new Member());
+        when(memberService.createMemberPublic(any())).thenReturn(new Member());
 
         // when, then
         performPost("/public/member", request)
@@ -35,7 +35,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("사용자 정보를 입력하지 않고, 회원가입 시도하면, 예외가 발생한다.")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#emptyFieldProvider")
-    void createMemberWithEmptyRequest(MemberCreateRequest request) throws Exception {
+    void createMemberWithEmptyRequest(PublicMemberCreateRequest request) throws Exception {
         // when, then
         performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
@@ -49,7 +49,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("잘못된 비밀번호 패턴으로 회원가입 시도하면, 예외가 발생한다.")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidPasswordPatternProvider")
-    void createMemberWithInvalidPassword(MemberCreateRequest request) throws Exception {
+    void createMemberWithInvalidPassword(PublicMemberCreateRequest request) throws Exception {
         // when, then
         performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
@@ -60,7 +60,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("로그인 ID 4~10 자리의 문자")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidLoginIdProvider")
-    void createMemberWithInvalidLoginId(MemberCreateRequest request) throws Exception {
+    void createMemberWithInvalidLoginId(PublicMemberCreateRequest request) throws Exception {
         // when, then
         performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
@@ -71,7 +71,7 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @DisplayName("로그인 ID 4~10 자리의 문자")
     @ParameterizedTest
     @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidNameProvider")
-    void createMemberWithInvalidName(MemberCreateRequest request) throws Exception {
+    void createMemberWithInvalidName(PublicMemberCreateRequest request) throws Exception {
         // when, then
         performPost("/public/member", request)
                 .andExpect(status().isBadRequest())
