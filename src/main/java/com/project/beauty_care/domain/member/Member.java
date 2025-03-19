@@ -1,6 +1,8 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.domain.BaseEntity;
+import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +48,24 @@ public class Member extends BaseEntity {
         this.role = role.getValue();
         this.isUse = Boolean.TRUE;
         this.lastLoginDateTime = lastLoginDateTime;
+    }
+
+    public static Member createMember(PublicMemberCreateRequest request, String password) {
+        return Member.builder()
+                .loginId(request.getLoginId())
+                .password(password)
+                .name(request.getName())
+                .role(Role.USER)
+                .build();
+    }
+
+    public static Member createMember(AdminMemberCreateRequest request, String password) {
+        return Member.builder()
+                .loginId(request.getLoginId())
+                .password(password)
+                .name(request.getName())
+                .role(request.getRole())
+                .build();
     }
 
     public void deleteMember() {this.isUse = Boolean.FALSE;}

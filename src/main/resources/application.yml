@@ -17,6 +17,9 @@ springdoc:
 jwt:
   secret: secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey
 
+initial:
+  password: qwer1234
+
 ---
 spring:
   config:

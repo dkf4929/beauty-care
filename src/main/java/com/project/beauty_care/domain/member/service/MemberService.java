@@ -2,13 +2,14 @@ package com.project.beauty_care.domain.member.service;
 
 import com.project.beauty_care.domain.mapper.MemberMapper;
 import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
-import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,16 +21,13 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository repository;
     private final PasswordEncoder passwordEncoder;
+    @Value("${initial.password}")
+    private String initialPassword;
 
     @Transactional
-    public Member createMember(MemberCreateRequest request) {
+    public Member createMemberPublic(PublicMemberCreateRequest request) {
         // dto to entity
-        Member member = Member.builder()
-                .loginId(request.getLoginId())
-                .password(encodePassword(request.getPassword()))
-                .name(request.getName())
-                .role(Role.USER)
-                .build();
+        Member member = Member.createMember(request, encodePassword(request.getPassword()));
 
         return repository.save(member);
     }
@@ -54,6 +52,13 @@ public class MemberService {
 
         // isUse => false
         findMember.deleteMember();
+    }
+
+    @Transactional
+    public Member createMemberAdmin(AdminMemberCreateRequest request) {
+        Member member = Member.createMember(request, encodePassword(initialPassword));
+
+        return repository.save(member);
     }
 
     // 비밀번호 암호화
