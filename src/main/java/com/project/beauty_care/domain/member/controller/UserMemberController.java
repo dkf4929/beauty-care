@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "MEMBER REST API(FOR USER)", description = "사용자 API")
+@Tag(name = "MEMBER REST API FOR USER", description = "사용자 API")
 @RequestMapping("/user/member")
 @RequiredArgsConstructor
 @RestController
@@ -40,6 +40,10 @@ public class UserMemberController {
                     mediaType = "application/json",
                     schema = @Schema(
                             example = "{ \"code\": \"E003\", \"message\": \"가입된 회원이 아닙니다.\" }"))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),

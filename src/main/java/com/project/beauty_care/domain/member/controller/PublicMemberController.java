@@ -1,8 +1,7 @@
 package com.project.beauty_care.domain.member.controller;
 
 import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
+import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
@@ -17,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Tag(name = "MEMBER REST API(FOR PUBLIC)", description = "사용자 API")
+@Tag(name = "MEMBER REST API FOR PUBLIC", description = "사용자 API")
 @RequestMapping("/public/member")
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +25,7 @@ public class PublicMemberController {
 
     @Operation(summary = "회원가입", description = "사용자 정보를 입력하여 회원가입 합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "회원가입 완료", content = @Content(
+            @ApiResponse(responseCode = "201", description = "회원 저장이 완료 되었습니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = Long.class, example = "1"))),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
@@ -45,8 +42,8 @@ public class PublicMemberController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<Long> createMember(@Valid @RequestBody MemberCreateRequest request) {
-        Member savedMember = service.createMember(request);
+    public SuccessResponse<Long> createMember(@Valid @RequestBody PublicMemberCreateRequest request) {
+        Member savedMember = service.createMemberPublic(request);
         return SuccessResponse.success(SuccessCodes.MEMBER_SAVE_SUCCESS, HttpStatus.CREATED, savedMember.getId());
     }
 }

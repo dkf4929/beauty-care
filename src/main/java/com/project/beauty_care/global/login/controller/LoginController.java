@@ -24,7 +24,7 @@ import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "LOGIN REST API", description = "로그인 API")
+@Tag(name = "LOGIN REST API FOR PUBLIC", description = "로그인 API")
 @RequestMapping("/login")
 public class LoginController {
     private final LoginService service;
