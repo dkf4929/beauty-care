@@ -1,7 +1,8 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.IntegrationTestSupport;
-import com.project.beauty_care.domain.member.dto.MemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.domain.member.service.MemberService;
@@ -12,6 +13,7 @@ import com.project.beauty_care.global.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +34,18 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Autowired
     private MemberRepository repository;
 
+    @Value("${initial.password}")
+    private String initialPassword;
+
     @DisplayName("사용자 정보를 입력받아, 회원 가입한다.")
     @Test
-    void createMember() {
+    void createMemberForPublic() {
         // given
-        MemberCreateRequest request = createMemberRequest();
+        PublicMemberCreateRequest request = buildCreatePublicMemberRequest();
         String password = request.getPassword();
 
         // when
-        Member savedMember = service.createMember(request);
+        Member savedMember = service.createMemberPublic(request);
 
         // then
         assertThat(savedMember)
@@ -52,16 +57,16 @@ class MemberServiceTest extends IntegrationTestSupport {
 
     @DisplayName("동일한 로그인 아이디로 회원가입 시도하면, 예외 발생")
     @Test
-    void createMemberWithIdenticalLoginId() {
+    void createMemberPublicWithIdenticalLoginId() {
         // given
-        MemberCreateRequest request = createMemberRequest();
-        MemberCreateRequest duplicatedRequest = createMemberRequest();
+        PublicMemberCreateRequest request = buildCreatePublicMemberRequest();
+        PublicMemberCreateRequest duplicatedRequest = buildCreatePublicMemberRequest();
 
-        service.createMember(request);
+        service.createMemberPublic(request);
 
         // when, then
         // 메시지에 제약조건을 포함하는지 확인
-        assertThatThrownBy(() -> service.createMember(duplicatedRequest))
+        assertThatThrownBy(() -> service.createMemberPublic(duplicatedRequest))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining(UniqueConstraint.UQ_MEMBER_LOGIN_ID.name());
     }
@@ -70,8 +75,8 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Test
     void softDeleteMember() {
         // given
-        MemberCreateRequest request = createMemberRequest();
-        Member member = service.createMember(request);
+        PublicMemberCreateRequest request = buildCreatePublicMemberRequest();
+        Member member = service.createMemberPublic(request);
 
         // isUse => true
         Boolean isUse = member.getIsUse();
@@ -148,8 +153,64 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .containsExactly(Errors.NOT_FOUND_MEMBER.getMessage(), Errors.NOT_FOUND_MEMBER.getErrorCode());
     }
 
-    private MemberCreateRequest createMemberRequest() {
-        return new MemberCreateRequest("user", "qwer1234", "user");
+    @DisplayName("사용자 정보를 입력받아, 사용자를 생성한다.(관리자)")
+    @Test
+    void createMemberForAdmin() {
+        // given, when
+        Member savedMember = saveMember();
+
+        // then
+        assertThat(savedMember)
+                .extracting("loginId", "name", "role", "isUse")
+                .containsExactly(savedMember.getLoginId(), savedMember.getName(), savedMember.getRole(), savedMember.getIsUse());
+    }
+
+    @DisplayName("회원 생성 시, 초기 비밀번호 확인")
+    @Test
+    void initialPasswordCheckWhenMemberCreated() {
+        // given, when
+        Member savedMember = saveMember();
+
+        // then
+        assertTrue(passwordEncoder.matches(initialPassword, savedMember.getPassword()));
+    }
+
+    @DisplayName("동일한 로그인 아이디로 회원가입 시도하면, 예외 발생")
+    @Test
+    void createMemberAdminWithIdenticalLoginId() {
+        // given
+        AdminMemberCreateRequest request = buildCreateAdminMemberRequest();
+        AdminMemberCreateRequest duplicatedRequest = buildCreateAdminMemberRequest();
+
+        service.createMemberAdmin(request);
+
+        // when, then
+        // 메시지에 제약조건을 포함하는지 확인
+        assertThatThrownBy(() -> service.createMemberAdmin(duplicatedRequest))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining(UniqueConstraint.UQ_MEMBER_LOGIN_ID.name());
+    }
+
+    private PublicMemberCreateRequest buildCreatePublicMemberRequest() {
+        return PublicMemberCreateRequest.builder()
+                .loginId("user")
+                .password("qwer1234")
+                .name("user")
+                .build();
+    }
+
+    private Member saveMember() {
+        AdminMemberCreateRequest request = buildCreateAdminMemberRequest();
+        return service.createMemberAdmin(request);
+    }
+
+    private AdminMemberCreateRequest buildCreateAdminMemberRequest() {
+        return AdminMemberCreateRequest.builder()
+                .loginId("user")
+                .isUse(Boolean.TRUE)
+                .role(Role.USER)
+                .name("user")
+                .build();
     }
 
     private Member createMember(String loginId) {
