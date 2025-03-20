@@ -1,6 +1,7 @@
 package com.project.beauty_care;
 
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.Role;
 import org.junit.jupiter.params.provider.Arguments;
@@ -51,6 +52,25 @@ public class RequestProviderFactory {
     public static Stream<Arguments> invalidAdminMemberCreateRequestProvider() {
         return Stream.of(
                 Arguments.of(new AdminMemberCreateRequest("", "", Role.USER, true))
+        );
+    }
+
+    public static Stream<Arguments> invalidAdminMemberUpdateRequestProvider() {
+        AdminMemberUpdateRequest idEmpty = AdminMemberUpdateRequest.builder()
+                .id(null)
+                .role(Role.USER)
+                .isUse(Boolean.TRUE)
+                .build();
+
+        AdminMemberUpdateRequest isUseEmpty = AdminMemberUpdateRequest.builder()
+                .id(1L)
+                .role(Role.USER)
+                .isUse(null)
+                .build();
+
+        return Stream.of(
+                Arguments.of(idEmpty, "사용자 ID를 입력하세요."),
+                Arguments.of(isUseEmpty, "계정 사용 여부를 입력하세요.")
         );
     }
 }

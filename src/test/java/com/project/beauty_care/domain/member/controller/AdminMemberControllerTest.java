@@ -3,11 +3,13 @@ package com.project.beauty_care.domain.member.controller;
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -19,11 +21,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,6 +38,8 @@ class AdminMemberControllerTest extends ControllerTestSupport {
     final String LOGIN_ID_ESSENTIAL = "로그인 ID는 필수입니다";
     final String NAME_ESSENTIAL = "이름은 필수입니다";
     final String NAME_SIZE_INVALID = "이름은 2~20자리의 문자 형태로 입력해야 합니다";
+    final String ID_EMPTY_MESSAGE =  "사용자 ID를 입력하세요.";
+    final String IS_USE_EMPTY_MESSAGE =  "계정 사용 여부를 입력하세요.";
 
     @DisplayName("모든 멤버 조회")
     @Test
@@ -143,7 +149,62 @@ class AdminMemberControllerTest extends ControllerTestSupport {
         );
     }
 
-    private static Member buildMember(String loginId, String name, Role role) {
+    @DisplayName("관리자가 사용자 정보를 수정한다")
+    @Test
+    void updateMember() throws Exception {
+        // given
+        final Long id = 1L;
+        final boolean isUse = Boolean.TRUE;
+        final Role role = Role.USER;
+
+        AdminMemberUpdateRequest request = AdminMemberUpdateRequest.builder()
+                .id(id)
+                .isUse(isUse)
+                .role(role)
+                .build();
+
+        // when, then
+        when(memberService.updateMemberAdmin(any(), any()))
+                .thenReturn(MemberResponse.builder()
+                        .id(id)
+                        .isUse(isUse)
+                        .role(role.getValue())
+                        .build());
+        mockMvc.perform(
+                put("/admin/member")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(id))
+                .andExpect(jsonPath("$.data.isUse").value(isUse))
+                .andExpect(jsonPath("$.data.role").value(role.getValue()));
+    }
+
+    @DisplayName("회원 수정 시나리오")
+    @ParameterizedTest
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidAdminMemberUpdateRequestProvider")
+    void updateMemberWithInvalidRequest(AdminMemberUpdateRequest request, String message) throws Exception {
+        mockMvc.perform(
+                        put("/admin/member")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode()))
+        .andExpect(jsonPath("$.message").value(message));
+    }
+
+    private Map<AdminMemberUpdateRequest, String> createRequestMap(AdminMemberUpdateRequest idEmptyRequest, AdminMemberUpdateRequest isUseEmptyRequest) {
+        return Map.of(
+                idEmptyRequest, ID_EMPTY_MESSAGE,
+                isUseEmptyRequest, IS_USE_EMPTY_MESSAGE
+        );
+    }
+
+    private Member buildMember(String loginId, String name, Role role) {
         return Member.builder()
                 .loginId(loginId)
                 .name(name)
@@ -176,6 +237,14 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 .name(name)
                 .role(role)
                 .isUse(Boolean.TRUE)
+                .build();
+    }
+
+    private AdminMemberUpdateRequest buildUpdateRequest(Long id, Role role, Boolean isUse) {
+        return AdminMemberUpdateRequest.builder()
+                .id(id)
+                .role(role)
+                .isUse(isUse)
                 .build();
     }
 }
