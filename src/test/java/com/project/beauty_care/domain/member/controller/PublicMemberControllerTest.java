@@ -1,8 +1,10 @@
-package com.project.beauty_care.domain.member;
+package com.project.beauty_care.domain.member.controller;
 
 import com.project.beauty_care.ControllerTestSupport;
+import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
+import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +25,8 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     @MethodSource("com.project.beauty_care.RequestProviderFactory#validProvider")
     void createMember(PublicMemberCreateRequest request) throws Exception {
         // given
-        when(memberService.createMemberPublic(any())).thenReturn(new Member());
+        when(memberService.createMemberPublic(any()))
+                .thenReturn(Member.createForTest(1L, "test", "1234", "test", Role.USER));
 
         // when, then
         performPost("/public/member", request)
