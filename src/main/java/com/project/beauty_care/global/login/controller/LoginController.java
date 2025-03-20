@@ -1,9 +1,9 @@
 package com.project.beauty_care.global.login.controller;
 
-import com.project.beauty_care.global.login.service.LoginService;
-import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
+import com.project.beauty_care.global.login.dto.LoginRequest;
+import com.project.beauty_care.global.login.service.LoginService;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
@@ -18,7 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
@@ -44,10 +47,10 @@ public class LoginController {
                     mediaType = "application/json",
                     schema = @Schema(
                             example = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"))),
-            @ApiResponse(responseCode = "401", description = "PASSWORD MISS MATCH", content = @Content(
+            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
-                            example = "{ \"code\": \"E003\", \"message\": \"비밀번호가 일치하지 않습니다.\" }"))),
+                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
             @ApiResponse(responseCode = "404", description = "ENTITY NOT FOUND", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
