@@ -4,16 +4,11 @@ import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.security.WithMockCustomUser;
-import com.project.beauty_care.global.security.dto.AppUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,7 +44,7 @@ class UserMemberControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.data.loginId").value("admin"))
                 .andExpect(jsonPath("$.data.name").value("admin"))
                 .andExpect(jsonPath("$.data.role").value("ROLE_ADMIN"))
-                .andExpect(jsonPath("$.data.use").value(true));
+                .andExpect(jsonPath("$.data.isUse").value(Boolean.TRUE));
     }
 
     @DisplayName("로그인 하지 않고, 사용자 정보 조회 시도 시, 예외가 발생한다.")

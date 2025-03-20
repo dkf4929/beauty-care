@@ -23,7 +23,7 @@ public class MemberResponse extends BaseDto {
     private String role;
 
     @Schema(description = "계정 잠금 여부", example = "false")
-    private boolean isUse;
+    private Boolean isUse;
 
     @Schema(description = "마지막 로그인 시간", example = "2025-01-01 00:00:00")
     private LocalDateTime lastLoginDateTime;
