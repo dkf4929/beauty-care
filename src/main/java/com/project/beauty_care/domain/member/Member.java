@@ -2,6 +2,7 @@ package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.Role;
 import jakarta.persistence.*;
@@ -36,6 +37,12 @@ public class Member extends BaseEntity {
 
     private LocalDateTime lastLoginDateTime;
 
+    // FOR ADMIN
+    public void updateMember(AdminMemberUpdateRequest request) {
+        this.isUse = request.getIsUse();
+        this.role = request.getRole().getValue();
+    }
+
     public void updateLastLoginDateTime(LocalDateTime lastLoginDateTime) {
         this.lastLoginDateTime = lastLoginDateTime;
     }
@@ -48,6 +55,17 @@ public class Member extends BaseEntity {
         this.role = role.getValue();
         this.isUse = Boolean.TRUE;
         this.lastLoginDateTime = lastLoginDateTime;
+    }
+
+    public static Member createForTest(Long id, String loginId, String password, String name, Role role) {
+        Member member = new Member();
+        member.id = id;
+        member.loginId = loginId;
+        member.password = password;
+        member.name = name;
+        member.role = role.getValue();
+
+        return member;
     }
 
     public static Member createMember(PublicMemberCreateRequest request, String password) {
