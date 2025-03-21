@@ -12,40 +12,40 @@ public class RequestProviderFactory {
     // MemberController
     public static Stream<Arguments> validProvider() {
         return Stream.of(
-                Arguments.of(new PublicMemberCreateRequest("admin", "qwer1234", "admin")),
-                Arguments.of(new PublicMemberCreateRequest("user", "qwer12345", "user")),
-                Arguments.of(new PublicMemberCreateRequest("user1", "qwer123456", "user1"))
+                Arguments.of(new PublicMemberCreateRequest("admin", "qwer1234", "qwer1234", "admin")),
+                Arguments.of(new PublicMemberCreateRequest("user", "qwer12345", "qwer12345", "user")),
+                Arguments.of(new PublicMemberCreateRequest("user1", "qwer123456", "qwer123456", "user1"))
         );
     }
 
     public static Stream<Arguments> invalidPasswordPatternProvider() {
         return Stream.of(
-                Arguments.of(new PublicMemberCreateRequest("admin", "12345", "admin")),
-                Arguments.of(new PublicMemberCreateRequest("admin", "12345678", "admin")),
-                Arguments.of(new PublicMemberCreateRequest("admin", "12345678123456789", "admin")),
-                Arguments.of(new PublicMemberCreateRequest("admin", "aa", "admin")),
-                Arguments.of(new PublicMemberCreateRequest("admin", "aaaaaaaa", "admin"))
+                Arguments.of(new PublicMemberCreateRequest("admin", "12345", "qwer1234", "admin")),
+                Arguments.of(new PublicMemberCreateRequest("admin", "12345678", "qwer1234", "admin")),
+                Arguments.of(new PublicMemberCreateRequest("admin", "12345678123456789", "qwer1234", "admin")),
+                Arguments.of(new PublicMemberCreateRequest("admin", "aa", "qwer1234", "admin")),
+                Arguments.of(new PublicMemberCreateRequest("admin", "aaaaaaaa", "qwer1234", "admin"))
         );
     }
 
     public static Stream<Arguments> emptyFieldProvider() {
         return Stream.of(
-                Arguments.of(new PublicMemberCreateRequest("", "", ""))
+                Arguments.of(new PublicMemberCreateRequest("", "", "", ""))
         );
     }
 
     public static Stream<Arguments> invalidLoginIdProvider() {
         return Stream.of(
-                Arguments.of(new PublicMemberCreateRequest("dd", "qwer1234", "user")),
-                Arguments.of(new PublicMemberCreateRequest("ddddddddddd", "qwer1234", "user"))
+                Arguments.of(new PublicMemberCreateRequest("dd", "qwer1234", "qwer1234", "user")),
+                Arguments.of(new PublicMemberCreateRequest("ddddddddddd", "qwer1234", "qwer1234", "user"))
         );
     }
 
     // token test
     public static Stream<Arguments> invalidNameProvider() {
         return Stream.of(
-                Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "d")),
-                Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "ddddddddddddddddddddd"))
+                Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "qwer1234", "d")),
+                Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "qwer1234", "ddddddddddddddddddddd"))
         );
     }
 

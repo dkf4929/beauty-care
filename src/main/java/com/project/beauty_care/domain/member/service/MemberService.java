@@ -2,14 +2,12 @@ package com.project.beauty_care.domain.member.service;
 
 import com.project.beauty_care.domain.mapper.MemberMapper;
 import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
-import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
-import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.*;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
+import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +28,8 @@ public class MemberService {
 
     public Member createMemberPublic(PublicMemberCreateRequest request) {
         // dto to entity
+        validConfirmPassword(request.getPassword(), request.getConfirmPassword());
+
         Member member = Member.createMember(request, encodePassword(request.getPassword()));
 
         return repository.save(member);
@@ -65,6 +65,16 @@ public class MemberService {
         return repository.save(member);
     }
 
+    public MemberResponse updateMemberUser(UserMemberUpdateRequest request) {
+        // 개인정보는 사용자용 API에서 수정한다.
+        validConfirmPassword(request.getPassword(), request.getConfirmPassword());
+
+        Member findMember = findById(request.getId());
+
+        findMember.updateMember(request.getName(), encodePassword(request.getPassword()));
+        return MemberMapper.INSTANCE.toDto(findMember);
+    }
+
     public MemberResponse updateMemberAdmin(AdminMemberUpdateRequest request, AppUser loginUser) {
         // 개인정보는 사용자용 API에서 수정한다.
         checkLoginUserEqualsRequest(request.getId(), loginUser.getMemberId());
@@ -96,5 +106,10 @@ public class MemberService {
     private void checkLoginUserEqualsRequest(Long requestId, Long loginMemberId) {
         if (requestId.equals(loginMemberId))
             throw new IllegalArgumentException("개인정보 수정은 사용자 기능입니다.");
+    }
+
+    private void validConfirmPassword(String password, String confirmPassword) {
+        if (!password.equals(confirmPassword))
+            throw new PasswordMissMatchException(Errors.PASSWORD_MISS_MATCH);
     }
 }

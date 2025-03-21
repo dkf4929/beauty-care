@@ -19,8 +19,16 @@ public class PublicMemberCreateRequest {
             regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,16}$",
             message = "비밀번호는 8~16자의 영문 + 숫자 조합이어야 합니다"
     )
-    @Schema(description = "패스워드", example = "qwer1234")
+    @Schema(description = "비밀번호", example = "qwer1234")
     private String password;
+
+    @NotBlank(message = "비밀번호 확인은 필수입니다")
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,16}$",
+            message = "비밀번호는 8~16자의 영문 + 숫자 조합이어야 합니다"
+    )
+    @Schema(description = "비밀번호 확인", example = "qwer1234")
+    private String confirmPassword;
 
     @NotBlank(message = "이름은 필수입니다")
     @Size(min = 2, max = 20, message = "이름은 2~20자리의 문자 형태로 입력해야 합니다")
@@ -28,9 +36,10 @@ public class PublicMemberCreateRequest {
     private String name;
 
     @Builder
-    public PublicMemberCreateRequest(String loginId, String password, String name) {
+    public PublicMemberCreateRequest(String loginId, String password, String confirmPassword, String name) {
         this.loginId = loginId;
         this.password = password;
+        this.confirmPassword = confirmPassword;
         this.name = name;
     }
 }

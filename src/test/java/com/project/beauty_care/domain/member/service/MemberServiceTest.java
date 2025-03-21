@@ -2,14 +2,15 @@ package com.project.beauty_care.domain.member.service;
 
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
+import com.project.beauty_care.domain.member.dto.UserMemberUpdateRequest;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
+import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +28,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@Transactional
 class MemberServiceTest extends IntegrationTestSupport {
     @Autowired
     private MemberService service;
@@ -51,8 +50,8 @@ class MemberServiceTest extends IntegrationTestSupport {
         // when, then
         assertThatThrownBy(() -> service.softDeleteMember(deleteMemberId))
                 .isInstanceOf(EntityNotFoundException.class)
-                .extracting("errors.message", "errors.errorCode")
-                .containsExactly(Errors.NOT_FOUND_MEMBER.getMessage(), Errors.NOT_FOUND_MEMBER.getErrorCode());
+                .hasFieldOrPropertyWithValue("errors.message", Errors.NOT_FOUND_MEMBER.getMessage())
+                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NOT_FOUND_MEMBER.getErrorCode());
     }
 
     @DisplayName("사용자 조회(ALL)")
@@ -108,8 +107,92 @@ class MemberServiceTest extends IntegrationTestSupport {
         // given, when, then
         assertThatThrownBy(() -> service.findMemberById(1L))
                 .isInstanceOf(EntityNotFoundException.class)
-                .extracting("errors.message", "errors.errorCode")
-                .containsExactly(Errors.NOT_FOUND_MEMBER.getMessage(), Errors.NOT_FOUND_MEMBER.getErrorCode());
+                .hasFieldOrPropertyWithValue("errors.message", Errors.NOT_FOUND_MEMBER.getMessage())
+                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NOT_FOUND_MEMBER.getErrorCode());
+    }
+
+    @DisplayName("회원 저장 시나리오 FOR PUBLIC")
+    @TestFactory
+    Collection<DynamicTest> createMemberForPublic() {
+        return List.of(
+                DynamicTest.dynamicTest("회원 저장(정상 case)", () -> {
+                    // given
+                    final String loginId = "test";
+                    final String password = "1234";
+                    final String confirmPassword = "1234";
+                    final String name = "test";
+
+                    PublicMemberCreateRequest request =
+                            buildPublicMemberCreateRequest(loginId, name, password, confirmPassword);
+
+                    when(repository.save(any()))
+                            .thenReturn(Member.createForTest(1L, loginId, password, name, Role.USER));
+
+                    // when
+                    Member savedMember = service.createMemberPublic(request);
+
+                    // then
+                    assertThat(savedMember)
+                            .extracting("loginId", "name", "password")
+                            .containsExactly(loginId, name, password);
+
+                    // 한번 호출 됐는지 검증
+                    verify(repository, times(1)).save(any());
+                }),
+                DynamicTest.dynamicTest("비밀번호와 비밀번호 확인 불일치 => 예외", () -> {
+                    // given
+                    PublicMemberCreateRequest request =
+                            buildPublicMemberCreateRequest("test", "test", "1234", "12345");
+
+                    // when, then
+                    assertThatThrownBy(() -> service.createMemberPublic(request))
+                            .isInstanceOf(PasswordMissMatchException.class)
+                            .hasFieldOrPropertyWithValue("errors.message", Errors.PASSWORD_MISS_MATCH.getMessage())
+                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
+                })
+        );
+    }
+
+    @DisplayName("회원 수정 시나리오 FOR USER")
+    @TestFactory
+    Collection<DynamicTest> updateMemberForUser() {
+        return List.of(
+                DynamicTest.dynamicTest("정상 시나리오", () -> {
+                    // given
+                    final String name = "test";
+                    final String password = "1234";
+                    final String confirmPassword = "1234";
+                    final Long id = 1L;
+
+                    UserMemberUpdateRequest request = buildUserMemberUpdateRequest(id, name, password, confirmPassword);
+
+                    when(repository.findById(anyLong()))
+                            .thenReturn(
+                                    Optional.of(
+                                            Member.createForTest(id, "test", "1234", "test", Role.USER)
+                                    )
+                            );
+
+                    // when
+                    MemberResponse memberResponse = service.updateMemberUser(request);
+
+                    // then
+                    assertThat(memberResponse)
+                            .isNotNull()
+                            .extracting("id", "name")
+                            .containsExactly(id, name);
+                }),
+                DynamicTest.dynamicTest("비밀번호 불일치 => 예외 발생", () -> {
+                    // given
+                    UserMemberUpdateRequest request = buildUserMemberUpdateRequest(1L, "test", "1234", "12345");
+
+                    // when, then
+                    assertThatThrownBy(() -> service.updateMemberUser(request))
+                            .isInstanceOf(PasswordMissMatchException.class)
+                            .hasFieldOrPropertyWithValue("errors.message", Errors.PASSWORD_MISS_MATCH.getMessage())
+                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
+                })
+        );
     }
 
     @DisplayName("회원 수정 시나리오 FOR ADMIN")
@@ -181,23 +264,6 @@ class MemberServiceTest extends IntegrationTestSupport {
         );
     }
 
-    private PublicMemberCreateRequest buildPublicMemberCreateRequest() {
-        return PublicMemberCreateRequest.builder()
-                .loginId("user")
-                .password("qwer1234")
-                .name("user")
-                .build();
-    }
-
-    private AdminMemberCreateRequest buildAdminMemberCreateRequest() {
-        return AdminMemberCreateRequest.builder()
-                .loginId("user")
-                .isUse(Boolean.TRUE)
-                .role(Role.USER)
-                .name("user")
-                .build();
-    }
-
     private Member createMember(String loginId) {
         return Member.builder()
                 .name("test")
@@ -215,12 +281,33 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .build();
     }
 
+    private UserMemberUpdateRequest buildUserMemberUpdateRequest(Long id, String name, String password, String confirmPassword) {
+        return UserMemberUpdateRequest.builder()
+                .id(id)
+                .name(name)
+                .password(password)
+                .confirmPassword(confirmPassword)
+                .build();
+    }
+
     private AppUser buildAppUser(Long memberId, String loginId, Role role, String name) {
         return AppUser.builder()
                 .memberId(memberId)
                 .loginId(loginId)
                 .role(role.getValue())
                 .name(name)
+                .build();
+    }
+
+    private PublicMemberCreateRequest buildPublicMemberCreateRequest(String loginId,
+                                                                     String name,
+                                                                     String password,
+                                                                     String confirmPassword) {
+        return PublicMemberCreateRequest.builder()
+                .loginId(loginId)
+                .name(name)
+                .password(password)
+                .confirmPassword(confirmPassword)
                 .build();
     }
 }
