@@ -62,8 +62,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
         // then
         assertThatThrownBy(() -> generateToken(new Date().getTime(), role))
                 .isInstanceOf(NoAuthorityMember.class)
-                .extracting("errors.message", "errors.errorCode")
-                .containsExactly(Errors.NO_AUTHORITY_MEMBER.getMessage(), Errors.NO_AUTHORITY_MEMBER.getErrorCode());
+                .hasFieldOrPropertyWithValue("errors.message", Errors.NO_AUTHORITY_MEMBER.getMessage())
+                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NO_AUTHORITY_MEMBER.getErrorCode());
     }
 
     @DisplayName("토큰의 권한 정보가 일치하는지 확인")
@@ -98,8 +98,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
                             .isInstanceOf(TokenExpiredException.class)
-                            .extracting("errors.message", "errors.errorCode")
-                            .containsExactly(Errors.TOKEN_EXPIRED.getMessage(), Errors.TOKEN_EXPIRED.getErrorCode());
+                            .hasFieldOrPropertyWithValue("errors.message", Errors.TOKEN_EXPIRED.getMessage())
+                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.TOKEN_EXPIRED.getErrorCode());
                 }),
                 // 경계값 test 1
                 DynamicTest.dynamicTest("토큰 만료 +1초 -> 예외 발생", () -> {
@@ -111,8 +111,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
                             .isInstanceOf(TokenExpiredException.class)
-                            .extracting("errors.message", "errors.errorCode")
-                            .containsExactly(Errors.TOKEN_EXPIRED.getMessage(), Errors.TOKEN_EXPIRED.getErrorCode());
+                            .hasFieldOrPropertyWithValue("errors.message", Errors.TOKEN_EXPIRED.getMessage())
+                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.TOKEN_EXPIRED.getErrorCode());
                 }),
                 // 경계값 test 2
                 DynamicTest.dynamicTest("토큰 만료 시점과 현재 시각 일치 시, 예외 발생", () -> {
@@ -124,8 +124,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
                             .isInstanceOf(TokenExpiredException.class)
-                            .extracting("errors.message", "errors.errorCode")
-                            .containsExactly(Errors.TOKEN_EXPIRED.getMessage(), Errors.TOKEN_EXPIRED.getErrorCode());
+                            .hasFieldOrPropertyWithValue("errors.message", Errors.TOKEN_EXPIRED.getMessage())
+                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.TOKEN_EXPIRED.getErrorCode());
                 }),
                 // 정상 : 유효한 토큰 (현재 시간 이후(+1s)의 만료 시간)
                 DynamicTest.dynamicTest("토큰 만료 -1초 -> 정상 case", () -> {

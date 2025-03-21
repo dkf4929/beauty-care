@@ -63,8 +63,8 @@ class LoginServiceTest extends IntegrationTestSupport {
         // when, then
         assertThatThrownBy(() -> service.login(request))
                 .isInstanceOf(RequestInvalidException.class)
-                .extracting("errors.message")
-                .isEqualTo(Errors.ANONYMOUS_USER.getMessage());
+                .hasFieldOrPropertyWithValue("errors.message", Errors.ANONYMOUS_USER.getMessage())
+                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.ANONYMOUS_USER.getErrorCode());;
     }
 
     @DisplayName("잘못된 비밀번호로 로그인을 시도할 경우 예외가 발생한다.")
@@ -82,8 +82,8 @@ class LoginServiceTest extends IntegrationTestSupport {
         // when, then
         assertThatThrownBy(() -> service.login(request))
                 .isInstanceOf(RequestInvalidException.class)
-                .extracting("errors.message")
-                .isEqualTo(Errors.PASSWORD_MISS_MATCH.getMessage());
+                .hasFieldOrPropertyWithValue("errors.message", Errors.PASSWORD_MISS_MATCH.getMessage())
+                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
     }
 
     private Member createMember(String loginId, Role role, String password, String name) {
