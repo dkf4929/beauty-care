@@ -5,11 +5,9 @@ import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
-import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -197,13 +195,6 @@ class AdminMemberControllerTest extends ControllerTestSupport {
         .andExpect(jsonPath("$.message").value(message));
     }
 
-    private Map<AdminMemberUpdateRequest, String> createRequestMap(AdminMemberUpdateRequest idEmptyRequest, AdminMemberUpdateRequest isUseEmptyRequest) {
-        return Map.of(
-                idEmptyRequest, ID_EMPTY_MESSAGE,
-                isUseEmptyRequest, IS_USE_EMPTY_MESSAGE
-        );
-    }
-
     private Member buildMember(String loginId, String name, Role role) {
         return Member.builder()
                 .loginId(loginId)
@@ -237,14 +228,6 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 .name(name)
                 .role(role)
                 .isUse(Boolean.TRUE)
-                .build();
-    }
-
-    private AdminMemberUpdateRequest buildUpdateRequest(Long id, Role role, Boolean isUse) {
-        return AdminMemberUpdateRequest.builder()
-                .id(id)
-                .role(role)
-                .isUse(isUse)
                 .build();
     }
 }

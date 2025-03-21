@@ -6,7 +6,6 @@ import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.SuccessResponse;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
 import io.swagger.v3.oas.annotations.Operation;
