@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.member.controller;
 
 import com.project.beauty_care.domain.member.dto.MemberResponse;
+import com.project.beauty_care.domain.member.dto.UserMemberUpdateRequest;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
@@ -11,12 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "MEMBER REST API FOR USER", description = "사용자 API")
 @RequestMapping("/user/member")
@@ -52,5 +52,30 @@ public class UserMemberController {
     public SuccessResponse<MemberResponse> findMemberById(@AuthenticationPrincipal AppUser appUser) {
         MemberResponse response = service.findMemberById(appUser.getMemberId());
         return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, response);
+    }
+
+    @Operation(summary = "사용자 수정",
+            description = "사용자 정보를 수정합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 완료되었습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MemberResponse.class))),
+            @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"))),
+            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
+    })
+    @PutMapping
+    public SuccessResponse<MemberResponse> updateMember(@RequestBody @Valid UserMemberUpdateRequest request) {
+        MemberResponse response = service.updateMemberUser(request);
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, response);
     }
 }

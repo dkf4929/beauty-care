@@ -6,6 +6,7 @@ import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.global.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class Member extends BaseEntity {
     @NotNull
     private String password;
 
-    @NotNull
+    @NotBlank
     private String name;
 
     private String role;
@@ -41,6 +42,12 @@ public class Member extends BaseEntity {
     public void updateMember(AdminMemberUpdateRequest request) {
         this.isUse = request.getIsUse();
         this.role = request.getRole().getValue();
+    }
+
+    // FOR USER
+    public void updateMember(String name, String password) {
+        this.name = name;
+        this.password = password;
     }
 
     public void updateLastLoginDateTime(LocalDateTime lastLoginDateTime) {
