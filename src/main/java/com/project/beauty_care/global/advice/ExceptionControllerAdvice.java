@@ -92,7 +92,7 @@ public class ExceptionControllerAdvice {
     protected ResponseEntity<ErrorResponse> handleException(Exception e, Errors error) {
         log.error(e);
         HttpStatus statusCode = error.getHttpStatus();
-        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), REQUEST_INVALID_MESSAGE);
+        ErrorResponse errorResponse = ErrorResponse.of(error.getErrorCode(), error.getMessage());
 
         return ResponseEntity.status(statusCode).body(errorResponse);
     }
