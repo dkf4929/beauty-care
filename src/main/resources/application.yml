@@ -22,6 +22,9 @@ initial:
 
 ---
 spring:
+  sql:
+    init:
+      mode: never
   config:
     activate:
       on-profile: local
