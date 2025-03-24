@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MemberMapper {
     MemberMapper INSTANCE = Mappers.getMapper(MemberMapper.class);
 
@@ -16,9 +16,9 @@ public interface MemberMapper {
     @Mapping(target = "role", source = "role")
     @Mapping(target = "lastLoginDateTime", source = "lastLoginDateTime")
     @Mapping(target = "isUse", source = "isUse")
-    @Mapping(target = "createdDateTime", source = "createdDateTime")
-    @Mapping(target = "updatedDateTime", source = "updatedDateTime")
     @Mapping(target = "createdBy", source = "createdBy")
     @Mapping(target = "updatedBy", source = "updatedBy")
+    @Mapping(target = "createdDateTime", source = "createdDateTime")
+    @Mapping(target = "updatedDateTime", source = "updatedDateTime")
     MemberResponse toDto(Member member);
 }

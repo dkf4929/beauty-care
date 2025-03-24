@@ -1,11 +1,14 @@
 package com.project.beauty_care.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-public abstract class BaseDto extends BaseTimeDto {
+@SuperBuilder
+public class BaseDto extends BaseTimeDto {
     @Schema(description = "생성자 ID", example = "1")
     private Long createdBy;
 

@@ -1,10 +1,11 @@
 package com.project.beauty_care.domain;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -13,18 +14,11 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 public abstract class BaseTimeEntity {
-    @Column(updatable = false)
+    @Column(updatable = false, name = "created_date_time")
+    @CreatedDate
     private LocalDateTime createdDateTime;
 
+    @LastModifiedDate
+    @Column(name = "updated_date_time")
     private LocalDateTime updatedDateTime;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdDateTime = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedDateTime = LocalDateTime.now();
-    }
 }
