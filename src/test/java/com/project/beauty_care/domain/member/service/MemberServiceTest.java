@@ -58,9 +58,9 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Test
     void findAllMembers() {
         // given
-        Member member1 = createMember("test1");
-        Member member2 = createMember("test2");
-        Member member3 = createMember("test3");
+        Member member1 = buildMember("test1");
+        Member member2 = buildMember("test2");
+        Member member3 = buildMember("test3");
         // when
         when(repository.findAll()).thenReturn(List.of(member1, member2, member3));
 
@@ -264,7 +264,7 @@ class MemberServiceTest extends IntegrationTestSupport {
         );
     }
 
-    private Member createMember(String loginId) {
+    private Member buildMember(String loginId) {
         return Member.builder()
                 .name("test")
                 .loginId(loginId)
