@@ -26,7 +26,12 @@ public enum Errors {
     BAD_REQUEST_INVALID_VALUE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "요청 값이 잘못되었습니다."),
 
     // NOT FOUND ENTITY
-    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다."),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다."),
+    NOT_FOUND_CODE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 코드가 아닙니다."),
+    NOT_FOUND_PARENT_CODE(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "상위 코드를 찾을 수 없습니다."),
+
+    CAN_NOT_DELETE_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "하위코드가 존재하는 경우, 삭제할 수 없습니다."),
+    DUPLICATED_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "중복된 코드 ID가 존재합니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "서버에 오류가 발생했습니다. 관리자에게 문의하세요.");
 
