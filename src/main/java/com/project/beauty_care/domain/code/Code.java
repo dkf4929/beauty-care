@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.code;
 
 import com.project.beauty_care.domain.BaseTimeEntity;
+import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -15,8 +16,13 @@ import java.util.List;
 
 @Entity
 @Getter
-@SQLRestriction("is_use = true")
+//@SQLRestriction("is_use = true")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+                name = "UQ_CODE_UPPER_ID_AND_NAME", columnNames = {"upper_id", "name"}
+        )
+)
 public class Code extends BaseTimeEntity {
     @Id
     private String id;
@@ -56,6 +62,19 @@ public class Code extends BaseTimeEntity {
         this.name = name;
         this.description = description;
         this.sortNumber = sortNumber;
+        this.isUse = isUse;
+    }
+
+    public Code update(AdminCodeUpdateRequest request) {
+        this.name = request.getName();
+        this.description = request.getDescription();
+        this.sortNumber = request.getSortNumber();
+        this.isUse = request.getIsUse();
+        return this;
+    }
+
+    // softDelete
+    public void updateIsUse(Boolean isUse) {
         this.isUse = isUse;
     }
 }
