@@ -21,7 +21,7 @@ class CodeRepositoryTest extends RepositoryTestSupport {
     @Autowired
     private CodeRepository repository;
 
-    @DisplayName("최상위 코드 조회 테스트")
+    @DisplayName("최상위 코드 조회")
     @Test
     void findByParentIsNull() {
         // given
@@ -81,7 +81,9 @@ class CodeRepositoryTest extends RepositoryTestSupport {
 
                     // when
                     repository.save(code);
-                    Code findCode = repository.findById(code.getId()).get();
+
+                    Code findCode = repository.findById(code.getId())
+                            .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_CODE));
 
                     // then
                     assertThat(code)
@@ -116,6 +118,30 @@ class CodeRepositoryTest extends RepositoryTestSupport {
                             .hasMessageContaining(constraint);
                 })
         );
+    }
+
+    @DisplayName("특정 아이디가 존재하는지 확인")
+    @Test
+    void existsById() {
+        // given
+        final String existsId = "sys";
+        final String notExistsId = "sys:agree";
+
+        Code code =
+                buildCode(existsId, "시스템", null, "", 1, Boolean.TRUE);
+
+        repository.save(code);
+
+        // when
+        boolean byExists = repository.existsById(existsId);
+        boolean byNotExists = repository.existsById(notExistsId);
+
+        // then
+        assertThat(byExists)
+                .isTrue();
+
+        assertThat(byNotExists)
+                .isFalse();
     }
 
     private Code buildCode(String id,
