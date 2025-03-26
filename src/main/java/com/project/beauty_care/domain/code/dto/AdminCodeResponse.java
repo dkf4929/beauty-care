@@ -2,12 +2,13 @@ package com.project.beauty_care.domain.code.dto;
 
 import com.project.beauty_care.domain.dto.BaseTimeDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @SuperBuilder
@@ -30,4 +31,17 @@ public class AdminCodeResponse extends BaseTimeDto {
 
     @Schema(description = "사용 여부", example = "true")
     private Boolean isUse;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        AdminCodeResponse that = (AdminCodeResponse) obj;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(sortNumber, that.sortNumber) &&
+                Objects.equals(isUse, that.isUse) &&
+                Objects.equals(children, that.children);
+    }
 }
