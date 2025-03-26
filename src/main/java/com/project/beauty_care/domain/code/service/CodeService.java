@@ -9,7 +9,6 @@ import com.project.beauty_care.domain.mapper.CodeMapper;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.RequestInvalidException;
-import com.project.beauty_care.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
