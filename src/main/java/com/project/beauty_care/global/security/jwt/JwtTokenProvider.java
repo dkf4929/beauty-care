@@ -1,7 +1,8 @@
 package com.project.beauty_care.global.security.jwt;
 
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -9,10 +10,11 @@ import com.project.beauty_care.global.security.dto.LoginResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +22,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
@@ -36,6 +37,9 @@ public class JwtTokenProvider {
     private static final String TOKEN_SCHEME = "Bearer ";
     @Value("${token.access}")
     private long accessTokenValidTime;
+
+    @Autowired
+    private RoleService roleService;
 
     private final Key key;
 
@@ -91,7 +95,7 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        String role = Claim.AUTHORITIES.getClaimValueString(claims);
+        Role role = roleService.findRoleByAuthority(Claim.AUTHORITIES.getClaimValueString(claims));
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = AppUser.builder()
@@ -104,7 +108,7 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(
                 principal,
                 "",
-                List.of(new SimpleGrantedAuthority(role)));
+                List.of(new SimpleGrantedAuthority(role.getRoleName())));
     }
 
     // 토큰 검증
@@ -186,9 +190,6 @@ public class JwtTokenProvider {
     }
 
     private void checkAuthority(String authority) {
-        Arrays.stream(Role.values())
-                .filter(role -> role.getValue().equals(authority))
-                .findFirst()
-                .orElseThrow(() -> new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER));
+        roleService.checkAuthority(authority);
     }
 }

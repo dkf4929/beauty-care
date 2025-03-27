@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.member.dto;
 
-import com.project.beauty_care.global.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -15,14 +14,14 @@ public class AdminMemberUpdateRequest {
     private Long id;
 
     @Schema(description = "권한", example = "USER")
-    private Role role;
+    private String role;
 
     @NotNull(message = "계정 사용 여부를 입력하세요.")
     @Schema(description = "계정 사용 여부", example = "true")
     private Boolean isUse;
 
     @Builder
-    public AdminMemberUpdateRequest(Long id, Role role, Boolean isUse) {
+    public AdminMemberUpdateRequest(Long id, String role, Boolean isUse) {
         this.id = id;
         this.role = role;
         this.isUse = isUse;

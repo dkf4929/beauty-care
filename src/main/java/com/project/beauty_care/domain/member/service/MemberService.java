@@ -4,8 +4,10 @@ import com.project.beauty_care.domain.mapper.MemberMapper;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.*;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.repository.RoleRepository;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -22,6 +24,7 @@ import java.util.List;
 @Transactional
 public class MemberService {
     private final MemberRepository repository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     @Value("${initial.password}")
     private String initialPassword;
@@ -30,7 +33,9 @@ public class MemberService {
         // dto to entity
         validConfirmPassword(request.getPassword(), request.getConfirmPassword());
 
-        Member member = Member.createMember(request, encodePassword(request.getPassword()));
+        Role role = findRoleById(Authentication.ROLE_USER.getName());
+
+        Member member = Member.createMember(request, encodePassword(request.getPassword()), role);
 
         return repository.save(member);
     }
@@ -60,7 +65,9 @@ public class MemberService {
     }
 
     public Member createMemberAdmin(AdminMemberCreateRequest request) {
-        Member member = Member.createMember(request, encodePassword(initialPassword));
+        Role role = findRoleById(request.getRole());
+
+        Member member = Member.createMember(request, encodePassword(initialPassword), role);
 
         return repository.save(member);
     }
@@ -84,7 +91,9 @@ public class MemberService {
         // 관리자 계정은 직접 수정 불가
         checkAdminRole(findMember.getRole());
 
-        findMember.updateMember(request);
+        Role role = findRoleById(request.getRole());
+
+        findMember.updateMember(request, role);
         return MemberMapper.INSTANCE.toDto(findMember);
     }
 
@@ -98,8 +107,13 @@ public class MemberService {
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_MEMBER));
     }
 
-    private void checkAdminRole(String role) {
-        if (role.equals(Role.ADMIN.getValue()))
+    private Role findRoleById(String roleId) {
+        return roleRepository.findById(roleId)
+                .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_ROLE));
+    }
+
+    private void checkAdminRole(Role role) {
+        if (role.getRoleName().equals(Authentication.ROLE_ADMIN.getName()))
             throw new IllegalArgumentException("관리자 권한을 가진 사용자는 수정할 수 없습니다.");
     }
 

@@ -3,7 +3,6 @@ package com.project.beauty_care.domain.login;
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;

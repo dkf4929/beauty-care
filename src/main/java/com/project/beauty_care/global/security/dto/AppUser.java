@@ -1,6 +1,6 @@
 package com.project.beauty_care.global.security.dto;
 
-import com.project.beauty_care.global.enums.Role;
+import com.project.beauty_care.domain.role.Role;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,11 +15,11 @@ public class AppUser implements UserDetails {
     private Long memberId;
     private String loginId;
     private String name;
-    private String role;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.role));
+        return List.of(new SimpleGrantedAuthority(this.role.getRoleName()));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class AppUser implements UserDetails {
     }
 
     @Builder
-    public AppUser(Long memberId, String loginId, String name, String role) {
+    public AppUser(Long memberId, String loginId, String name, Role role) {
         this.memberId = memberId;
         this.loginId = loginId;
         this.name = name;

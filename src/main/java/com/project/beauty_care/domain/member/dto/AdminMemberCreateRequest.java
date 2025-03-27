@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.member.dto;
 
-import com.project.beauty_care.global.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -22,13 +21,13 @@ public class AdminMemberCreateRequest {
     private String name;
 
     @Schema(description = "권한", example = "USER")
-    private Role role;
+    private String role;
 
     @Schema(description = "계정 잠금 여부", example = "false")
     private Boolean isUse;
 
     @Builder
-    public AdminMemberCreateRequest(String loginId, String name, Role role, Boolean isUse) {
+    public AdminMemberCreateRequest(String loginId, String name, String role, Boolean isUse) {
         this.loginId = loginId;
         this.name = name;
         this.role = role;

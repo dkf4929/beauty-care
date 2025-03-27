@@ -8,7 +8,6 @@ import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.UserMemberUpdateRequest;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.security.dto.AppUser;

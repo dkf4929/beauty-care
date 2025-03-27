@@ -2,7 +2,6 @@ package com.project.beauty_care.domain.member.controller;
 
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.security.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

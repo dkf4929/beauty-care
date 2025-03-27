@@ -13,7 +13,7 @@ public interface MemberMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "loginId", source = "loginId")
     @Mapping(target = "name", source = "name")
-    @Mapping(target = "role", source = "role")
+    @Mapping(target = "role", source = "member.role.roleName")
     @Mapping(target = "lastLoginDateTime", source = "lastLoginDateTime")
     @Mapping(target = "isUse", source = "isUse")
     @Mapping(target = "createdBy", source = "createdBy")

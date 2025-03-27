@@ -4,7 +4,7 @@ import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
-import com.project.beauty_care.global.enums.Role;
+import com.project.beauty_care.domain.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,16 +34,18 @@ public class Member extends BaseEntity {
     @NotBlank
     private String name;
 
-    private String role;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     private Boolean isUse;
 
     private LocalDateTime lastLoginDateTime;
 
     // FOR ADMIN
-    public void updateMember(AdminMemberUpdateRequest request) {
+    public void updateMember(AdminMemberUpdateRequest request, Role role) {
         this.isUse = request.getIsUse();
-        this.role = request.getRole().getValue();
+        this.role = role;
     }
 
     // FOR USER
@@ -59,7 +63,7 @@ public class Member extends BaseEntity {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
-        this.role = role.getValue();
+        this.role = role;
         this.isUse = Boolean.TRUE;
         this.lastLoginDateTime = lastLoginDateTime;
     }
@@ -70,26 +74,26 @@ public class Member extends BaseEntity {
         member.loginId = loginId;
         member.password = password;
         member.name = name;
-        member.role = role.getValue();
+        member.role = role;
 
         return member;
     }
 
-    public static Member createMember(PublicMemberCreateRequest request, String password) {
+    public static Member createMember(PublicMemberCreateRequest request, String password, Role role) {
         return Member.builder()
                 .loginId(request.getLoginId())
                 .password(password)
                 .name(request.getName())
-                .role(Role.USER)
+                .role(role)
                 .build();
     }
 
-    public static Member createMember(AdminMemberCreateRequest request, String password) {
+    public static Member createMember(AdminMemberCreateRequest request, String password, Role role) {
         return Member.builder()
                 .loginId(request.getLoginId())
                 .password(password)
                 .name(request.getName())
-                .role(request.getRole())
+                .role(role)
                 .build();
     }
 

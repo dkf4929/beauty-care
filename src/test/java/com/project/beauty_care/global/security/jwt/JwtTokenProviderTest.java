@@ -2,7 +2,6 @@ package com.project.beauty_care.global.security.jwt;
 
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;

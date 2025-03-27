@@ -40,6 +40,8 @@ dependencies {
 	implementation 'com.mysql:mysql-connector-j:9.2.0'
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.0'
+	// https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
 
 
 	compileOnly 'org.projectlombok:lombok'

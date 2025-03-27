@@ -3,7 +3,6 @@ package com.project.beauty_care.domain.member.repository;
 import com.project.beauty_care.RepositoryTestSupport;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.enums.UniqueConstraint;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import org.junit.jupiter.api.DisplayName;

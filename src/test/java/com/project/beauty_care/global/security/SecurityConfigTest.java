@@ -5,7 +5,6 @@ import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.Role;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;

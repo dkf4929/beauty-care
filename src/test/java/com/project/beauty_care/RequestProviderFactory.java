@@ -3,7 +3,6 @@ package com.project.beauty_care;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
-import com.project.beauty_care.global.enums.Role;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
