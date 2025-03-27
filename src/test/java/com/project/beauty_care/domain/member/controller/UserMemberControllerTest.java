@@ -2,6 +2,7 @@ package com.project.beauty_care.domain.member.controller;
 
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.security.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class UserMemberControllerTest extends ControllerTestSupport {
                         .isUse(Boolean.TRUE)
                         .id(1L)
                         .name("admin")
-                        .role(Role.ADMIN.getValue())
+                        .role(Authentication.ADMIN.getName())
                         .loginId("admin")
                         .build());
 
@@ -42,7 +43,7 @@ class UserMemberControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.data.id").value(1))
                 .andExpect(jsonPath("$.data.loginId").value("admin"))
                 .andExpect(jsonPath("$.data.name").value("admin"))
-                .andExpect(jsonPath("$.data.role").value("ROLE_ADMIN"))
+                .andExpect(jsonPath("$.data.role").value("ADMIN"))
                 .andExpect(jsonPath("$.data.isUse").value(Boolean.TRUE));
     }
 

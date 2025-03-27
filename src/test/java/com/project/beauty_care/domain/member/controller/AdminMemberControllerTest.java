@@ -5,6 +5,8 @@ import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -62,12 +65,13 @@ class AdminMemberControllerTest extends ControllerTestSupport {
         // given
         final String loginId = "user";
         final String name = "user";
+        Role role = buildRole(Authentication.USER.getName());
 
-        AdminMemberCreateRequest request = buildCreateRequest(loginId, name, Role.USER);
+        AdminMemberCreateRequest request = buildCreateRequest(loginId, name, Authentication.USER.getName());
 
         // when
         when(memberService.createMemberAdmin(any()))
-                .thenReturn(buildMember(loginId, name, Role.USER));
+                .thenReturn(buildMember(loginId, name, role));
 
         mockMvc.perform(
                         post("/admin/member")
@@ -83,10 +87,12 @@ class AdminMemberControllerTest extends ControllerTestSupport {
     @DisplayName("필수값 미입력 시, 예외 발생")
     @TestFactory
     Collection<DynamicTest> createMemberWithInvalidRequest() throws Exception {
+        final String role = Authentication.USER.getName();
+
         return List.of(
                 DynamicTest.dynamicTest("로그인 ID 미입력 => 예외 발생", () ->
                 {
-                    AdminMemberCreateRequest request = buildCreateRequest("", "user", Role.USER);
+                    AdminMemberCreateRequest request = buildCreateRequest("", "user", role);
 
                     mockMvc.perform(
                                     post("/admin/member")
@@ -101,7 +107,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 }),
                 DynamicTest.dynamicTest("로그인 ID는 4~10자리 문자 형태", () ->
                 {
-                    AdminMemberCreateRequest request = buildCreateRequest("ddd", "user", Role.USER);
+                    AdminMemberCreateRequest request = buildCreateRequest("ddd", "user", role);
 
                     mockMvc.perform(
                                     post("/admin/member")
@@ -115,7 +121,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 }),
                 DynamicTest.dynamicTest("사용자명 미입력 => 예외 발생", () ->
                 {
-                    AdminMemberCreateRequest request = buildCreateRequest("user", "", Role.USER);
+                    AdminMemberCreateRequest request = buildCreateRequest("user", "", role);
 
                     mockMvc.perform(
                                     post("/admin/member")
@@ -130,7 +136,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 }),
                 DynamicTest.dynamicTest("사용자명 2~20자리의 문자 형태", () ->
                 {
-                    AdminMemberCreateRequest request = buildCreateRequest("user", "d", Role.USER);
+                    AdminMemberCreateRequest request = buildCreateRequest("user", "d", role);
 
                     mockMvc.perform(
                                     post("/admin/member")
@@ -151,7 +157,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
         // given
         final Long id = 1L;
         final boolean isUse = Boolean.TRUE;
-        final Role role = Role.USER;
+        final String role = Authentication.USER.getName();
 
         AdminMemberUpdateRequest request = AdminMemberUpdateRequest.builder()
                 .id(id)
@@ -164,7 +170,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 .thenReturn(MemberResponse.builder()
                         .id(id)
                         .isUse(isUse)
-                        .role(role.getValue())
+                        .role(role)
                         .build());
         mockMvc.perform(
                 put("/admin/member")
@@ -175,7 +181,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(id))
                 .andExpect(jsonPath("$.data.isUse").value(isUse))
-                .andExpect(jsonPath("$.data.role").value(role.getValue()));
+                .andExpect(jsonPath("$.data.role").value(role));
     }
 
     @DisplayName("회원 수정 시나리오")
@@ -207,25 +213,32 @@ class AdminMemberControllerTest extends ControllerTestSupport {
                         .isUse(Boolean.TRUE)
                         .id(1L)
                         .name("admin")
-                        .role(Role.ADMIN.getValue())
+                        .role(Authentication.ADMIN.getName())
                         .loginId("admin")
                         .build(),
                 MemberResponse.builder()
                         .isUse(Boolean.TRUE)
                         .id(2L)
                         .name("user")
-                        .role(Role.USER.getValue())
+                        .role(Authentication.USER.getName())
                         .loginId("user")
                         .build()
         );
     }
 
-    private AdminMemberCreateRequest buildCreateRequest(String loginId, String name, Role role) {
+    private AdminMemberCreateRequest buildCreateRequest(String loginId, String name, String role) {
         return AdminMemberCreateRequest.builder()
                 .loginId(loginId)
                 .name(name)
                 .role(role)
                 .isUse(Boolean.TRUE)
+                .build();
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
                 .build();
     }
 }

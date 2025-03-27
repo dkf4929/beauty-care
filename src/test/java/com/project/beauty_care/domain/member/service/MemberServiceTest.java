@@ -7,6 +7,9 @@ import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.UserMemberUpdateRequest;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.repository.RoleRepository;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.PasswordMissMatchException;
@@ -21,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +41,14 @@ class MemberServiceTest extends IntegrationTestSupport {
     @MockitoBean
     private MemberRepository repository;
 
+    @MockitoBean
+    private RoleRepository roleRepository;
+
     @Value("${initial.password}")
     private String initialPassword;
+
+    final Role USER = buildRole(Authentication.USER.getName());
+    final Role ADMIN = buildRole(Authentication.ADMIN.getName());
 
     @DisplayName("존재하지 않는 사용자를 삭제하려고 시도하면, 예외 발생")
     @Test
@@ -57,9 +67,9 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Test
     void findAllMembers() {
         // given
-        Member member1 = buildMember("test1");
-        Member member2 = buildMember("test2");
-        Member member3 = buildMember("test3");
+        Member member1 = buildMember("test1", USER);
+        Member member2 = buildMember("test2", USER);
+        Member member3 = buildMember("test3", USER);
         // when
         when(repository.findAll()).thenReturn(List.of(member1, member2, member3));
 
@@ -70,9 +80,9 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .hasSize(3)
                 .extracting("loginId", "name", "role")
                 .containsExactly(
-                        tuple("test1", "test", Role.USER.getValue()),
-                        tuple("test2", "test", Role.USER.getValue()),
-                        tuple("test3", "test", Role.USER.getValue())
+                        tuple("test1", "test", USER.getRoleName()),
+                        tuple("test2", "test", USER.getRoleName()),
+                        tuple("test3", "test", USER.getRoleName())
                 );
     }
 
@@ -84,11 +94,10 @@ class MemberServiceTest extends IntegrationTestSupport {
         final String loginId = "test";
         final String password = "1234";
         final String name = "test";
-        final Role role = Role.USER;
 
         when(repository.findById(any()))
                 .thenReturn(Optional.of(
-                        Member.createForTest(id, loginId, password, name, role)
+                        Member.createForTest(id, loginId, password, name, USER)
                 ));
 
         // when
@@ -97,7 +106,7 @@ class MemberServiceTest extends IntegrationTestSupport {
         // then
         assertThat(findMember)
                 .extracting("loginId", "name", "role")
-                .containsExactly(loginId, name, role.getValue());
+                .containsExactly(loginId, name, USER.getRoleName());
     }
 
     @DisplayName("존재하지 않는 사용자 조회 시, 예외 발생")
@@ -125,7 +134,10 @@ class MemberServiceTest extends IntegrationTestSupport {
                             buildPublicMemberCreateRequest(loginId, name, password, confirmPassword);
 
                     when(repository.save(any()))
-                            .thenReturn(Member.createForTest(1L, loginId, password, name, Role.USER));
+                            .thenReturn(Member.createForTest(1L, loginId, password, name, USER));
+
+                    when(roleRepository.findById(any()))
+                            .thenReturn(Optional.ofNullable(USER));
 
                     // when
                     Member savedMember = service.createMemberPublic(request);
@@ -168,7 +180,7 @@ class MemberServiceTest extends IntegrationTestSupport {
                     when(repository.findById(anyLong()))
                             .thenReturn(
                                     Optional.of(
-                                            Member.createForTest(id, "test", "1234", "test", Role.USER)
+                                            Member.createForTest(id, "test", "1234", "test", USER)
                                     )
                             );
 
@@ -201,21 +213,23 @@ class MemberServiceTest extends IntegrationTestSupport {
                 DynamicTest.dynamicTest("정상 시나리오", () -> {
                     // given
                     final Long id = 1L;
-                    final Role role = Role.USER;
                     final boolean isUse = true;
 
                     final Long loginMemberId = 2L;
 
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(id, role, isUse);
+                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(id, Authentication.USER.getName(), isUse);
 
                     when(repository.findById(anyLong()))
                             .thenReturn(
                                     Optional.of(
-                                            Member.createForTest(id, "test", "1234", "test", Role.USER)
+                                            Member.createForTest(id, "test", "1234", "test", USER)
                                     )
                             );
 
-                    AppUser appUser = buildAppUser(loginMemberId, "test", Role.ADMIN, "test");
+                    when(roleRepository.findById(any()))
+                            .thenReturn(Optional.ofNullable(ADMIN));
+
+                    AppUser appUser = buildAppUser(loginMemberId, "test", ADMIN, "test");
 
                     // when
                     MemberResponse memberResponse = service.updateMemberAdmin(request, appUser);
@@ -224,7 +238,7 @@ class MemberServiceTest extends IntegrationTestSupport {
                     assertThat(memberResponse)
                             .isNotNull()
                             .extracting("id", "role", "isUse")
-                            .containsExactly(id, role.getValue(), isUse);
+                            .containsExactly(id, ADMIN.getRoleName(), isUse);
                 }),
                 DynamicTest.dynamicTest("관리자 권한의 회원 수정 시도 시, 예외 발생", () -> {
                     // given
@@ -232,11 +246,11 @@ class MemberServiceTest extends IntegrationTestSupport {
 
                     when(repository.findById(anyLong()))
                             .thenReturn(Optional.of(
-                                    Member.createForTest(1L, "test", "1234", "test", Role.ADMIN)
+                                    Member.createForTest(1L, "test", "1234", "test", ADMIN)
                             ));
 
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Role.ADMIN, Boolean.FALSE);
-                    AppUser appUser = buildAppUser(2L, "test", Role.ADMIN, "test");
+                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Authentication.ADMIN.getName(), Boolean.FALSE);
+                    AppUser appUser = buildAppUser(2L, "test", ADMIN, "test");
 
                     // when, then
                     assertThatThrownBy(() -> service.updateMemberAdmin(request, appUser))
@@ -249,11 +263,11 @@ class MemberServiceTest extends IntegrationTestSupport {
 
                     when(repository.findById(anyLong()))
                             .thenReturn(Optional.of(
-                                    Member.createForTest(1L, "test", "1234", "test", Role.ADMIN)
+                                    Member.createForTest(1L, "test", "1234", "test", ADMIN)
                             ));
 
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Role.ADMIN, Boolean.FALSE);
-                    AppUser appUser = buildAppUser(1L, "test", Role.ADMIN, "test");
+                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Authentication.ADMIN.getName(), Boolean.FALSE);
+                    AppUser appUser = buildAppUser(1L, "test", ADMIN, "test");
 
                     // when, then
                     assertThatThrownBy(() -> service.updateMemberAdmin(request, appUser))
@@ -263,16 +277,16 @@ class MemberServiceTest extends IntegrationTestSupport {
         );
     }
 
-    private Member buildMember(String loginId) {
+    private Member buildMember(String loginId, Role role) {
         return Member.builder()
                 .name("test")
                 .loginId(loginId)
-                .role(Role.USER)
+                .role(role)
                 .password("qwer1234")
                 .build();
     }
 
-    private AdminMemberUpdateRequest buildAdminMemberUpdateRequest(Long id, Role role, Boolean isUse) {
+    private AdminMemberUpdateRequest buildAdminMemberUpdateRequest(Long id, String role, Boolean isUse) {
         return AdminMemberUpdateRequest.builder()
                 .id(id)
                 .role(role)
@@ -293,7 +307,7 @@ class MemberServiceTest extends IntegrationTestSupport {
         return AppUser.builder()
                 .memberId(memberId)
                 .loginId(loginId)
-                .role(role.getValue())
+                .role(role)
                 .name(name)
                 .build();
     }
@@ -307,6 +321,13 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .name(name)
                 .password(password)
                 .confirmPassword(confirmPassword)
+                .build();
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
                 .build();
     }
 }

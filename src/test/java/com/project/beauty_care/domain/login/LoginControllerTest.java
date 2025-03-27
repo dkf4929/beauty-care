@@ -1,6 +1,8 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.ControllerTestSupport;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.SuccessCodes;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +37,7 @@ class LoginControllerTest extends ControllerTestSupport {
         AppUser appUser = AppUser.builder()
                 .loginId("admin")
                 .name("admin")
-                .role(Role.ADMIN.getValue())
+                .role(buildRole(Authentication.ADMIN.getName()))
                 .build();
 
         when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);
@@ -70,5 +74,12 @@ class LoginControllerTest extends ControllerTestSupport {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
+                .build();
     }
 }

@@ -1,16 +1,16 @@
 package com.project.beauty_care.global.security.jwt;
 
 import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.repository.RoleRepository;
+import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 class JwtTokenProviderTest extends IntegrationTestSupport {
     @Autowired
@@ -36,13 +36,25 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @Value("${token.access}")
     private long accessTokenValidTime;
 
+    final String USER = com.project.beauty_care.global.enums.Authentication.USER.getName();
+    final String ADMIN = com.project.beauty_care.global.enums.Authentication.ADMIN.getName();
+
+    @MockitoBean
+    RoleRepository roleRepository;
+
+    @BeforeEach
+    void setUp() {
+        when(roleRepository.findAll())
+                .thenReturn(List.of(buildRole(ADMIN), buildRole(USER)));
+    }
+
     @DisplayName("인증 객체와 현재 시간을 받아, 토큰을 생성한다.")
     @Test
     void generateTokenWithAuthentication() {
         // given, when
         long now = new Date().getTime();
         LoginResponse loginResponse =
-                generateToken(now, Role.USER.getValue());
+                generateToken(now, buildRole(USER));
 
         // then
         assertThat(loginResponse).isNotNull();
@@ -59,7 +71,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @CsvSource({"ROLE_MANAGER", "ROLE_SYSTEM_ADMIN"})
     void generateTokenWithInvalidAuthority(String role) {
         // then
-        assertThatThrownBy(() -> generateToken(new Date().getTime(), role))
+        assertThatThrownBy(() -> generateToken(new Date().getTime(), buildRole(role)))
                 .isInstanceOf(NoAuthorityMember.class)
                 .hasFieldOrPropertyWithValue("errors.message", Errors.NO_AUTHORITY_MEMBER.getMessage())
                 .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NO_AUTHORITY_MEMBER.getErrorCode());
@@ -69,7 +81,10 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @Test
     void getAuthentication() {
         // given
-        LoginResponse loginResponse = generateToken(new Date().getTime(), Role.USER.getValue());
+        LoginResponse loginResponse = generateToken(new Date().getTime(), buildRole(USER));
+
+        when(roleRepository.findById(any()))
+                .thenReturn(Optional.ofNullable(buildRole(USER)));
 
         // when
         Authentication authentication = jwtTokenProvider.getAuthentication(loginResponse.getAccessToken());
@@ -77,8 +92,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
         // then
         assertThat(authentication).isNotNull()
                 .extracting("principal")
-                .extracting("role", "name", "loginId", "memberId")
-                .containsExactly(Role.USER.getValue(), "user", "user", 1L);
+                .extracting("role.roleName", "name", "loginId", "memberId")
+                .containsExactly(USER, "user", "user", 1L);
     }
 
     @DisplayName("토큰 만료시간 체크 시나리오")
@@ -92,7 +107,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                             .toInstant()
                             .toEpochMilli();
 
-                    LoginResponse loginResponse = generateToken(expiredPast, Role.USER.getValue());
+                    LoginResponse loginResponse = generateToken(expiredPast, buildRole(USER));
 
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
@@ -105,7 +120,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // given: expired -> 만료 1초 전
                     final long expired1SecBefore = System.currentTimeMillis() - accessTokenValidTime - 1000;
 
-                    LoginResponse loginResponse = generateToken(expired1SecBefore, Role.USER.getValue());
+                    LoginResponse loginResponse = generateToken(expired1SecBefore, buildRole(USER));
 
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
@@ -118,7 +133,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // given: expired -> 만료시점 동일
                     final long expiredEquals = System.currentTimeMillis() - accessTokenValidTime;
 
-                    LoginResponse loginResponse = generateToken(expiredEquals, Role.USER.getValue());
+                    LoginResponse loginResponse = generateToken(expiredEquals, buildRole(USER));
 
                     // when, then
                     assertThatThrownBy(() -> jwtTokenProvider.validateToken(loginResponse.getAccessToken()))
@@ -131,7 +146,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // given
                     long validTime = System.currentTimeMillis() - accessTokenValidTime + 1000;
 
-                    LoginResponse loginResponse = generateToken(validTime, Role.USER.getValue());
+                    LoginResponse loginResponse = generateToken(validTime, buildRole(USER));
 
                     // when
                     boolean isValid = jwtTokenProvider.validateToken(loginResponse.getAccessToken());
@@ -150,8 +165,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                     // given
                     final String tokenString = "eyJhbGciOiJIUzI1NiIsIn....";
 
-                    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-                    Mockito.when(request.getHeader("Authorization")).thenReturn("Bearer " + tokenString);
+                    HttpServletRequest request = mock(HttpServletRequest.class);
+                    when(request.getHeader("Authorization")).thenReturn("Bearer " + tokenString);
 
                     // when
                     String token = jwtTokenProvider.resolveToken(request);
@@ -161,8 +176,8 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                 }),
                 DynamicTest.dynamicTest("인증 헤더에 토큰이 없으면 null을 리턴한다.", () -> {
                     // given
-                    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-                    Mockito.when(request.getHeader("Authorization")).thenReturn(null);
+                    HttpServletRequest request = mock(HttpServletRequest.class);
+                    when(request.getHeader("Authorization")).thenReturn(null);
 
                     // when
                     String token = jwtTokenProvider.resolveToken(request);
@@ -173,7 +188,7 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
         );
     }
 
-    private LoginResponse generateToken(long now, String role) {
+    private LoginResponse generateToken(long now, Role role) {
         // principal
         AppUser user = AppUser.builder()
                 .role(role)
@@ -183,8 +198,15 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
                 .build();
 
         UsernamePasswordAuthenticationToken authentication
-                = new UsernamePasswordAuthenticationToken(user, "", List.of(new SimpleGrantedAuthority(role)));
+                = new UsernamePasswordAuthenticationToken(user, "", List.of(new SimpleGrantedAuthority(role.getRoleName())));
 
         return jwtTokenProvider.generateToken(authentication, now);
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
+                .build();
     }
 }

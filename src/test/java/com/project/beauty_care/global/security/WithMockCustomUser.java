@@ -16,5 +16,5 @@ public @interface WithMockCustomUser {
     long memberId() default 1L;
     String loginId() default "admin";
     String name() default "admin";
-    String role() default "ROLE_ADMIN";
+    String roleName() default "ADMIN";
 }

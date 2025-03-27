@@ -3,6 +3,8 @@ package com.project.beauty_care.domain.member.controller;
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +29,9 @@ class PublicMemberControllerTest extends ControllerTestSupport {
     void createMember(PublicMemberCreateRequest request) throws Exception {
         // given
         when(memberService.createMemberPublic(any()))
-                .thenReturn(Member.createForTest(1L, "test", "1234", "test", Role.USER));
+                .thenReturn(
+                        Member.createForTest(1L, "test", "1234", "test", buildRole(Authentication.USER.getName()))
+                );
 
         // when, then
         performPost("/public/member", request)
@@ -85,5 +91,12 @@ class PublicMemberControllerTest extends ControllerTestSupport {
         return mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
+                .build();
     }
 }

@@ -1,23 +1,30 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.IntegrationTestSupport;
-import com.project.beauty_care.global.login.service.LoginService;
-import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.RequestInvalidException;
+import com.project.beauty_care.global.login.dto.LoginRequest;
+import com.project.beauty_care.global.login.service.LoginService;
 import com.project.beauty_care.global.security.dto.AppUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@Transactional
 class LoginServiceTest extends IntegrationTestSupport {
     @Autowired
     private LoginService service;
@@ -25,19 +32,22 @@ class LoginServiceTest extends IntegrationTestSupport {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
+    @MockitoBean
     private MemberRepository memberRepository;
 
     @DisplayName("유효한 아이디와 패스워드를 사용하여 로그인이 성공한다")
     @Test
     void login() {
         //given
-        Member member = createMember("admin", Role.ADMIN, "qwer1234", "admin");
+        Member member = buildMember("admin", buildRole(Authentication.ADMIN.name()), "qwer1234", "admin");
 
         LoginRequest request = LoginRequest.builder()
                 .loginId("admin")
                 .password("qwer1234")
                 .build();
+
+        when(memberRepository.findByLoginIdAndIsUseIsTrue(any()))
+                .thenReturn(Optional.ofNullable(member));
 
         // when
         AppUser loginMember = service.login(request);
@@ -70,13 +80,16 @@ class LoginServiceTest extends IntegrationTestSupport {
     @Test
     void loginWithInvalidPassword() {
         // given
-        Member member = createMember("admin", Role.ADMIN, "qwer1234", "admin");
+        Member member = buildMember("admin", buildRole(Authentication.ADMIN.name()), "qwer1234", "admin");
         final String invalidPassword = "1234";
 
         LoginRequest request = LoginRequest.builder()
                 .loginId(member.getLoginId())
                 .password(invalidPassword)
                 .build();
+
+        when(memberRepository.findByLoginIdAndIsUseIsTrue(any()))
+                .thenReturn(Optional.ofNullable(member));
 
         // when, then
         assertThatThrownBy(() -> service.login(request))
@@ -85,14 +98,19 @@ class LoginServiceTest extends IntegrationTestSupport {
                 .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
     }
 
-    private Member createMember(String loginId, Role role, String password, String name) {
-        Member member = Member.builder()
+    private Member buildMember(String loginId, Role role, String password, String name) {
+        return Member.builder()
                 .loginId(loginId)
                 .role(role)
                 .password(passwordEncoder.encode(password))
                 .name(name)
                 .build();
+    }
 
-        return memberRepository.save(member);
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
+                .build();
     }
 }

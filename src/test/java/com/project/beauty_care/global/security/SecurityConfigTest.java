@@ -3,6 +3,9 @@ package com.project.beauty_care.global.security;
 import com.project.beauty_care.IntegrationTestSupport;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.service.MemberService;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.service.RoleService;
+import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -20,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,12 +47,20 @@ public class SecurityConfigTest extends IntegrationTestSupport {
     @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 
+    @MockitoBean
+    private RoleService roleService;
+
     @DisplayName("권한에 따른 멤버 조회 API 호출 시나리오")
     @TestFactory
     Collection<DynamicTest> createMemberWithAuthentication() throws Exception {
         return List.of(
                 DynamicTest.dynamicTest("어드민 권한 => API 호출 성공", () -> {
                     // given
+                    final String API_PATH = "/admin/member";
+
+                    when(roleService.findRolesByUrlPattern(API_PATH))
+                            .thenReturn(List.of(buildRole(Authentication.ADMIN.getName())));
+
                     when(memberService.findAllMembers())
                             .thenReturn(buildAllMembers());
 
@@ -59,12 +71,14 @@ public class SecurityConfigTest extends IntegrationTestSupport {
                             .thenReturn(Boolean.TRUE);
 
                     when(jwtTokenProvider.getAuthentication(anyString()))
-                            .thenReturn(buildAuthentication("admin", "admin", Role.ADMIN));
+                            .thenReturn(
+                                    buildAuthentication("admin", "admin", buildRole(Authentication.ADMIN.getName()))
+                            );
 
                     // when, then
                     mockMvc.perform(
                                     MockMvcRequestBuilders
-                                            .get("/admin/member")
+                                            .get(API_PATH)
                             )
                             .andDo(print())
                             .andExpect(status().isOk())
@@ -87,7 +101,9 @@ public class SecurityConfigTest extends IntegrationTestSupport {
                             .thenReturn(Boolean.TRUE);
 
                     when(jwtTokenProvider.getAuthentication(anyString()))
-                            .thenReturn(buildAuthentication("user", "user", Role.USER));
+                            .thenReturn(
+                                    buildAuthentication("user", "user", buildRole(Authentication.USER.getName()))
+                            );
 
                     // when, then
                     mockMvc.perform(
@@ -121,14 +137,14 @@ public class SecurityConfigTest extends IntegrationTestSupport {
                         .isUse(Boolean.TRUE)
                         .id(1L)
                         .name("admin")
-                        .role(Role.ADMIN.getValue())
+                        .role(Authentication.ADMIN.getName())
                         .loginId("admin")
                         .build(),
                 MemberResponse.builder()
                         .isUse(Boolean.TRUE)
                         .id(2L)
                         .name("user")
-                        .role(Role.USER.getValue())
+                        .role(Authentication.USER.getName())
                         .loginId("user")
                         .build()
         );
@@ -140,10 +156,17 @@ public class SecurityConfigTest extends IntegrationTestSupport {
                         .memberId(1L)
                         .name(name)
                         .loginId(loginId)
-                        .role(role.getValue())
+                        .role(role)
                         .build(),
                 "1234",
-                List.of(new SimpleGrantedAuthority(role.getValue()))
+                List.of(new SimpleGrantedAuthority(role.getRoleName()))
         );
+    }
+
+    private Role buildRole(String role) {
+        return Role.builder()
+                .roleName(role)
+                .urlPatterns(Collections.emptyMap())
+                .build();
     }
 }

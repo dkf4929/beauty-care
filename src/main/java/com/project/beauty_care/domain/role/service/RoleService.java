@@ -11,7 +11,6 @@ import org.springframework.util.AntPathMatcher;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +18,7 @@ public class RoleService {
     private final RoleRepository repository;
     private final AntPathMatcher matcher = new AntPathMatcher();
 
+    // 캐시 처리 필요.. (redis 사용 시)
     public List<Role> findRolesByUrlPattern(String url) {
         return repository.findAll()
                 .stream()

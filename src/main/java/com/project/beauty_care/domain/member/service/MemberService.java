@@ -33,7 +33,7 @@ public class MemberService {
         // dto to entity
         validConfirmPassword(request.getPassword(), request.getConfirmPassword());
 
-        Role role = findRoleById(Authentication.ROLE_USER.getName());
+        Role role = findRoleById(Authentication.USER.getName());
 
         Member member = Member.createMember(request, encodePassword(request.getPassword()), role);
 
@@ -113,7 +113,7 @@ public class MemberService {
     }
 
     private void checkAdminRole(Role role) {
-        if (role.getRoleName().equals(Authentication.ROLE_ADMIN.getName()))
+        if (role.getRoleName().equals(Authentication.ADMIN.getName()))
             throw new IllegalArgumentException("관리자 권한을 가진 사용자는 수정할 수 없습니다.");
     }
 

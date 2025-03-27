@@ -9,3 +9,7 @@ insert into beauty_care.code(`name`,`id`,`upper_id`,`description`,`sort_number`,
 ('동의 상태', 'sys:agree', 'sys', '동의 상태', 1, true, NOW(), NOW()),
 ('동의', 'sys:agree:Y', 'sys:agree', '동의', 1, true, NOW(), NOW()),
 ('미동의', 'sys:agree:N', 'sys:agree', '미동의', 2, true, NOW(), NOW());
+
+insert into beauty_care.role (role_name, url_patterns) VALUES
+('ADMIN', '{"pattern":["/admin/**", "/user/**"]}'),
+('USER', '{"pattern":["/user/**"]}');
