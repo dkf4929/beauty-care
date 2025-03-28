@@ -33,7 +33,7 @@ public enum Errors {
 
     CAN_NOT_DELETE_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "하위코드가 존재하는 경우, 삭제할 수 없습니다."),
     DUPLICATED_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "중복된 코드 ID가 존재합니다."),
-    DUPLICATED_ROLE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "중복된 권한이 존재합니다."),
+    DUPLICATED_ROLE(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT.getErrorCode(), "중복된 권한이 존재합니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "서버에 오류가 발생했습니다. 관리자에게 문의하세요.");
 

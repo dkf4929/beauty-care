@@ -11,6 +11,7 @@ import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.dto.RoleUpdateRequest;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import com.project.beauty_care.global.exception.RequestInvalidException;
@@ -147,6 +148,6 @@ public class RoleService {
     }
 
     private void checkExistsRoleName(String roleName) {
-        if (repository.existsById(roleName)) throw new RequestInvalidException(Errors.DUPLICATED_ROLE);
+        if (repository.existsById(roleName)) throw new CustomException(Errors.DUPLICATED_ROLE);
     }
 }
