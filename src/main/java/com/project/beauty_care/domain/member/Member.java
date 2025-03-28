@@ -58,6 +58,10 @@ public class Member extends BaseEntity {
         this.lastLoginDateTime = lastLoginDateTime;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
     @Builder
     public Member(String loginId, String password, String name, Role role, LocalDateTime lastLoginDateTime) {
         this.loginId = loginId;

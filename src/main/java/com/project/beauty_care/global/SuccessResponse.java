@@ -27,4 +27,8 @@ public class SuccessResponse<T> {
     public static <T> SuccessResponse<T> success(SuccessCodes successCodes, HttpStatus httpStatus, T data) {
         return new SuccessResponse<>(successCodes, httpStatus, data);
     }
+
+    public static SuccessResponse success(SuccessCodes successCodes, HttpStatus httpStatus) {
+        return new SuccessResponse<>(successCodes, httpStatus, null);
+    }
 }
