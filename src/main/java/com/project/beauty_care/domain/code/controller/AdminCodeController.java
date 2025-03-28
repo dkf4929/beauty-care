@@ -4,10 +4,8 @@ import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.service.CodeService;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
-import com.project.beauty_care.global.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -21,8 +19,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

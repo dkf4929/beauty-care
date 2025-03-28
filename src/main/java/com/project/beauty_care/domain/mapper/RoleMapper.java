@@ -1,7 +1,5 @@
 package com.project.beauty_care.domain.mapper;
 
-import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.dto.MemberSummaryResponse;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.dto.RoleMemberResponse;

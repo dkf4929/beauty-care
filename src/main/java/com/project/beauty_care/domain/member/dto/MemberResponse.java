@@ -2,7 +2,7 @@ package com.project.beauty_care.domain.member.dto;
 
 import com.project.beauty_care.domain.dto.BaseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;

@@ -14,7 +14,6 @@ import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
-import com.project.beauty_care.global.exception.RequestInvalidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

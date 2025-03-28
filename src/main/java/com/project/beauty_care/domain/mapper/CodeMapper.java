@@ -2,7 +2,6 @@ package com.project.beauty_care.domain.mapper;
 
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
-import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

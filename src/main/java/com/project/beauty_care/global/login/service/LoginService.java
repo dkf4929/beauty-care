@@ -1,10 +1,10 @@
 package com.project.beauty_care.global.login.service;
 
-import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.RequestInvalidException;
+import com.project.beauty_care.global.login.dto.LoginRequest;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

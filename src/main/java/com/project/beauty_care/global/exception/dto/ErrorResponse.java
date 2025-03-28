@@ -1,8 +1,6 @@
 package com.project.beauty_care.global.exception.dto;
 
-import com.project.beauty_care.global.enums.ErrorCodes;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.enums.YesOrNo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
