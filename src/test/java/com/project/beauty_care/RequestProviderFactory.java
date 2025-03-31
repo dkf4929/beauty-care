@@ -3,6 +3,7 @@ package com.project.beauty_care;
 import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
+import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -53,6 +54,20 @@ public class RequestProviderFactory {
         return Stream.of(
                 Arguments.of(new AdminMemberCreateRequest("", "", Authentication.USER.getName(), true))
         );
+    }
+
+    public static Stream<Arguments> roleProvider() {
+        Role role1 = Role.builder().
+                roleName(Authentication.ADMIN.getName())
+                .isUse(Boolean.TRUE)
+                .build();
+
+        Role role2 = Role.builder().
+                roleName(Authentication.ADMIN.getName())
+                .isUse(Boolean.FALSE)
+                .build();
+
+        return Stream.of(Arguments.of(role1), Arguments.of(role2));
     }
 
     public static Stream<Arguments> invalidAdminMemberUpdateRequestProvider() {

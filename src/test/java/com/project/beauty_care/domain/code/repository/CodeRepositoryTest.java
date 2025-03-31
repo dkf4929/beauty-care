@@ -5,13 +5,10 @@ import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,55 +67,51 @@ class CodeRepositoryTest extends RepositoryTestSupport {
                 );
     }
 
-    @DisplayName("코드 저장 시나리오")
-    @TestFactory
-    Collection<DynamicTest> saveTest() {
-        return List.of(
-                DynamicTest.dynamicTest("정상 case", () -> {
-                    // given
-                    Code code =
-                            buildCode("sys", "시스템", null, "시스템", 1, Boolean.TRUE);
+    @DisplayName("정상적으로 코드를 저장한다.")
+    @Test
+    void saveCode() {
+        // given
+        Code code = buildCode("sys", "시스템", null, "시스템", 1, Boolean.TRUE);
 
-                    // when
-                    repository.save(code);
+        // when
+        repository.save(code);
 
-                    Code findCode = repository.findById(code.getId())
-                            .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_CODE));
+        Code findCode = repository.findById(code.getId())
+                .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_CODE));
 
-                    // then
-                    assertThat(code)
-                            .extracting("id", "name", "parent", "description", "sortNumber", "isUse")
-                            .containsExactly(findCode.getId(),
-                                    findCode.getName(),
-                                    findCode.getParent(),
-                                    findCode.getDescription(),
-                                    findCode.getSortNumber(),
-                                    findCode.getIsUse());
-                }),
-                DynamicTest.dynamicTest("동일한 상위코드와 이름을 가질 경우, 예외 발생", () -> {
-                    // given
-                    final String constraint = "UQ_CODE_UPPER_ID_AND_NAME";
-
-                    Code parent =
-                            buildCode("sys", "시스템", null, "시스템", 1, Boolean.TRUE);
-
-                    repository.saveAndFlush(parent);
-
-                    Code child =
-                            buildCode("sys:agree", "동의 상태", parent, "동의 상태", 1, Boolean.TRUE);
-
-                    Code child2 =
-                            buildCode("sys:agree2", "동의 상태", parent, "동의 상태", 2, Boolean.TRUE);
-
-                    repository.saveAndFlush(child);
-
-                    // when, then
-                    assertThatThrownBy(() -> repository.saveAndFlush(child2))
-                            .isInstanceOf(DataIntegrityViolationException.class)
-                            .hasMessageContaining(constraint);
-                })
-        );
+        // then
+        assertThat(findCode)
+                .extracting("id", "name", "parent", "description", "sortNumber", "isUse")
+                .containsExactly(
+                        code.getId(),
+                        code.getName(),
+                        code.getParent(),
+                        code.getDescription(),
+                        code.getSortNumber(),
+                        code.getIsUse()
+                );
     }
+
+    @DisplayName("동일한 상위 코드와 이름을 가질 경우 예외가 발생한다.")
+    @Test
+    void saveDuplicateCode_ThrowsException() {
+        // given
+        final String constraint = "UQ_CODE_UPPER_ID_AND_NAME";
+
+        Code parent = buildCode("sys", "시스템", null, "시스템", 1, Boolean.TRUE);
+        repository.saveAndFlush(parent);
+
+        Code child = buildCode("sys:agree", "동의 상태", parent, "동의 상태", 1, Boolean.TRUE);
+        Code child2 = buildCode("sys:agree2", "동의 상태", parent, "동의 상태", 2, Boolean.TRUE);
+
+        repository.saveAndFlush(child);
+
+        // when, then
+        assertThatThrownBy(() -> repository.saveAndFlush(child2))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining(constraint);
+    }
+
 
     @DisplayName("특정 아이디가 존재하는지 확인")
     @Test

@@ -18,12 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ public class RoleService {
                 .map(role -> {
                     List<MemberSummaryResponse> summaryResponseList = memberToSummaryDto(role.getMembers());
 
-                    return RoleMapper.INSTANCE.toDto(role, patternMaptoList(role.getUrlPatterns()), summaryResponseList);
+                    return RoleMapper.INSTANCE.toDto(role, patternMapToList(role.getUrlPatterns()), summaryResponseList);
                 })
                 .toList();
     }
@@ -59,12 +57,12 @@ public class RoleService {
 
         Role savedEntity = repository.save(entity);
 
-        List<String> patterns = patternMaptoList(savedEntity.getUrlPatterns());
+        List<String> patterns = patternMapToList(savedEntity.getUrlPatterns());
 
         return RoleMapper.INSTANCE.toDto(savedEntity, patterns);
     }
 
-    // 캐시 처리 필요.. (redis 사용 시)
+    // TODO: 캐시 처리 필요.. (redis 사용 시)
     @Transactional(readOnly = true)
     public List<Role> findRolesByUrlPattern(String url) {
         return repository.findAllByIsUseIsTrue()
@@ -75,10 +73,10 @@ public class RoleService {
 
     @Transactional(readOnly = true)
     public void checkAuthority(String authority) {
-        repository.findAll().stream()
-                .filter(role -> role.getRoleName().equals(authority))
-                .findFirst()
-                .orElseThrow(() -> new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER));
+        List<Role> roles = repository.findAllByRoleName(authority);
+
+        if (CollectionUtils.isEmpty(roles))
+            throw new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER);
     }
 
     @Transactional(readOnly = true)
@@ -96,7 +94,7 @@ public class RoleService {
 
         entity.updateRole(request, patternMap);
 
-        return RoleMapper.INSTANCE.toDto(entity, patternMaptoList(entity.getUrlPatterns()));
+        return RoleMapper.INSTANCE.toDto(entity, patternMapToList(entity.getUrlPatterns()));
     }
 
     public void hardDeleteRole(String role) {
@@ -122,28 +120,24 @@ public class RoleService {
                 .toList();
     }
 
-    private List<String> patternMaptoList(Map<String, Object> urlPatterns) {
-        List<String> patterns = new ArrayList<>();
-
-        Object patternObject = urlPatterns.getOrDefault(PATTERN, Collections.emptyList());
-
-        if (patternObject instanceof List<?> patternList)
-            patterns = patternList.stream()
-                    .map(String::valueOf)
-                    .toList();
-        return patterns;
+    private List<String> patternMapToList(Map<String, Object> urlPatterns) {
+        return Optional.ofNullable(urlPatterns.get(PATTERN))
+                .filter(List.class::isInstance)
+                .map(list -> (List<?>) list)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(String::valueOf)
+                .toList();
     }
 
     private boolean isPatternMatch(String url, Role role) {
-        Object patternObject = role.getUrlPatterns()
-                .getOrDefault("pattern", Collections.emptyList());
-
-        if (patternObject instanceof List<?> patternList)
-            return patternList.stream()
-                    .map(String::valueOf)
-                    .anyMatch(pattern -> matcher.match(pattern, url) || pattern.equals(url));
-
-        return false;
+        return Optional.ofNullable(role.getUrlPatterns().get(PATTERN))
+                .filter(List.class::isInstance)
+                .map(list -> (List<?>) list)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(String::valueOf)
+                .anyMatch(pattern -> matcher.match(pattern, url) || pattern.equals(url));
     }
 
     private void checkExistsRoleName(String roleName) {

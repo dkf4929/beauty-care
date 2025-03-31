@@ -6,18 +6,13 @@ import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
-import com.project.beauty_care.domain.mapper.CodeMapper;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.exception.RequestInvalidException;
-import org.apache.commons.lang3.ObjectUtils;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -26,9 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.DynamicTest.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.*;
 
 class CodeServiceTest extends IntegrationTestSupport {

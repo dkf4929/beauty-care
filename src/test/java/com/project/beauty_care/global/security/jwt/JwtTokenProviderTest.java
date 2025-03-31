@@ -42,19 +42,25 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @MockitoBean
     RoleRepository roleRepository;
 
+    @Autowired
+    private RoleService roleService;
+
     @BeforeEach
     void setUp() {
-        when(roleRepository.findAll())
-                .thenReturn(List.of(buildRole(ADMIN), buildRole(USER)));
     }
 
     @DisplayName("인증 객체와 현재 시간을 받아, 토큰을 생성한다.")
     @Test
     void generateTokenWithAuthentication() {
         // given, when
+        final Role role = buildRole(USER);
+
+        when(roleRepository.findAllByRoleName(any()))
+                .thenReturn(List.of(role));
+
         long now = new Date().getTime();
         LoginResponse loginResponse =
-                generateToken(now, buildRole(USER));
+                generateToken(now, role);
 
         // then
         assertThat(loginResponse).isNotNull();
@@ -70,6 +76,10 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @ParameterizedTest
     @CsvSource({"ROLE_MANAGER", "ROLE_SYSTEM_ADMIN"})
     void generateTokenWithInvalidAuthority(String role) {
+        // given
+        when(roleRepository.findAllByRoleName(anyString()))
+                .thenReturn(Collections.emptyList());
+
         // then
         assertThatThrownBy(() -> generateToken(new Date().getTime(), buildRole(role)))
                 .isInstanceOf(NoAuthorityMember.class)
@@ -81,10 +91,13 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @Test
     void getAuthentication() {
         // given
-        LoginResponse loginResponse = generateToken(new Date().getTime(), buildRole(USER));
+        final Role role = buildRole(USER);
 
-        when(roleRepository.findById(any()))
-                .thenReturn(Optional.ofNullable(buildRole(USER)));
+        when(roleRepository.findAllByRoleName(any())).thenReturn(List.of(role));
+
+        when(roleRepository.findById(any())).thenReturn(Optional.of(role));
+
+        LoginResponse loginResponse = generateToken(new Date().getTime(), buildRole(USER));
 
         // when
         Authentication authentication = jwtTokenProvider.getAuthentication(loginResponse.getAccessToken());
@@ -99,6 +112,9 @@ class JwtTokenProviderTest extends IntegrationTestSupport {
     @DisplayName("토큰 만료시간 체크 시나리오")
     @TestFactory
     Collection<DynamicTest> validateTokenDynamicTest() {
+        when(roleRepository.findAllByRoleName(anyString()))
+                .thenReturn(List.of(buildRole(ADMIN)));
+
         return List.of(
                 DynamicTest.dynamicTest("토큰 만료 시 예외가 발생한다(과거 시점)", () -> {
                     // given : expired -> 만료(과거일)
