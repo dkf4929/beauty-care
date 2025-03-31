@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class Role extends BaseEntity {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "longtext")
-    private Map<String, Object> urlPatterns;
+    private Map<String, Object> urlPatterns = new HashMap<>();
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();

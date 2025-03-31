@@ -16,6 +16,7 @@ public interface RoleMapper {
 
     @Mapping(target = "roleName", source = "role.roleName")
     @Mapping(target = "urlPatterns", source = "urlPatterns")
+    @Mapping(target = "isUse", source = "role.isUse")
     @Mapping(target = "createdBy", source = "role.createdBy")
     @Mapping(target = "updatedBy", source = "role.updatedBy")
     @Mapping(target = "createdDateTime", source = "role.createdDateTime")

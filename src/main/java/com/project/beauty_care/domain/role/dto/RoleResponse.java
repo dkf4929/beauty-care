@@ -16,4 +16,7 @@ public class RoleResponse extends BaseDto {
 
     @Schema(description = "허용할 URL 패턴", examples = {"/admin/**", "/user/**"})
     private List<String> urlPatterns = new ArrayList<>();
+
+    @Schema(description = "사용 여부", example = "true")
+    private Boolean isUse;
 }
