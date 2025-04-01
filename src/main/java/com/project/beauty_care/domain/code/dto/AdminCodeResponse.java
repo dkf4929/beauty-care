@@ -2,8 +2,7 @@ package com.project.beauty_care.domain.code.dto;
 
 import com.project.beauty_care.domain.dto.BaseTimeDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.Objects;
 
 @Getter
 @SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdminCodeResponse extends BaseTimeDto {
     @Schema(description = "코드 ID", example = "sys:agree:Y")
     private String id;

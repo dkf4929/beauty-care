@@ -7,14 +7,18 @@ import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
 import com.project.beauty_care.domain.mapper.CodeMapper;
 import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.RequestInvalidException;
+import com.project.beauty_care.global.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,8 +26,10 @@ import java.util.Optional;
 @Transactional
 public class CodeService {
     private final CodeRepository repository;
+    private final CommonUtils utils;
 
     // 조회 ALL
+    @Cacheable(value = RedisCacheKey.ALL_CODES, cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public AdminCodeResponse findAllCode() {
         // 최상위 코드 검색
@@ -42,6 +48,7 @@ public class CodeService {
     }
 
     // 조회 BY ID
+    @Cacheable(value = RedisCacheKey.ALL_CODES, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public AdminCodeResponse findCodeById(String codeId) {
         Code entity = findById(codeId);
@@ -70,6 +77,9 @@ public class CodeService {
 
         Code savedEntity = repository.save(entity);
 
+        // redis cache clear
+        utils.clearRedisCache(RedisCacheKey.ALL_CODES);
+
         return CodeMapper.INSTANCE.toDto(savedEntity);
     }
 
@@ -82,6 +92,9 @@ public class CodeService {
 
         Code updatedEntity = entity.update(request);
 
+        // redis cache clear
+        utils.clearRedisCache(RedisCacheKey.ALL_CODES, RedisCacheKey.CODE + updatedEntity.getId());
+
         return CodeMapper.INSTANCE.toDto(updatedEntity);
     }
 
@@ -92,6 +105,9 @@ public class CodeService {
         // 하위코드가 존재하는 경우, 삭제 불가
         checkIsDeletable(entity);
         repository.deleteById(codeId);
+
+        // redis cache clear
+        utils.clearRedisCache(RedisCacheKey.ALL_CODES, RedisCacheKey.CODE + codeId);
 
         return codeId;
     }
