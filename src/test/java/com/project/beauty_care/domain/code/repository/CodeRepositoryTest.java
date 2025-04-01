@@ -94,7 +94,7 @@ class CodeRepositoryTest extends RepositoryTestSupport {
 
     @DisplayName("동일한 상위 코드와 이름을 가질 경우 예외가 발생한다.")
     @Test
-    void saveDuplicateCode_ThrowsException() {
+    void saveDuplicatedCode() {
         // given
         final String constraint = "UQ_CODE_UPPER_ID_AND_NAME";
 
