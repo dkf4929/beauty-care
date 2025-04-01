@@ -42,7 +42,9 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.6.0'
 	// https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
-
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.4'
+	implementation 'org.json:json:20210307'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3'
 
 	compileOnly 'org.projectlombok:lombok'
 //	runtimeOnly 'com.mysql:mysql-connector-j'
