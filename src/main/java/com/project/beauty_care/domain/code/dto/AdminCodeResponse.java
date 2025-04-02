@@ -2,7 +2,10 @@ package com.project.beauty_care.domain.code.dto;
 
 import com.project.beauty_care.domain.dto.BaseTimeDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
