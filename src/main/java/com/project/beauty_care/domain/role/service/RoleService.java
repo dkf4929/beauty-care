@@ -11,17 +11,22 @@ import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.dto.RoleUpdateRequest;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,12 +67,13 @@ public class RoleService {
         return RoleMapper.INSTANCE.toDto(savedEntity, patterns);
     }
 
-    // TODO: 캐시 처리 필요.. (redis 사용 시)
+    @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
-    public List<Role> findRolesByUrlPattern(String url) {
+    public List<String> findRoleNameByUrlPattern(String url) {
         return repository.findAllByIsUseIsTrue()
                 .stream()
                 .filter(role -> isPatternMatch(url, role))
+                .map(Role::getRoleName)
                 .toList();
     }
 

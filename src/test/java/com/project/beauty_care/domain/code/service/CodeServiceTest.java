@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.code.service;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.*;
 
-class CodeServiceTest extends IntegrationTestSupport {
+class CodeServiceTest extends TestSupportWithOutRedis {
     @Autowired
     private CodeService service;
 

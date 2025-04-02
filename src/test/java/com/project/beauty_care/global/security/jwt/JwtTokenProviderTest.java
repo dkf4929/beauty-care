@@ -1,6 +1,6 @@
 package com.project.beauty_care.global.security.jwt;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.domain.role.service.RoleService;
@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-class JwtTokenProviderTest extends IntegrationTestSupport {
+class JwtTokenProviderTest extends TestSupportWithOutRedis {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 

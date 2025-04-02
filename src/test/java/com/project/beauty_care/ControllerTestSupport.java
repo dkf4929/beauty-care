@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.beauty_care.domain.member.controller.AdminMemberController;
 import com.project.beauty_care.domain.member.controller.PublicMemberController;
 import com.project.beauty_care.domain.member.controller.UserMemberController;
-import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.global.login.controller.LoginController;
 import com.project.beauty_care.global.login.service.LoginService;

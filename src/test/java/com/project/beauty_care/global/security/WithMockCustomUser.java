@@ -1,13 +1,11 @@
 package com.project.beauty_care.global.security;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.List;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

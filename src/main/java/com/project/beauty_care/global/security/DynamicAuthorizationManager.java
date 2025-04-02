@@ -1,6 +1,5 @@
 package com.project.beauty_care.global.security;
 
-import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.service.RoleService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +24,16 @@ public class DynamicAuthorizationManager implements AuthorizationManager<Request
         String requestUri = request.getRequestURI();
 
         // url 패턴과 일치하는 Role을 찾는다.
-        List<Role> roleList = roleService.findRolesByUrlPattern(requestUri);
+        List<String> roleList = roleService.findRoleNameByUrlPattern(requestUri);
 
         AuthorizationDecision authorizationDecision = new AuthorizationDecision(false);
 
         // 권한 있는지 check
-        for (Role role : roleList) {
+        for (String roleName : roleList) {
             Authentication grantedAuthentication = authentication.get();
 
             // 권한 일치 -> pass
-            if (grantedAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(role.getRoleName())))
+            if (grantedAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(roleName)))
                 authorizationDecision = new AuthorizationDecision(Boolean.TRUE);
         }
 

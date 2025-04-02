@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.member.service;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class MemberServiceTest extends IntegrationTestSupport {
+class MemberServiceTest extends TestSupportWithOutRedis {
     @Autowired
     private MemberService service;
 

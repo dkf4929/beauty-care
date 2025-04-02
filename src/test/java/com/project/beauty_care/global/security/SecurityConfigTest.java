@@ -1,6 +1,6 @@
 package com.project.beauty_care.global.security;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.domain.role.Role;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SecurityConfigTest extends IntegrationTestSupport {
+public class SecurityConfigTest extends TestSupportWithOutRedis {
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,8 +58,8 @@ public class SecurityConfigTest extends IntegrationTestSupport {
                     // given
                     final String API_PATH = "/admin/member";
 
-                    when(roleService.findRolesByUrlPattern(API_PATH))
-                            .thenReturn(List.of(buildRole(Authentication.ADMIN.getName())));
+                    when(roleService.findRoleNameByUrlPattern(API_PATH))
+                            .thenReturn(List.of(Authentication.ADMIN.getName()));
 
                     when(memberService.findAllMembers())
                             .thenReturn(buildAllMembers());

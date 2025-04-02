@@ -1,6 +1,6 @@
 package com.project.beauty_care.global.config;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SpringSecurityAuditorAwareTest extends IntegrationTestSupport {
+class SpringSecurityAuditorAwareTest extends TestSupportWithOutRedis {
     @Autowired
     private SpringSecurityAuditorAware springSecurityAuditorAware;
 

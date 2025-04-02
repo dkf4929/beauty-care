@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -27,9 +26,10 @@ import java.util.Optional;
 public class CodeService {
     private final CodeRepository repository;
     private final CommonUtils utils;
+    private static final String KEY = "ALL";
 
     // 조회 ALL
-    @Cacheable(value = RedisCacheKey.ALL_CODES, cacheManager = "redisCacheManager")
+    @Cacheable(value = RedisCacheKey.CODE, key = "'ALL'", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public AdminCodeResponse findAllCode() {
         // 최상위 코드 검색
@@ -48,7 +48,7 @@ public class CodeService {
     }
 
     // 조회 BY ID
-    @Cacheable(value = RedisCacheKey.ALL_CODES, key = "#p0", cacheManager = "redisCacheManager")
+    @Cacheable(value = RedisCacheKey.CODE, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public AdminCodeResponse findCodeById(String codeId) {
         Code entity = findById(codeId);
@@ -78,7 +78,7 @@ public class CodeService {
         Code savedEntity = repository.save(entity);
 
         // redis cache clear
-        utils.clearRedisCache(RedisCacheKey.ALL_CODES);
+        utils.clearRedisCache(RedisCacheKey.CODE, KEY, savedEntity.getId());
 
         return CodeMapper.INSTANCE.toDto(savedEntity);
     }
@@ -93,7 +93,7 @@ public class CodeService {
         Code updatedEntity = entity.update(request);
 
         // redis cache clear
-        utils.clearRedisCache(RedisCacheKey.ALL_CODES, RedisCacheKey.CODE + updatedEntity.getId());
+        utils.clearRedisCache(RedisCacheKey.CODE, KEY, updatedEntity.getId());
 
         return CodeMapper.INSTANCE.toDto(updatedEntity);
     }
@@ -107,7 +107,7 @@ public class CodeService {
         repository.deleteById(codeId);
 
         // redis cache clear
-        utils.clearRedisCache(RedisCacheKey.ALL_CODES, RedisCacheKey.CODE + codeId);
+        utils.clearRedisCache(RedisCacheKey.CODE, KEY, entity.getId());
 
         return codeId;
     }

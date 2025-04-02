@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.role.service;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.dto.RoleCreateRequest;
 import com.project.beauty_care.domain.role.dto.RoleMemberResponse;
@@ -24,11 +24,10 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.*;
 
-class RoleServiceTest extends IntegrationTestSupport {
+class RoleServiceTest extends TestSupportWithOutRedis {
     @Autowired
     private RoleService service;
 
@@ -142,7 +141,7 @@ class RoleServiceTest extends IntegrationTestSupport {
     @DisplayName("일치하는 패턴의 Role을 검색한다.")
     @ParameterizedTest
     @CsvSource({"/admin/member", "/user/member", "/manager/test"})
-    void findRolesByUrlPattern(String pattern) {
+    void findRoleNameByUrlPattern(String pattern) {
         // given
         final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
 
@@ -156,18 +155,12 @@ class RoleServiceTest extends IntegrationTestSupport {
                 );
 
         // when
-        List<Role> roleList = service.findRolesByUrlPattern(pattern);
+        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
 
         // then
         assertThat(roleList)
                 .hasSize(1)
-                .extracting("roleName", "urlPatterns", "isUse")
-                .containsExactly(
-                        tuple(roleList.getFirst().getRoleName(),
-                                roleList.getFirst().getUrlPatterns(),
-                                roleList.getFirst().getIsUse()
-                        )
-                );
+                .isEqualTo(List.of(Authentication.ADMIN.getName()));
 
         verify(repository, times(1)).findAllByIsUseIsTrue();
     }
@@ -175,7 +168,7 @@ class RoleServiceTest extends IntegrationTestSupport {
     @DisplayName("일치하는 url 패턴이 존재하지 않을 경우 빈 리스트를 리턴한다.")
     @ParameterizedTest
     @ValueSource(strings = {"/manager/member"})
-    void findRolesByUrlPatternWithNotMatchedPattern(String pattern) {
+    void findRoleNameByUrlPatternWithNotMatchedPattern(String pattern) {
         // given
         final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
 
@@ -189,7 +182,7 @@ class RoleServiceTest extends IntegrationTestSupport {
                 );
 
         // when
-        List<Role> roleList = service.findRolesByUrlPattern(pattern);
+        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
 
         // then
         assertThat(roleList).isEmpty();

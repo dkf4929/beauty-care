@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.login;
 
-import com.project.beauty_care.IntegrationTestSupport;
+import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.domain.role.Role;
@@ -12,7 +12,6 @@ import com.project.beauty_care.global.login.service.LoginService;
 import com.project.beauty_care.global.security.dto.AppUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -25,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class LoginServiceTest extends IntegrationTestSupport {
+class LoginServiceTest extends TestSupportWithOutRedis {
     @Autowired
     private LoginService service;
 

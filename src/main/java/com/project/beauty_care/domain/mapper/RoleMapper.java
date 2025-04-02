@@ -31,4 +31,13 @@ public interface RoleMapper {
     @Mapping(target = "createdDateTime", source = "role.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "role.updatedDateTime")
     RoleMemberResponse toDto(Role role, List<String> urlPatterns, List<MemberSummaryResponse> members);
+
+    @Mapping(target = "roleName", source = "role.roleName")
+    @Mapping(target = "urlPatterns", ignore = true)
+    @Mapping(target = "isUse", source = "role.isUse")
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "createdDateTime", ignore = true)
+    @Mapping(target = "updatedDateTime", ignore = true)
+    RoleResponse toSimpleDto(Role role);
 }
