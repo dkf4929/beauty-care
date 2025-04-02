@@ -33,6 +33,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qwer1234
+  cache:
+    type: redis # redisConfig 활성화
   data:
     redis:
       host: localhost
@@ -64,6 +66,8 @@ spring:
     redis:
       host: beauty-care-redis-container
       port: 6379
+  cache:
+    type: redis
   jpa:
     show-sql: true
     hibernate:
@@ -83,7 +87,7 @@ spring:
       on-profile: test
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 token:
   access: 3600000  # 1시간
