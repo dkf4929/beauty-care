@@ -1,12 +1,13 @@
-package com.project.beauty_care.global.config;
+package com.project.beauty_care.domain.code.service;
 
 import com.project.beauty_care.TestSupportWithRedis;
 import com.project.beauty_care.domain.code.Code;
+import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
-import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -18,7 +19,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 class CacheManagerTest extends TestSupportWithRedis {
     @Autowired
@@ -33,12 +36,12 @@ class CacheManagerTest extends TestSupportWithRedis {
     @DisplayName("cache test")
     @Test
     void findCodeWithCache() {
-        final String key = "ALL";
+        final String key = "all";
 
         Code code
                 = buildCode("sys:agree", "동의 상태", 1, new ArrayList<>(), "", Boolean.TRUE);
 
-        doReturn(Optional.of(code)).when(codeRepository).findByParentIsNull();
+        Mockito.doReturn(Optional.of(code)).when(codeRepository).findByParentIsNull();
 
         // 최초 호출 -> DB 접근 (캐시 저장)
         codeService.findAllCode();
@@ -48,7 +51,7 @@ class CacheManagerTest extends TestSupportWithRedis {
         Cache cache = cacheManager.getCache(RedisCacheKey.CODE);
         assertThat(cache).isNotNull();
 
-        Object cachedValue = cache.get(key);
+        Object cachedValue = cache.get(key, Object.class);
         assertThat(cachedValue).isNotNull();
 
         // 캐시에서 조회
@@ -64,6 +67,38 @@ class CacheManagerTest extends TestSupportWithRedis {
         // 캐시 삭제 후 호출 -> count 증가
         codeService.findAllCode();
         verify(codeRepository, times(2)).findByParentIsNull();
+    }
+
+    @DisplayName("코드 수정 => 관련 캐시 삭제")
+    @Test
+    void whenUpdateCodeThenClearCache() {
+        // given
+        final String codeId = "sys";
+        final String key = "all";
+
+        Code code
+                = buildCode(codeId, "시스템", 1, new ArrayList<>(), "", Boolean.TRUE);
+
+        doReturn(Optional.of(code)).when(codeRepository).findByParentIsNull();
+        doReturn(Optional.of(code)).when(codeRepository).findById(codeId);
+
+        // 캐시 저장
+        codeService.findAllCode();
+        codeService.findCodeById(codeId);
+
+        Cache cache = cacheManager.getCache(RedisCacheKey.CODE);
+
+        // check cache
+        assertThat(cache).isNotNull();
+        assertThat(cache.get(codeId)).isNotNull();
+        assertThat(cache.get(key)).isNotNull();
+
+        // when
+        codeService.updateCode(codeId, AdminCodeUpdateRequest.builder().isUse(Boolean.TRUE).build());
+
+        // then : update -> 캐시 삭제
+        assertThat(cache.get(codeId)).isNull();
+        assertThat(cache.get(key)).isNull();
     }
 
     private Code buildCode(String id,
