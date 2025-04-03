@@ -38,6 +38,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
 	implementation 'com.mysql:mysql-connector-j:9.2.0'
+	// querydsl
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.0'
 	// https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63
@@ -54,6 +56,7 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	// https://mvnrepository.com/artifact/org.testcontainers/mysql
 	testImplementation 'org.testcontainers:mysql:1.20.5'
@@ -63,6 +66,20 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+// Querydsl 설정부
+def generated = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+	main.java.srcDirs += [ generated ]
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+	delete file(generated)
 }
