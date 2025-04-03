@@ -16,11 +16,13 @@ import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
@@ -37,6 +39,7 @@ public class RoleService {
     private static final String PATTERN = "pattern";
 
     @Transactional(readOnly = true)
+    @Cacheable(value = RedisCacheKey.ROLE, key = "'all'", cacheManager = "redisCacheManager")
     public List<RoleMemberResponse> findAllRoles(String roleName) {
         List<Role> roles = StringUtils.hasText(roleName) ? repository.findAllByRoleName(roleName) : repository.findAll();
 
@@ -50,6 +53,7 @@ public class RoleService {
                 .toList();
     }
 
+    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public RoleResponse createRole(RoleCreateRequest request) {
         // 동일한 ID가 존재하는지 확인
         checkExistsRoleName(request.getRoleName());
@@ -65,22 +69,20 @@ public class RoleService {
         return RoleMapper.INSTANCE.toDto(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
     }
 
-    @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public void checkAuthority(String authority) {
-        List<RoleResponse> roles = getAllByRoleNameCached(authority);
+        RoleResponse role = findByRoleNameCached(authority);
 
-        if (CollectionUtils.isEmpty(roles))
+        if (ObjectUtils.isEmpty(role))
             throw new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER);
     }
 
     @Transactional(readOnly = true)
     public RoleResponse findRoleByAuthority(String authority) {
-        Role role = findById(authority);
-
-        return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
+        return findByRoleNameCached(authority);
     }
 
+    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public RoleResponse updateRole(RoleUpdateRequest request) {
         if (!request.getBeforeRoleName().equals(request.getAfterRoleName()))
             checkExistsRoleName(request.getAfterRoleName());
@@ -95,12 +97,13 @@ public class RoleService {
     }
 
     @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
-    public List<RoleResponse> getAllByRoleNameCached(String authority) {
-        return repository.findAllByRoleName(authority).stream()
-                .map(RoleMapper.INSTANCE::toSimpleDto)
-                .toList();
+    public RoleResponse findByRoleNameCached(String authority) {
+        Role role = findById(authority);
+
+        return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
+    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public void hardDeleteRole(String role) {
         repository.deleteById(role);
     }
