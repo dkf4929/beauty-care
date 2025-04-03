@@ -1,7 +1,5 @@
 package com.project.beauty_care.global.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
@@ -25,20 +23,13 @@ import java.time.Duration;
 @Configuration
 @EnableRedisRepositories
 @EnableCaching
-@ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis", matchIfMissing = true) // 조건부 redis connect
+@ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis", matchIfMissing = true) // 조건부 connect
 public class RedisConfig {
     @Value("${spring.data.redis.host}")
     private String redisHost;
 
     @Value("${spring.data.redis.port}")
     private Integer redisPort;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @PostConstruct
-    public void init() {
-        objectMapper.findAndRegisterModules();
-    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(RedisStandaloneConfiguration redisStandaloneConfiguration, LettuceClientConfiguration lettuceClientConfiguration) {
@@ -47,7 +38,7 @@ public class RedisConfig {
 
     @Bean
     RedisStandaloneConfiguration redisStandaloneConfiguration() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();;
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(this.redisHost);
         redisStandaloneConfiguration.setPort(this.redisPort);
         return redisStandaloneConfiguration;
