@@ -138,57 +138,57 @@ class RoleServiceTest extends TestSupportWithOutRedis {
                 .containsExactly(request.getRoleName(), request.getUrlPatterns(), request.getIsUse());
     }
 
-    @DisplayName("일치하는 패턴의 Role을 검색한다.")
-    @ParameterizedTest
-    @CsvSource({"/admin/member", "/user/member", "/manager/test"})
-    void findRoleNameByUrlPattern(String pattern) {
-        // given
-        final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
+//    @DisplayName("일치하는 패턴의 Role을 검색한다.")
+//    @ParameterizedTest
+//    @CsvSource({"/admin/member", "/user/member", "/manager/test"})
+//    void findRoleNameByUrlPattern(String pattern) {
+//        // given
+//        final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
+//
+//        when(repository.findAllByIsUseIsTrue())
+//                .thenReturn(List.of(
+//                                buildRole(
+//                                        Authentication.ADMIN.getName(),
+//                                        Map.of("pattern", patternList),
+//                                        Boolean.TRUE)
+//                        )
+//                );
+//
+//        // when
+//        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
+//
+//        // then
+//        assertThat(roleList)
+//                .hasSize(1)
+//                .isEqualTo(List.of(Authentication.ADMIN.getName()));
+//
+//        verify(repository, times(1)).findAllByIsUseIsTrue();
+//    }
 
-        when(repository.findAllByIsUseIsTrue())
-                .thenReturn(List.of(
-                                buildRole(
-                                        Authentication.ADMIN.getName(),
-                                        Map.of("pattern", patternList),
-                                        Boolean.TRUE)
-                        )
-                );
-
-        // when
-        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
-
-        // then
-        assertThat(roleList)
-                .hasSize(1)
-                .isEqualTo(List.of(Authentication.ADMIN.getName()));
-
-        verify(repository, times(1)).findAllByIsUseIsTrue();
-    }
-
-    @DisplayName("일치하는 url 패턴이 존재하지 않을 경우 빈 리스트를 리턴한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"/manager/member"})
-    void findRoleNameByUrlPatternWithNotMatchedPattern(String pattern) {
-        // given
-        final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
-
-        when(repository.findAllByIsUseIsTrue())
-                .thenReturn(List.of(
-                                buildRole(
-                                        Authentication.ADMIN.getName(),
-                                        Map.of("pattern", patternList),
-                                        Boolean.TRUE)
-                        )
-                );
-
-        // when
-        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
-
-        // then
-        assertThat(roleList).isEmpty();
-
-        verify(repository, times(1)).findAllByIsUseIsTrue();
-    }
+//    @DisplayName("일치하는 url 패턴이 존재하지 않을 경우 빈 리스트를 리턴한다.")
+//    @ParameterizedTest
+//    @ValueSource(strings = {"/manager/member"})
+//    void findRoleNameByUrlPatternWithNotMatchedPattern(String pattern) {
+//        // given
+//        final List<String> patternList = List.of("/admin/**", "/user/**", "/manager/test");
+//
+//        when(repository.findAllByIsUseIsTrue())
+//                .thenReturn(List.of(
+//                                buildRole(
+//                                        Authentication.ADMIN.getName(),
+//                                        Map.of("pattern", patternList),
+//                                        Boolean.TRUE)
+//                        )
+//                );
+//
+//        // when
+//        List<String> roleList = service.findRoleNameByUrlPattern(pattern);
+//
+//        // then
+//        assertThat(roleList).isEmpty();
+//
+//        verify(repository, times(1)).findAllByIsUseIsTrue();
+//    }
 
     @DisplayName("권한 정보를 수정한다.")
     @Test

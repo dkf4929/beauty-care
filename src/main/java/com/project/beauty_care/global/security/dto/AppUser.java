@@ -1,6 +1,7 @@
 package com.project.beauty_care.global.security.dto;
 
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +16,7 @@ public class AppUser implements UserDetails {
     private Long memberId;
     private String loginId;
     private String name;
-    private Role role;
+    private RoleResponse role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -33,7 +34,7 @@ public class AppUser implements UserDetails {
     }
 
     @Builder
-    public AppUser(Long memberId, String loginId, String name, Role role) {
+    public AppUser(Long memberId, String loginId, String name, RoleResponse role) {
         this.memberId = memberId;
         this.loginId = loginId;
         this.name = name;

@@ -1,9 +1,11 @@
 package com.project.beauty_care.global.security;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.domain.member.service.MemberService;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.ErrorCodes;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,16 +54,23 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
     @MockitoBean
     private RoleService roleService;
 
+    final String KEY = "pattern";
+
+    final Map<String, Object> ADMIN_PATTERN_MAP = Map.of(KEY, List.of("/admin/**"));
+    final Map<String, Object> USER_PATTERN_MAP = Map.of(KEY, List.of("/user/**"));
+
     @DisplayName("권한에 따른 멤버 조회 API 호출 시나리오")
     @TestFactory
     Collection<DynamicTest> createMemberWithAuthentication() throws Exception {
+        final String API_PATH = "/admin/member";
+
         return List.of(
                 DynamicTest.dynamicTest("어드민 권한 => API 호출 성공", () -> {
                     // given
-                    final String API_PATH = "/admin/member";
+                    org.springframework.security.core.Authentication authentication
+                            = buildAuthentication("admin", "admin", buildRole(Authentication.ADMIN.getName(), ADMIN_PATTERN_MAP));
 
-                    when(roleService.findRoleNameByUrlPattern(API_PATH))
-                            .thenReturn(List.of(Authentication.ADMIN.getName()));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     when(memberService.findAllMembers())
                             .thenReturn(buildAllMembers());
@@ -71,9 +82,7 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
                             .thenReturn(Boolean.TRUE);
 
                     when(jwtTokenProvider.getAuthentication(anyString()))
-                            .thenReturn(
-                                    buildAuthentication("admin", "admin", buildRole(Authentication.ADMIN.getName()))
-                            );
+                            .thenReturn(authentication);
 
                     // when, then
                     mockMvc.perform(
@@ -94,6 +103,9 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
                     verify(memberService, times(1)).findAllMembers();
                 }),
                 DynamicTest.dynamicTest("사용자 권한 API 호출 시도 => FORBIDDEN", () -> {
+                    org.springframework.security.core.Authentication authentication
+                            = buildAuthentication("user", "user", buildRole(Authentication.USER.getName(), USER_PATTERN_MAP));
+
                     when(jwtTokenProvider.resolveToken(any()))
                             .thenReturn("Bearer token");
 
@@ -102,13 +114,13 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
 
                     when(jwtTokenProvider.getAuthentication(anyString()))
                             .thenReturn(
-                                    buildAuthentication("user", "user", buildRole(Authentication.USER.getName()))
+                                    buildAuthentication("user", "user", buildRole(Authentication.USER.getName(), Collections.emptyMap()))
                             );
 
                     // when, then
                     mockMvc.perform(
                                     MockMvcRequestBuilders
-                                            .get("/admin/member")
+                                            .get(API_PATH)
                             )
                             .andDo(print())
                             .andExpect(status().isForbidden())
@@ -120,7 +132,7 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
 
                     mockMvc.perform(
                                     MockMvcRequestBuilders
-                                            .get("/admin/member")
+                                            .get(API_PATH)
                             )
                             .andDo(print())
                             .andExpect(status().isUnauthorized())
@@ -156,17 +168,17 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
                         .memberId(1L)
                         .name(name)
                         .loginId(loginId)
-                        .role(role)
+                        .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                         .build(),
                 "1234",
                 List.of(new SimpleGrantedAuthority(role.getRoleName()))
         );
     }
 
-    private Role buildRole(String role) {
+    private Role buildRole(String role, Map<String, Object> urlPatternMap) {
         return Role.builder()
                 .roleName(role)
-                .urlPatterns(Collections.emptyMap())
+                .urlPatterns(urlPatternMap)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.project.beauty_care.global.security;
 
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.security.dto.AppUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +24,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 .memberId(withMockCustomUser.memberId())
                 .loginId(withMockCustomUser.loginId())
                 .name(withMockCustomUser.name())
-                .role(role)
+                .role(RoleMapper.INSTANCE.toSimpleDto(role))
                 .build();
 
         // 인증 객체 생성
@@ -35,12 +36,5 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(authentication);
         return context;
-    }
-
-    private Role buildRole(String role) {
-        return Role.builder()
-                .roleName(role)
-                .urlPatterns(Collections.emptyMap())
-                .build();
     }
 }

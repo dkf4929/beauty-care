@@ -45,7 +45,7 @@ public class RoleService {
                 .map(role -> {
                     List<MemberSummaryResponse> summaryResponseList = memberToSummaryDto(role.getMembers());
 
-                    return RoleMapper.INSTANCE.toDto(role, patternMapToList(role.getUrlPatterns()), summaryResponseList);
+                    return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()), summaryResponseList);
                 })
                 .toList();
     }
@@ -62,32 +62,23 @@ public class RoleService {
 
         Role savedEntity = repository.save(entity);
 
-        List<String> patterns = patternMapToList(savedEntity.getUrlPatterns());
-
-        return RoleMapper.INSTANCE.toDto(savedEntity, patterns);
+        return RoleMapper.INSTANCE.toDto(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
     }
 
     @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
-    public List<String> findRoleNameByUrlPattern(String url) {
-        return repository.findAllByIsUseIsTrue()
-                .stream()
-                .filter(role -> isPatternMatch(url, role))
-                .map(Role::getRoleName)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
     public void checkAuthority(String authority) {
-        List<Role> roles = repository.findAllByRoleName(authority);
+        List<RoleResponse> roles = getAllByRoleNameCached(authority);
 
         if (CollectionUtils.isEmpty(roles))
             throw new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER);
     }
 
     @Transactional(readOnly = true)
-    public Role findRoleByAuthority(String authority) {
-        return findById(authority);
+    public RoleResponse findRoleByAuthority(String authority) {
+        Role role = findById(authority);
+
+        return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
     public RoleResponse updateRole(RoleUpdateRequest request) {
@@ -100,7 +91,14 @@ public class RoleService {
 
         entity.updateRole(request, patternMap);
 
-        return RoleMapper.INSTANCE.toDto(entity, patternMapToList(entity.getUrlPatterns()));
+        return RoleMapper.INSTANCE.toDto(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
+    }
+
+    @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
+    public List<RoleResponse> getAllByRoleNameCached(String authority) {
+        return repository.findAllByRoleName(authority).stream()
+                .map(RoleMapper.INSTANCE::toSimpleDto)
+                .toList();
     }
 
     public void hardDeleteRole(String role) {
@@ -123,16 +121,6 @@ public class RoleService {
     private List<MemberSummaryResponse> memberToSummaryDto(List<Member> memberList) {
         return memberList.stream()
                 .map(MemberMapper.INSTANCE::toSummaryDto)
-                .toList();
-    }
-
-    private List<String> patternMapToList(Map<String, Object> urlPatterns) {
-        return Optional.ofNullable(urlPatterns.get(PATTERN))
-                .filter(List.class::isInstance)
-                .map(list -> (List<?>) list)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(String::valueOf)
                 .toList();
     }
 

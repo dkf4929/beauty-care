@@ -1,7 +1,10 @@
 package com.project.beauty_care.global.security;
 
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,12 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member member = repository.findByLoginIdAndIsUseIsTrue(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException("등록된 사용자가 아닙니다."));
 
+        Role role = member.getRole();
+
         // 인증용 객체로 변환
         return AppUser.builder()
                 .memberId(member.getId())
                 .loginId(member.getLoginId())
                 .name(member.getName())
-                .role(member.getRole())
+                .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                 .build();
     }
 }

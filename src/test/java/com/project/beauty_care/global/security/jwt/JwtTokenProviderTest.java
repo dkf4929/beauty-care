@@ -1,6 +1,7 @@
 package com.project.beauty_care.global.security.jwt;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.domain.role.service.RoleService;
@@ -206,7 +207,7 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
     private LoginResponse generateToken(long now, Role role) {
         // principal
         AppUser user = AppUser.builder()
-                .role(role)
+                .role(RoleMapper.INSTANCE.toSimpleDto(role))
                 .name("user")
                 .loginId("user")
                 .memberId(1L)

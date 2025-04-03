@@ -1,7 +1,10 @@
 package com.project.beauty_care.global.login.service;
 
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
+import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.login.dto.LoginRequest;
@@ -27,6 +30,8 @@ public class LoginService {
         Member findMember = repository.findByLoginIdAndIsUseIsTrue(loginId)
                 .orElseThrow(() -> new RequestInvalidException(Errors.ANONYMOUS_USER));
 
+        Role role = findMember.getRole();
+
         // 패스워드 일치 여부 검사
         validPassword(password, findMember);
         updateLastLoginDateTime(findMember);
@@ -35,7 +40,7 @@ public class LoginService {
                 .memberId(findMember.getId())
                 .loginId(findMember.getLoginId())
                 .name(findMember.getName())
-                .role(findMember.getRole())
+                .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                 .build();
     }
 

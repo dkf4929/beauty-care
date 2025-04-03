@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.member.service;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.MemberResponse;
@@ -307,7 +308,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
         return AppUser.builder()
                 .memberId(memberId)
                 .loginId(loginId)
-                .role(role)
+                .role(RoleMapper.INSTANCE.toSimpleDto(role))
                 .name(name)
                 .build();
     }

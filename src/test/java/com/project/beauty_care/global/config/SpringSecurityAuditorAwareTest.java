@@ -1,6 +1,7 @@
 package com.project.beauty_care.global.config;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -66,7 +67,7 @@ class SpringSecurityAuditorAwareTest extends TestSupportWithOutRedis {
 
         AppUser adminUser = AppUser.builder()
                 .memberId(1L)
-                .role(adminRole)
+                .role(RoleMapper.INSTANCE.toSimpleDto(adminRole))
                 .name("admin")
                 .loginId("admin")
                 .build();

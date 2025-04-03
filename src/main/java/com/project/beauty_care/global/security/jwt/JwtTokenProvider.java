@@ -1,6 +1,7 @@
 package com.project.beauty_care.global.security.jwt;
 
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
@@ -74,7 +75,8 @@ public class JwtTokenProvider {
                         createClaims(appUser.getMemberId(),
                                 appUser.getLoginId(),
                                 appUser.getName(),
-                                authority
+                                authority,
+                                appUser.getRole().getUrlPatterns()
                         )
                 )
                 .setExpiration(accessTokenExpiresIn)
@@ -97,7 +99,7 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        Role role = roleService.findRoleByAuthority(Claim.AUTHORITIES.getClaimValueString(claims));
+        RoleResponse role = roleService.findRoleByAuthority(Claim.AUTHORITIES.getClaimValueString(claims));
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = AppUser.builder()
@@ -156,12 +158,14 @@ public class JwtTokenProvider {
     private Map<String, Object> createClaims(Long memberId,
                                              String loginId,
                                              String name,
-                                             String authorities) {
+                                             String authorities,
+                                             List<String> authUrlPatterns) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(Claim.ID.getValue(), memberId);
         claims.put(Claim.LOGIN_ID.getValue(), loginId);
         claims.put(Claim.NAME.getValue(), name);
         claims.put(Claim.AUTHORITIES.getValue(), authorities);
+        claims.put(Claim.AUTHORITY_URI.getValue(), authUrlPatterns);
         return claims;
     }
 
@@ -171,7 +175,8 @@ public class JwtTokenProvider {
         ID("member_id", Long.class),
         LOGIN_ID("login_id", String.class),
         NAME("name", String.class),
-        AUTHORITIES(AUTHORITIES_KEY, String.class);
+        AUTHORITIES(AUTHORITIES_KEY, String.class),
+        AUTHORITY_URI("authority_uri", List.class),;
 
         private String value;
         private Class type;

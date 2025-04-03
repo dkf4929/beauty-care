@@ -53,8 +53,8 @@ class LoginServiceTest extends TestSupportWithOutRedis {
 
         // then
         assertThat(loginMember)
-                .extracting("loginId", "name", "role")
-                .containsExactly(member.getLoginId(), member.getName(), member.getRole());
+                .extracting("loginId", "name", "role.roleName")
+                .containsExactly(member.getLoginId(), member.getName(), member.getRole().getRoleName());
     }
 
     @DisplayName("등록되지 않은 사용자로 로그인을 시도할 경우, 예외가 발생한다.")

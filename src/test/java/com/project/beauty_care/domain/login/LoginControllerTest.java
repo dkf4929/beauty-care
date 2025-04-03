@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.login;
 
 import com.project.beauty_care.ControllerTestSupport;
+import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.ErrorCodes;
@@ -37,7 +38,7 @@ class LoginControllerTest extends ControllerTestSupport {
         AppUser appUser = AppUser.builder()
                 .loginId("admin")
                 .name("admin")
-                .role(buildRole(Authentication.ADMIN.getName()))
+                .role(RoleMapper.INSTANCE.toSimpleDto(buildRole(Authentication.ADMIN.getName())))
                 .build();
 
         when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);
