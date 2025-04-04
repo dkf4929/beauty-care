@@ -18,8 +18,6 @@ public class AdminCodeCreateRequest {
     @Schema(description = "코드 ID", example = "sys:agree:Y")
     private String codeId;
 
-    @Pattern(regexp = "^[A-Za-z0-9:]+$", message = "ID는 영문 대소문자, 숫자, 콜론(:)만 입력 가능합니다.")
-    @Length(min=1, max=25, message = "ID는 1 ~ 25글자 사이로 입력해주세요")
     @Schema(description = "상위 코드 ID", example = "sys:agree")
     private String parentId;
 
