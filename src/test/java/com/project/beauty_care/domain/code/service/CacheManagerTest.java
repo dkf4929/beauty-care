@@ -19,9 +19,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 class CacheManagerTest extends TestSupportWithRedis {
     @Autowired
@@ -39,7 +37,7 @@ class CacheManagerTest extends TestSupportWithRedis {
         final String key = "all";
 
         Code code
-                = buildCode("sys:agree", "동의 상태", 1, new ArrayList<>(), "", Boolean.TRUE);
+                = buildCode("sys", "system", 1, new ArrayList<>(), "", Boolean.TRUE);
 
         Mockito.doReturn(Optional.of(code)).when(codeRepository).findByParentIsNull();
 

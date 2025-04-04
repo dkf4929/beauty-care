@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.member.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.beauty_care.domain.dto.BaseDto;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import io.swagger.v3.oas.annotations.media.Schema;

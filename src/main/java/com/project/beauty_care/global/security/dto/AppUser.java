@@ -1,6 +1,5 @@
 package com.project.beauty_care.global.security.dto;
 
-import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import lombok.Builder;
 import lombok.Getter;
