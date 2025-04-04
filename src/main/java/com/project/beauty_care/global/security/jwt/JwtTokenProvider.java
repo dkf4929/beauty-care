@@ -1,6 +1,5 @@
 package com.project.beauty_care.global.security.jwt;
 
-import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
@@ -165,7 +164,7 @@ public class JwtTokenProvider {
         claims.put(Claim.LOGIN_ID.getValue(), loginId);
         claims.put(Claim.NAME.getValue(), name);
         claims.put(Claim.AUTHORITIES.getValue(), authorities);
-        claims.put(Claim.AUTHORITY_URI.getValue(), authUrlPatterns);
+        claims.put(Claim.AUTHORITY_PATTERN.getValue(), authUrlPatterns);
         return claims;
     }
 
@@ -176,7 +175,7 @@ public class JwtTokenProvider {
         LOGIN_ID("login_id", String.class),
         NAME("name", String.class),
         AUTHORITIES(AUTHORITIES_KEY, String.class),
-        AUTHORITY_URI("authority_uri", List.class),;
+        AUTHORITY_PATTERN("authority_pattern", List.class),;
 
         private String value;
         private Class type;
