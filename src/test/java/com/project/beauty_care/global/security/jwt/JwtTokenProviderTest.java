@@ -3,10 +3,11 @@ package com.project.beauty_care.global.security.jwt;
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
-import com.project.beauty_care.global.exception.NoAuthorityMember;
+import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
@@ -14,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +45,7 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
     @MockitoBean
     RoleRepository roleRepository;
 
-    @Autowired
+    @MockitoBean
     private RoleService roleService;
 
     @BeforeEach
@@ -72,28 +75,14 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
         assertThat(loginResponse.getAccessToken()).isNotEmpty();
     }
 
-    @DisplayName("유효하지 않은 권한 -> 예외 발생")
-    @ParameterizedTest
-    @CsvSource({"ROLE_MANAGER", "ROLE_SYSTEM_ADMIN"})
-    void generateTokenWithInvalidAuthority(String role) {
-        // given
-        when(roleRepository.findAllByRoleName(anyString()))
-                .thenReturn(Collections.emptyList());
-
-        // then
-        assertThatThrownBy(() -> generateToken(new Date().getTime(), buildRole(role)))
-                .isInstanceOf(NoAuthorityMember.class)
-                .hasFieldOrPropertyWithValue("errors.message", Errors.NO_AUTHORITY_MEMBER.getMessage())
-                .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NO_AUTHORITY_MEMBER.getErrorCode());
-    }
-
     @DisplayName("토큰의 권한 정보가 일치하는지 확인")
     @Test
     void getAuthentication() {
         // given
         final Role role = buildRole(USER);
 
-        when(roleRepository.findAllByRoleName(any())).thenReturn(List.of(role));
+        when(roleService.findRoleByAuthority(any()))
+                .thenReturn(RoleMapper.INSTANCE.toSimpleDto(role));
 
         when(roleRepository.findById(any())).thenReturn(Optional.of(role));
 
@@ -114,6 +103,8 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
     Collection<DynamicTest> validateTokenDynamicTest() {
         when(roleRepository.findAllByRoleName(anyString()))
                 .thenReturn(List.of(buildRole(ADMIN)));
+
+        doNothing().when(roleService).checkAuthority(anyString());
 
         return List.of(
                 DynamicTest.dynamicTest("토큰 만료 시 예외가 발생한다(과거 시점)", () -> {
