@@ -15,7 +15,7 @@ springdoc:
     path: /beauty-care/swagger.html
 
 jwt:
-  secret: secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey
+  secret: "W8aQog6MTN0MoAtH+dRCvxUuIFLpmdtFwPrIf3EXcP/7doFiON4VKlfy9o6M+/LzqzqFrq5WJ52xWxvRUf79uQ=="
 
 initial:
   password: qwer1234
