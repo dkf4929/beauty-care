@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Schema(description = "공통 API 응답")
-// 스웨거 어노테이션 중복으로, 명칭 변경
 public class SuccessResponse<T> {
     @Schema(description = "응답 코드")
     private int successCode;
