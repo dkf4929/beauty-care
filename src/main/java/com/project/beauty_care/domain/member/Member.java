@@ -32,7 +32,7 @@ public class Member extends BaseEntity {
     @NotBlank
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 

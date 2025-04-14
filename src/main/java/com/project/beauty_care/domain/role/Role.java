@@ -2,6 +2,7 @@ package com.project.beauty_care.domain.role;
 
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.menuRole.MenuRole;
 import com.project.beauty_care.domain.role.dto.RoleUpdateRequest;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -29,6 +30,9 @@ public class Role extends BaseEntity {
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuRole> menuRole = new ArrayList<>();
 
     private Boolean isUse;
 
