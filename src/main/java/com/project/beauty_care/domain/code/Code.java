@@ -26,7 +26,7 @@ public class Code extends BaseTimeEntity {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "upper_id")
     private Code parent;
 
