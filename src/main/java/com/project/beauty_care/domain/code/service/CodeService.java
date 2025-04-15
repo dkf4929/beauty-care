@@ -49,7 +49,7 @@ public class CodeService {
     @Transactional(readOnly = true)
     public AdminCodeResponse findCodeById(String codeId) {
         Code entity = findById(codeId);
-        return CodeMapper.INSTANCE.toDto(entity);
+        return CodeMapper.INSTANCE.toResponse(entity);
     }
 
 //    @Caching(evict = {
@@ -74,14 +74,14 @@ public class CodeService {
                 .parent(parent)
                 .build();
 
-        return CodeMapper.INSTANCE.toDto(repository.save(entity));
+        return CodeMapper.INSTANCE.toResponse(repository.save(entity));
     }
 
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
     public AdminCodeResponse updateCode(String codeId, AdminCodeUpdateRequest request) {
         Code entity = findById(codeId);
         if (!request.getIsUse()) entity.getChildren().forEach(this::updateIsUseFalse);
-        return CodeMapper.INSTANCE.toDto(entity.update(request));
+        return CodeMapper.INSTANCE.toResponse(entity.update(request));
     }
 
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
@@ -102,9 +102,9 @@ public class CodeService {
     }
 
     private AdminCodeResponse toDto(Code code) {
-        AdminCodeResponse dto = CodeMapper.INSTANCE.toDto(code);
+        AdminCodeResponse dto = CodeMapper.INSTANCE.toResponse(code);
         List<AdminCodeResponse> childrenList = code.getChildren().stream()
-                .map(CodeMapper.INSTANCE::toDto)
+                .map(CodeMapper.INSTANCE::toResponse)
                 .toList();
         dto.setChildren(childrenList);
         return dto;

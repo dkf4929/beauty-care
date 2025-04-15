@@ -47,7 +47,7 @@ public class RoleService {
                 .map(role -> {
                     List<MemberSummaryResponse> summaryResponseList = memberToSummaryDto(role.getMembers());
 
-                    return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()), summaryResponseList);
+                    return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()), summaryResponseList);
                 })
                 .toList();
     }
@@ -65,7 +65,7 @@ public class RoleService {
 
         Role savedEntity = repository.save(entity);
 
-        return RoleMapper.INSTANCE.toDto(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
+        return RoleMapper.INSTANCE.toResponse(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
     }
 
     @Transactional(readOnly = true)
@@ -92,14 +92,14 @@ public class RoleService {
 
         entity.updateRole(request, patternMap);
 
-        return RoleMapper.INSTANCE.toDto(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
+        return RoleMapper.INSTANCE.toResponse(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
     }
 
     @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
     public RoleResponse findByRoleNameCached(String authority) {
         Role role = findById(authority);
 
-        return RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
+        return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
     @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
@@ -122,7 +122,7 @@ public class RoleService {
 
     private List<MemberSummaryResponse> memberToSummaryDto(List<Member> memberList) {
         return memberList.stream()
-                .map(MemberMapper.INSTANCE::toSummaryDto)
+                .map(MemberMapper.INSTANCE::toSummaryResponse)
                 .toList();
     }
 

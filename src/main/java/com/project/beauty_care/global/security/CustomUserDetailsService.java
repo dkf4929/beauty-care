@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .memberId(member.getId())
                 .loginId(member.getLoginId())
                 .name(member.getName())
-                .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
+                .role(RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                 .build();
     }
 }

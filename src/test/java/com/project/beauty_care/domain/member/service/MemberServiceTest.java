@@ -308,7 +308,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
         return AppUser.builder()
                 .memberId(memberId)
                 .loginId(loginId)
-                .role(RoleMapper.INSTANCE.toSimpleDto(role))
+                .role(RoleMapper.INSTANCE.toSimpleResponse(role))
                 .name(name)
                 .build();
     }

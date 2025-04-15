@@ -40,7 +40,7 @@ public class LoginService {
                 .memberId(findMember.getId())
                 .loginId(findMember.getLoginId())
                 .name(findMember.getName())
-                .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
+                .role(RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                 .build();
     }
 

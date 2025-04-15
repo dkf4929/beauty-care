@@ -23,7 +23,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 .memberId(withMockCustomUser.memberId())
                 .loginId(withMockCustomUser.loginId())
                 .name(withMockCustomUser.name())
-                .role(RoleMapper.INSTANCE.toSimpleDto(role))
+                .role(RoleMapper.INSTANCE.toSimpleResponse(role))
                 .build();
 
         // 인증 객체 생성

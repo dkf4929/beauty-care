@@ -23,7 +23,7 @@ public interface MemberMapper {
     @Mapping(target = "updatedBy", source = "updatedBy")
     @Mapping(target = "createdDateTime", source = "createdDateTime")
     @Mapping(target = "updatedDateTime", source = "updatedDateTime")
-    MemberResponse toDto(Member member);
+    MemberResponse toResponse(Member member);
 
     @Mapping(target = "id", source = "member.id")
     @Mapping(target = "loginId", source = "member.loginId")
@@ -35,7 +35,7 @@ public interface MemberMapper {
     @Mapping(target = "updatedBy", source = "member.updatedBy")
     @Mapping(target = "createdDateTime", source = "member.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "member.updatedDateTime")
-    MemberRoleResponse toDto(Member member, RoleResponse role);
+    MemberRoleResponse toResponse(Member member, RoleResponse role);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "loginId", source = "loginId")
@@ -46,5 +46,5 @@ public interface MemberMapper {
     @Mapping(target = "updatedBy", source = "updatedBy")
     @Mapping(target = "createdDateTime", source = "createdDateTime")
     @Mapping(target = "updatedDateTime", source = "updatedDateTime")
-    MemberSummaryResponse toSummaryDto(Member member);
+    MemberSummaryResponse toSummaryResponse(Member member);
 }

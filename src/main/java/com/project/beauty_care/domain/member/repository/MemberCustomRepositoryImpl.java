@@ -42,8 +42,8 @@ public abstract class MemberCustomRepositoryImpl implements MemberCustomReposito
                 .map(String::valueOf)
                 .toList();
 
-        RoleResponse roleResponse = RoleMapper.INSTANCE.toDto(role, urlPatterns);
+        RoleResponse roleResponse = RoleMapper.INSTANCE.toResponse(role, urlPatterns);
 
-        return MemberMapper.INSTANCE.toDto(findMember, roleResponse);
+        return MemberMapper.INSTANCE.toResponse(findMember, roleResponse);
     }
 }

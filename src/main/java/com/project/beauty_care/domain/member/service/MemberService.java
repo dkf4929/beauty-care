@@ -45,7 +45,7 @@ public class MemberService {
         List<Member> memberList = repository.findAll();
 
         return memberList.stream()
-                .map(MemberMapper.INSTANCE::toDto)
+                .map(MemberMapper.INSTANCE::toResponse)
                 .toList();
     }
 
@@ -53,7 +53,7 @@ public class MemberService {
     public MemberResponse findMemberById(Long id) {
         Member member = findById(id);
 
-        return MemberMapper.INSTANCE.toDto(member);
+        return MemberMapper.INSTANCE.toResponse(member);
     }
 
     // 미사용
@@ -79,7 +79,7 @@ public class MemberService {
         Member findMember = findById(request.getId());
 
         findMember.updateMember(request.getName(), encodePassword(request.getPassword()));
-        return MemberMapper.INSTANCE.toDto(findMember);
+        return MemberMapper.INSTANCE.toResponse(findMember);
     }
 
     public MemberResponse updateMemberAdmin(AdminMemberUpdateRequest request, AppUser loginUser) {
@@ -94,7 +94,7 @@ public class MemberService {
         Role role = findRoleById(request.getRole());
 
         findMember.updateMember(request, role);
-        return MemberMapper.INSTANCE.toDto(findMember);
+        return MemberMapper.INSTANCE.toResponse(findMember);
     }
 
     // 비밀번호 암호화

@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/role")
-public class RoleController {
+public class AdminRoleController {
     private final RoleService service;
 
     @Operation(summary = "권한 목록 조회",

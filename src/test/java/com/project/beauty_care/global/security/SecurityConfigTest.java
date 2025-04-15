@@ -168,7 +168,7 @@ public class SecurityConfigTest extends TestSupportWithOutRedis {
                         .memberId(1L)
                         .name(name)
                         .loginId(loginId)
-                        .role(RoleMapper.INSTANCE.toDto(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
+                        .role(RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns())))
                         .build(),
                 "1234",
                 List.of(new SimpleGrantedAuthority(role.getRoleName()))

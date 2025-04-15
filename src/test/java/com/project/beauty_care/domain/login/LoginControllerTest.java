@@ -38,7 +38,7 @@ class LoginControllerTest extends ControllerTestSupport {
         AppUser appUser = AppUser.builder()
                 .loginId("admin")
                 .name("admin")
-                .role(RoleMapper.INSTANCE.toSimpleDto(buildRole(Authentication.ADMIN.getName())))
+                .role(RoleMapper.INSTANCE.toSimpleResponse(buildRole(Authentication.ADMIN.getName())))
                 .build();
 
         when(loginService.login(any(LoginRequest.class))).thenReturn(appUser);

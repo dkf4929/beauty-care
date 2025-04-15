@@ -76,7 +76,7 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
         final Role role = buildRole(USER);
 
         when(roleService.findRoleByAuthority(any()))
-                .thenReturn(RoleMapper.INSTANCE.toSimpleDto(role));
+                .thenReturn(RoleMapper.INSTANCE.toSimpleResponse(role));
 
         when(roleRepository.findById(any())).thenReturn(Optional.of(role));
 
@@ -192,7 +192,7 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
     private LoginResponse generateToken(long now, Role role) {
         // principal
         AppUser user = AppUser.builder()
-                .role(RoleMapper.INSTANCE.toSimpleDto(role))
+                .role(RoleMapper.INSTANCE.toSimpleResponse(role))
                 .name("user")
                 .loginId("user")
                 .memberId(1L)

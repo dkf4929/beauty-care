@@ -21,7 +21,7 @@ public interface RoleMapper {
     @Mapping(target = "updatedBy", source = "role.updatedBy")
     @Mapping(target = "createdDateTime", source = "role.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "role.updatedDateTime")
-    RoleResponse toDto(Role role, List<String> urlPatterns);
+    RoleResponse toResponse(Role role, List<String> urlPatterns);
 
     @Mapping(target = "roleName", source = "role.roleName")
     @Mapping(target = "urlPatterns", source = "urlPatterns")
@@ -30,7 +30,7 @@ public interface RoleMapper {
     @Mapping(target = "updatedBy", source = "role.updatedBy")
     @Mapping(target = "createdDateTime", source = "role.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "role.updatedDateTime")
-    RoleMemberResponse toDto(Role role, List<String> urlPatterns, List<MemberSummaryResponse> members);
+    RoleMemberResponse toResponse(Role role, List<String> urlPatterns, List<MemberSummaryResponse> members);
 
     @Mapping(target = "roleName", source = "role.roleName")
     @Mapping(target = "urlPatterns", ignore = true)
@@ -39,5 +39,5 @@ public interface RoleMapper {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "createdDateTime", ignore = true)
     @Mapping(target = "updatedDateTime", ignore = true)
-    RoleResponse toSimpleDto(Role role);
+    RoleResponse toSimpleResponse(Role role);
 }

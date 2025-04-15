@@ -30,5 +30,5 @@ public interface CodeMapper {
     @Mapping(target = "isUse", source = "code.isUse")
     @Mapping(target = "createdDateTime", source = "createdDateTime")
     @Mapping(target = "updatedDateTime", source = "updatedDateTime")
-    AdminCodeResponse toDto(Code code);
+    AdminCodeResponse toResponse(Code code);
 }

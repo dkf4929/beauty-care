@@ -67,7 +67,7 @@ class SpringSecurityAuditorAwareTest extends TestSupportWithOutRedis {
 
         AppUser adminUser = AppUser.builder()
                 .memberId(1L)
-                .role(RoleMapper.INSTANCE.toSimpleDto(adminRole))
+                .role(RoleMapper.INSTANCE.toSimpleResponse(adminRole))
                 .name("admin")
                 .loginId("admin")
                 .build();
