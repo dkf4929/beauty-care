@@ -29,7 +29,9 @@ public enum Errors {
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 사용자가 아닙니다."),
     NOT_FOUND_CODE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 코드가 아닙니다."),
     NOT_FOUND_PARENT_CODE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 코드를 찾을 수 없습니다."),
-    NOT_FOUND_ROLE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "권한을 찾을 수 없습니다."),
+    NOT_FOUND_ROLE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 권한이 아닙니다."),
+    NOT_FOUND_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 메뉴가 아닙니다."),
+    NOT_USE_PARENT_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴가 사용중 상태가 아닙니다."),
 
     CAN_NOT_DELETE_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "하위코드가 존재하는 경우, 삭제할 수 없습니다."),
     DUPLICATED_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "중복된 코드 ID가 존재합니다."),

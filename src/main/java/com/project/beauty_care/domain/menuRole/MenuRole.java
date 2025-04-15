@@ -2,11 +2,9 @@ package com.project.beauty_care.domain.menuRole;
 
 import com.project.beauty_care.domain.menu.Menu;
 import com.project.beauty_care.domain.role.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuRole {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -24,4 +23,10 @@ public class MenuRole {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Builder
+    public MenuRole(Role role, Menu menu) {
+        this.role = role;
+        this.menu = menu;
+    }
 }
