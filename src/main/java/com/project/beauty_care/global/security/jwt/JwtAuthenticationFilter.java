@@ -1,14 +1,18 @@
 package com.project.beauty_care.global.security.jwt;
 
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.PermitSvc;
 import com.project.beauty_care.global.exception.JwtException;
+import com.project.beauty_care.global.security.dto.AppUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -17,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -47,6 +52,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static void setAuthenticationToSecurityContextForTest() {
+        AppUser authentication = AppUser.builder()
+                .memberId(1L)
+                .loginId("admin")
+                .name("admin")
+                .role(RoleResponse.builder().roleName("ADMIN").isUse(Boolean.TRUE).build())
+                .build();
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        authentication,
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
     }
 
     private boolean isPermitPath(String requestURI) {
