@@ -8,13 +8,15 @@ import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AdminMenuRequest {
+@SuperBuilder
+public class MenuBaseRequest {
     @NotBlank(message = "메뉴명을 입력하세요.")
     @Size(min = 2, max = 20, message = "메뉴명은 2~20 자리의 문자 형태로 입력해야 합니다.")
     @Schema(example = "시스템")
@@ -39,9 +41,6 @@ public class AdminMenuRequest {
     @NotNull(message = "메뉴 사용여부를 입력하세요.")
     @Schema(example = "true")
     private Boolean isUse;
-
-    @Schema(example = "1")
-    private Long parentMenuId;
 
     @NotEmpty(message = "권한을 지정하세요.")
     @Schema(example = "ADMIN")

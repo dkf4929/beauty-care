@@ -1,12 +1,15 @@
 package com.project.beauty_care.domain.menu.controller;
 
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
-import com.project.beauty_care.domain.menu.dto.AdminMenuRequest;
+import com.project.beauty_care.domain.menu.dto.AdminMenuCreateRequest;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
+import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
 import com.project.beauty_care.domain.menu.service.MenuService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,8 +37,12 @@ public class AdminMenuController {
                     schema = @Schema(implementation = AdminMenuResponse.class))),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(
-                            example = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"))),
+                    examples = {
+                            @ExampleObject(name = "Invalid Field",
+                                    value = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"),
+                            @ExampleObject(name = "Menu Depth Error",
+                                    value = "{ \"code\": \"E006\", \"message\": \"메뉴는 최대 3depth 입니다.\" }")
+                    })),
             @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
@@ -50,7 +57,9 @@ public class AdminMenuController {
                             @ExampleObject(name = "Not Found Role",
                                     value = "{ \"code\": \"E006\", \"message\": \"등록된 권한이 아닙니다.\" }"),
                             @ExampleObject(name = "Not Used Menu",
-                                    value = "{ \"code\": \"E006\", \"message\": \"상위 메뉴가 사용중 상태가 아닙니다.\" }")
+                                    value = "{ \"code\": \"E006\", \"message\": \"상위 메뉴를 찾을 수 없습니다.\" }"),
+                            @ExampleObject(name = "Menu Max Level Error",
+                                    value = "{ \"code\": \"E006\", \"message\": \"메뉴는 최대 3depth 입니다.\" }")
                     })
             ),
             @ApiResponse(responseCode = "409", description = "Duplicated", content = @Content(
@@ -77,7 +86,7 @@ public class AdminMenuController {
             )
     })
     @PostMapping
-    public SuccessResponse<AdminMenuResponse> createMenu(@RequestBody @Valid AdminMenuRequest request) {
+    public SuccessResponse<AdminMenuResponse> createMenu(@RequestBody @Valid AdminMenuCreateRequest request) {
         return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, HttpStatus.CREATED, service.createMenu(request));
     }
 
@@ -103,5 +112,57 @@ public class AdminMenuController {
     @GetMapping
     public SuccessResponse<AdminMenuResponse> findMenuAll() {
         return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, service.findAllMenu());
+    }
+
+    @Operation(summary = "메뉴 수정",
+            description = "메뉴를 수정한다.",
+            parameters = @Parameter(
+                    name = "menuId",
+                    description = "메뉴 ID",
+                    required = true,
+                    in = ParameterIn.PATH,
+                    schema = @Schema(type = "Long")
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 완료되었습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AdminMenuResponse.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
+            @ApiResponse(responseCode = "404", description = "ENTITY NOT FOUND", content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "Not Found Role",
+                                    value = "{ \"code\": \"E006\", \"message\": \"등록된 권한이 아닙니다.\" }"),
+                            @ExampleObject(name = "Not Used Menu",
+                                    value = "{ \"code\": \"E006\", \"message\": \"상위 메뉴를 찾을 수 없습니다.\" }"),
+                            @ExampleObject(name = "Menu Max Level Error",
+                                    value = "{ \"code\": \"E006\", \"message\": \"메뉴는 최대 3depth 입니다.\" }")
+                    })
+            ),
+            @ApiResponse(responseCode = "409", description = "Duplicated", content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "Duplicated Menu Name",
+                                    value = "{ \"code\": \"E005\", \"message\": \"중복된 메뉴명이 존재합니다.\" }"),
+                            @ExampleObject(name = "Duplicated Menu Path",
+                                    value = "{ \"code\": \"E005\", \"message\": \"중복된 메뉴 경로가 존재합니다.\" }")
+                    }
+            )),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
+    })
+    @PutMapping("/{menuId}")
+    public SuccessResponse<AdminCodeResponse> updateCode(@PathVariable("codeId") String codeId,
+                                                         @RequestBody @Valid AdminMenuUpdateRequest request) {
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, service.updateMenu(request));
     }
 }

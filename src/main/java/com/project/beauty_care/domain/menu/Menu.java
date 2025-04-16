@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.menu;
 
 import com.project.beauty_care.domain.BaseEntity;
+import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
 import com.project.beauty_care.domain.menuRole.MenuRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -56,6 +57,18 @@ public class Menu extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuRole> menuRole = new ArrayList<>();
+
+    public Menu updateMenu(AdminMenuUpdateRequest request, List<MenuRole> menuRole) {
+        this.menuName = request.getMenuName();
+        this.menuPath = request.getMenuPath();
+        this.description = request.getDescription();
+        this.sortNumber = request.getSortNumber();
+        this.isLeaf = request.getIsLeaf();
+        this.isUse = request.getIsUse();
+        this.menuRole = menuRole;
+
+        return this;
+    }
 
     @Builder
     public Menu(String menuName, String menuPath, String description, Integer sortNumber, Boolean isLeaf, Boolean isUse, Menu parent) {

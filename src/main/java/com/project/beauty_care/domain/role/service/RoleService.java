@@ -31,7 +31,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RoleService {
     private final RoleRepository repository;
     private final AntPathMatcher matcher = new AntPathMatcher();
@@ -52,6 +51,7 @@ public class RoleService {
                 .toList();
     }
 
+    @Transactional
     @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public RoleResponse createRole(RoleCreateRequest request) {
         // 동일한 ID가 존재하는지 확인
@@ -81,6 +81,7 @@ public class RoleService {
         return findByRoleNameCached(authority);
     }
 
+    @Transactional
     @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public RoleResponse updateRole(RoleUpdateRequest request) {
         if (!request.getBeforeRoleName().equals(request.getAfterRoleName()))
@@ -95,6 +96,7 @@ public class RoleService {
         return RoleMapper.INSTANCE.toResponse(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
     }
 
+    @Transactional
     @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
     public RoleResponse findByRoleNameCached(String authority) {
         Role role = findById(authority);
@@ -102,6 +104,7 @@ public class RoleService {
         return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
+    @Transactional
     @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
     public void hardDeleteRole(String role) {
         repository.deleteById(role);
@@ -110,6 +113,14 @@ public class RoleService {
     private Role findById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_ROLE));
+    }
+
+    public List<Role> findRoleByRoleNames(List<String> roleNames) {
+        return repository.findAllById(roleNames);
+    }
+
+    public RoleResponse convertRoleToResponse(Role role) {
+        return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
     private Role buildEntity(RoleCreateRequest request, Map<String, Object> patternMap) {

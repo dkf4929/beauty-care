@@ -31,10 +31,13 @@ public enum Errors {
     NOT_FOUND_PARENT_CODE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 코드를 찾을 수 없습니다."),
     NOT_FOUND_ROLE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 권한이 아닙니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 메뉴가 아닙니다."),
-    NOT_USE_PARENT_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴가 사용중 상태가 아닙니다."),
+    NOT_FOUND_PARENT_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴를 찾을 수 없습니다."),
 
+    // request invalid
     CAN_NOT_DELETE_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "하위코드가 존재하는 경우, 삭제할 수 없습니다."),
     DUPLICATED_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "중복된 코드 ID가 존재합니다."),
+    CAN_NOT_SAVE_CHILDREN_MENU(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "메뉴는 최대 3depth 입니다."),
+    PARENT_MENU_NOT_USE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴가 사용중 상태가 아닙니다."),
     DUPLICATED_ROLE(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT.getErrorCode(), "중복된 권한이 존재합니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "서버에 오류가 발생했습니다. 관리자에게 문의하세요.");
