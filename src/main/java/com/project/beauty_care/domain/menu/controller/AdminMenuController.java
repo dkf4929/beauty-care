@@ -161,8 +161,8 @@ public class AdminMenuController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @PutMapping("/{menuId}")
-    public SuccessResponse<AdminCodeResponse> updateCode(@PathVariable("codeId") String codeId,
+    public SuccessResponse<AdminMenuResponse> updateCode(@PathVariable("menuId") Long menuId,
                                                          @RequestBody @Valid AdminMenuUpdateRequest request) {
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, service.updateMenu(request));
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, service.updateMenu(request, menuId));
     }
 }

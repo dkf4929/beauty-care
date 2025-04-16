@@ -16,7 +16,7 @@ public class MenuRoleService {
 
     public List<MenuRole> createMenuRoleWithMenuAndRole(Menu menu, List<Role> roles) {
         return roles.stream()
-                .map(role -> buildMenuRole(menu, role))
+                .map(role -> buildEntity(menu, role))
                 .toList();
     }
 
@@ -24,7 +24,7 @@ public class MenuRoleService {
         repository.saveAll(menuRoles);
     }
 
-    private MenuRole buildMenuRole(Menu entity, Role role) {
+    private MenuRole buildEntity(Menu entity, Role role) {
         return MenuRole.builder()
                 .menu(entity)
                 .role(role)

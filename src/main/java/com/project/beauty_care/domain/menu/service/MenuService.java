@@ -81,8 +81,8 @@ public class MenuService {
     }
 
     @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
-    public AdminMenuResponse updateMenu(AdminMenuUpdateRequest request) {
-        Menu menu = findById(request.getMenuId());
+    public AdminMenuResponse updateMenu(AdminMenuUpdateRequest request, Long menuId) {
+        Menu menu = findById(menuId);
         Menu parent = menu.getParent();
 
         // 최하위 메뉴에 leafMenu 추가 불가.
