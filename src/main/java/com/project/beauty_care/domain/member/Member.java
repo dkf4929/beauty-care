@@ -56,10 +56,6 @@ public class Member extends BaseEntity {
         this.lastLoginDateTime = lastLoginDateTime;
     }
 
-    public void updateRole(Role role) {
-        this.role = role;
-    }
-
     @Builder
     public Member(String loginId, String password, String name, Role role, LocalDateTime lastLoginDateTime) {
         this.loginId = loginId;
@@ -79,24 +75,6 @@ public class Member extends BaseEntity {
         member.role = role;
 
         return member;
-    }
-
-    public static Member createMember(PublicMemberCreateRequest request, String password, Role role) {
-        return Member.builder()
-                .loginId(request.getLoginId())
-                .password(password)
-                .name(request.getName())
-                .role(role)
-                .build();
-    }
-
-    public static Member createMember(AdminMemberCreateRequest request, String password, Role role) {
-        return Member.builder()
-                .loginId(request.getLoginId())
-                .password(password)
-                .name(request.getName())
-                .role(role)
-                .build();
     }
 
     public void deleteMember() {this.isUse = Boolean.FALSE;}

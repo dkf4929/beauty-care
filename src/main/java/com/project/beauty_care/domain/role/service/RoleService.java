@@ -3,8 +3,10 @@ package com.project.beauty_care.domain.role.service;
 import com.project.beauty_care.domain.mapper.MemberMapper;
 import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.member.Member;
+import com.project.beauty_care.domain.member.MemberConverter;
 import com.project.beauty_care.domain.member.dto.MemberSummaryResponse;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.RoleConverter;
 import com.project.beauty_care.domain.role.dto.RoleCreateRequest;
 import com.project.beauty_care.domain.role.dto.RoleMemberResponse;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
@@ -35,6 +37,8 @@ public class RoleService {
     private final RoleRepository repository;
     private final AntPathMatcher matcher = new AntPathMatcher();
     private static final String PATTERN = "pattern";
+    private final RoleConverter converter;
+    private final MemberConverter memberConverter;
 
     @Transactional(readOnly = true)
     @Cacheable(value = RedisCacheKey.ROLE, key = "'all'", cacheManager = "redisCacheManager")
@@ -44,9 +48,14 @@ public class RoleService {
         // toDto
         return roles.stream()
                 .map(role -> {
-                    List<MemberSummaryResponse> summaryResponseList = memberToSummaryDto(role.getMembers());
+                    List<MemberSummaryResponse> summaryResponseList
+                            = memberConverter.toSummaryResponse(role.getMembers());
 
-                    return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()), summaryResponseList);
+                    return converter.toResponse(
+                            role,
+                            RoleResponse.patternMapToList(role.getUrlPatterns()),
+                            summaryResponseList
+                    );
                 })
                 .toList();
     }
@@ -61,11 +70,11 @@ public class RoleService {
         Map<String, Object> patternMap = Map.of(PATTERN, request.getUrlPatterns());
 
         // build entity
-        Role entity = buildEntity(request, patternMap);
+        Role entity = converter.buildEntity(request, patternMap);
 
         Role savedEntity = repository.save(entity);
 
-        return RoleMapper.INSTANCE.toResponse(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
+        return converter.toResponse(savedEntity, RoleResponse.patternMapToList(savedEntity.getUrlPatterns()));
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +102,7 @@ public class RoleService {
 
         entity.updateRole(request, patternMap);
 
-        return RoleMapper.INSTANCE.toResponse(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
+        return converter.toResponse(entity, RoleResponse.patternMapToList(entity.getUrlPatterns()));
     }
 
     @Transactional
@@ -101,7 +110,7 @@ public class RoleService {
     public RoleResponse findByRoleNameCached(String authority) {
         Role role = findById(authority);
 
-        return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
+        return converter.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
     @Transactional
@@ -117,24 +126,6 @@ public class RoleService {
 
     public List<Role> findRoleByRoleNames(List<String> roleNames) {
         return repository.findAllById(roleNames);
-    }
-
-    public RoleResponse convertRoleToResponse(Role role) {
-        return RoleMapper.INSTANCE.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
-    }
-
-    private Role buildEntity(RoleCreateRequest request, Map<String, Object> patternMap) {
-        return Role.builder()
-                .roleName(request.getRoleName().toUpperCase())
-                .urlPatterns(patternMap)
-                .isUse(request.getIsUse())
-                .build();
-    }
-
-    private List<MemberSummaryResponse> memberToSummaryDto(List<Member> memberList) {
-        return memberList.stream()
-                .map(MemberMapper.INSTANCE::toSummaryResponse)
-                .toList();
     }
 
     private boolean isPatternMatch(String url, Role role) {

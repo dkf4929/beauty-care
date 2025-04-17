@@ -1,6 +1,8 @@
 package com.project.beauty_care.domain.code.service;
 
 import com.project.beauty_care.domain.code.Code;
+import com.project.beauty_care.domain.code.CodeConverter;
+import com.project.beauty_care.domain.code.CodeValidator;
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
@@ -26,6 +28,8 @@ import java.util.Optional;
 public class CodeService {
     private final CodeRepository repository;
     private static final String KEY = "all";
+    private final CodeValidator validator;
+    private final CodeConverter converter;
 
     // 조회 ALL
     @Cacheable(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager")
@@ -36,10 +40,10 @@ public class CodeService {
         if (codeOptional.isPresent()) {
             Code entity = codeOptional.get();
             List<AdminCodeResponse> childList = entity.getChildren().stream()
-                    .map(this::toDto)
+                    .map(converter::toHierarchy)
                     .toList();
 
-            return CodeMapper.INSTANCE.toAdminCodeResponse(entity, childList);
+            return converter.toResponse(entity, childList);
         } else
             return AdminCodeResponse.builder().build();
     }
@@ -49,13 +53,9 @@ public class CodeService {
     @Transactional(readOnly = true)
     public AdminCodeResponse findCodeById(String codeId) {
         Code entity = findById(codeId);
-        return CodeMapper.INSTANCE.toResponse(entity);
+        return converter.toResponse(entity);
     }
 
-//    @Caching(evict = {
-//            @CacheEvict(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager"),
-//            @CacheEvict(value = RedisCacheKey.CODE, key = "#codeId", cacheManager = "redisCacheManager")
-//    })
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
     public AdminCodeResponse createCode(AdminCodeCreateRequest request) {
         Code parent = null;
@@ -65,49 +65,33 @@ public class CodeService {
             parent = repository.findById(request.getParentId())
                     .orElseThrow(() -> new EntityNotFoundException(Errors.INTERNAL_SERVER_ERROR));
 
-        Code entity = Code.builder()
-                .id(request.getCodeId())
-                .name(request.getName())
-                .sortNumber(request.getSortNumber())
-                .description(request.getDescription())
-                .isUse(request.getIsUse())
-                .parent(parent)
-                .build();
+        Code entity = converter.buildEntity(request, parent);
 
-        return CodeMapper.INSTANCE.toResponse(repository.save(entity));
+        return converter.toResponse(repository.save(entity));
     }
 
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
     public AdminCodeResponse updateCode(String codeId, AdminCodeUpdateRequest request) {
         Code entity = findById(codeId);
+
         if (!request.getIsUse()) entity.getChildren().forEach(this::updateIsUseFalse);
-        return CodeMapper.INSTANCE.toResponse(entity.update(request));
+
+        return converter.toResponse(entity.update(request));
     }
 
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
     public String deleteCode(String codeId) {
         Code entity = findById(codeId);
-        checkIsDeletable(entity);
+
+        validator.checkIsDeletable(entity);
         repository.deleteById(codeId);
+
         return codeId;
     }
 
     private Code findById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_CODE));
-    }
-
-    private void checkIsDeletable(Code entity) {
-        if (!entity.getChildren().isEmpty()) throw new RequestInvalidException(Errors.CAN_NOT_DELETE_CODE);
-    }
-
-    private AdminCodeResponse toDto(Code code) {
-        AdminCodeResponse dto = CodeMapper.INSTANCE.toResponse(code);
-        List<AdminCodeResponse> childrenList = code.getChildren().stream()
-                .map(CodeMapper.INSTANCE::toResponse)
-                .toList();
-        dto.setChildren(childrenList);
-        return dto;
     }
 
     private void updateIsUseFalse(Code entity) {

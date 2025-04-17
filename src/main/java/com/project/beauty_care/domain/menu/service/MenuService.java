@@ -2,6 +2,7 @@ package com.project.beauty_care.domain.menu.service;
 
 import com.project.beauty_care.domain.menu.Menu;
 import com.project.beauty_care.domain.menu.MenuConverter;
+import com.project.beauty_care.domain.menu.MenuValidator;
 import com.project.beauty_care.domain.menu.dto.AdminMenuCreateRequest;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
 import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
@@ -15,7 +16,6 @@ import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import com.project.beauty_care.global.exception.RequestInvalidException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -34,6 +34,7 @@ public class MenuService {
     private final MenuRoleService menuRoleService;
     private final MenuConverter converter;
     private final RoleConverter roleConverter;
+    private final MenuValidator validator;
 
     @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
     public AdminMenuResponse createMenu(AdminMenuCreateRequest request) {
@@ -42,13 +43,13 @@ public class MenuService {
         List<Role> roleList = List.of();
 
         // 메뉴 depth 최대 3
-        validateMenuLevelAndIsLeaf(request);
+        validator.validateMenuLevelAndIsLeaf(request);
 
         // 상위메뉴
         if (ObjectUtils.isNotEmpty(request.getParentMenuId())) {
             parent = findByParentId(request.getParentMenuId());
             // 상위 메뉴 "사용 중" 상태 아닌 경우 예외
-            checkParentMenuIsUse(request, parent);
+            validator.validateParentMenuIsUse(request, parent);
         }
 
         Menu entity = buildEntity(request, parent);
@@ -91,7 +92,7 @@ public class MenuService {
         Menu parent = menu.getParent();
 
         // 최하위 메뉴에 leafMenu 추가 불가.
-        validateParentMenu(request, parent);
+        validator.validateParentMenu(request, parent);
 
         List<Role> roleList = roleService.findRoleByRoleNames(request.getRoleNames());
         List<RoleResponse> roleResponseList = roleList.stream().map(roleService::convertRoleToResponse).toList();
@@ -111,23 +112,6 @@ public class MenuService {
         List<RoleResponse> roleResponseList = roleConverter.toResponseWithMenu(menu);
 
         return converter.toResponse(menu, roleResponseList);
-    }
-
-    private static void validateMenuLevelAndIsLeaf(AdminMenuCreateRequest request) {
-        // 메뉴 뎁스 2 초과하거나
-        // 뎁스가 2인데, 최하위 메뉴 여부가 false => 예외
-        if (request.getMenuLevel() > 2 || (request.getMenuLevel() == 2 && !request.getIsLeaf()))
-            throw new RequestInvalidException(Errors.MAX_MENU_DEPTH_ERROR);
-    }
-
-    private void validateParentMenu(AdminMenuUpdateRequest request, Menu parent) {
-        if (parent.getIsLeaf() && request.getIsLeaf())
-            throw new RequestInvalidException(Errors.MAX_MENU_DEPTH_ERROR);
-    }
-
-    private void checkParentMenuIsUse(AdminMenuCreateRequest request, Menu parent) {
-        if (request.getIsUse() && !parent.getIsUse())
-            throw new RequestInvalidException(Errors.PARENT_MENU_NOT_USE);
     }
 
     private Menu buildEntity(AdminMenuCreateRequest request, Menu parent) {

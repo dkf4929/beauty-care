@@ -20,7 +20,7 @@ public interface CodeMapper {
     @Mapping(target = "isUse", source = "code.isUse")
     @Mapping(target = "createdDateTime", source = "code.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "code.updatedDateTime")
-    AdminCodeResponse toAdminCodeResponse(Code code, List<AdminCodeResponse> children);
+    AdminCodeResponse toResponse(Code code, List<AdminCodeResponse> children);
 
     @Mapping(target = "id", source = "code.id")
     @Mapping(target = "name", source = "code.name")
