@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.menu.service;
 
-import com.project.beauty_care.domain.mapper.MenuMapper;
 import com.project.beauty_care.domain.menu.Menu;
+import com.project.beauty_care.domain.menu.MenuConverter;
 import com.project.beauty_care.domain.menu.dto.AdminMenuCreateRequest;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
 import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
@@ -9,6 +9,7 @@ import com.project.beauty_care.domain.menu.repository.MenuRepository;
 import com.project.beauty_care.domain.menuRole.MenuRole;
 import com.project.beauty_care.domain.menuRole.service.MenuRoleService;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.RoleConverter;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
@@ -22,9 +23,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +32,17 @@ public class MenuService {
     private final MenuRepository repository;
     private final RoleService roleService;
     private final MenuRoleService menuRoleService;
+    private final MenuConverter converter;
+    private final RoleConverter roleConverter;
 
     @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
     public AdminMenuResponse createMenu(AdminMenuCreateRequest request) {
         Menu parent = null;
+        List<MenuRole> menuRoles;
+        List<Role> roleList = List.of();
 
         // 메뉴 depth 최대 3
-        validateMenuLevel(request);
+        validateMenuLevelAndIsLeaf(request);
 
         // 상위메뉴
         if (ObjectUtils.isNotEmpty(request.getParentMenuId())) {
@@ -48,36 +51,38 @@ public class MenuService {
             checkParentMenuIsUse(request, parent);
         }
 
-        List<Role> roleList = roleService.findRoleByRoleNames(request.getRoleNames());
         Menu entity = buildEntity(request, parent);
 
         // save
         Menu savedEntity = repository.save(entity);
 
         // 연관관계 mapping
-        List<MenuRole> menuRoles = menuRoleService.createMenuRoleWithMenuAndRole(entity, roleList);
-        menuRoleService.saveAllMenuRoles(menuRoles);
+        if (!request.getRoleNames().isEmpty()) {
+            roleList = roleService.findRoleByRoleNames(request.getRoleNames());
+            menuRoles = menuRoleService.createMenuRoleWithMenuAndRole(entity, roleList);
+
+            menuRoleService.saveAllMenuRoles(menuRoles);
+        }
 
         // convert response
         List<RoleResponse> roleResponseList = roleList.stream()
                 .map(roleService::convertRoleToResponse)
                 .toList();
 
-        return MenuMapper.INSTANCE.toResponse(savedEntity, roleResponseList);
+        return converter.toResponse(savedEntity, roleResponseList);
     }
 
-    @Cacheable(value = RedisCacheKey.MENU, key = "'all'", cacheManager = "redisCacheManager")
+    @Cacheable(value = RedisCacheKey.MENU, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
-    public AdminMenuResponse findAllMenu() {
-        Optional<Menu> menuOptional = repository.findByParentIsNull();
+    public AdminMenuResponse findAllMenu(String role) {
+        Menu menu = repository.findByParentIsNull()
+                .orElse(null);
 
         // 상위메뉴 empty => return
-        if (menuOptional.isEmpty()) return null;
-
-        Menu menu = menuOptional.get();
+        if (ObjectUtils.isEmpty(menu)) return AdminMenuResponse.builder().build();
 
         // 계층형 구조 변환
-        return convertHierarchyResponse(menu);
+        return converter.toHierarchy(menu, role);
     }
 
     @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
@@ -96,53 +101,33 @@ public class MenuService {
         // update menu
         menu.updateMenu(request, menuRoleList);
 
-        return MenuMapper.INSTANCE.toResponse(menu, roleResponseList);
+        return converter.toResponse(menu, roleResponseList);
     }
 
     @Transactional(readOnly = true)
     public AdminMenuResponse findMenuById(Long id) {
         Menu menu = findById(id);
 
-        List<RoleResponse> roleResponseList = menu.getMenuRole().stream()
-                .map(MenuRole::getRole)
-                .map(roleService::convertRoleToResponse)
-                .toList();
+        List<RoleResponse> roleResponseList = roleConverter.toResponseWithMenu(menu);
 
-        return MenuMapper.INSTANCE.toResponse(menu, roleResponseList);
+        return converter.toResponse(menu, roleResponseList);
     }
 
-    private static void validateMenuLevel(AdminMenuCreateRequest request) {
-        if (request.getMenuLevel() >= 2 && !request.getIsLeaf())
-            throw new RequestInvalidException(Errors.CAN_NOT_SAVE_CHILDREN_MENU);
+    private static void validateMenuLevelAndIsLeaf(AdminMenuCreateRequest request) {
+        // 메뉴 뎁스 2 초과하거나
+        // 뎁스가 2인데, 최하위 메뉴 여부가 false => 예외
+        if (request.getMenuLevel() > 2 || (request.getMenuLevel() == 2 && !request.getIsLeaf()))
+            throw new RequestInvalidException(Errors.MAX_MENU_DEPTH_ERROR);
     }
 
     private void validateParentMenu(AdminMenuUpdateRequest request, Menu parent) {
         if (parent.getIsLeaf() && request.getIsLeaf())
-            throw new RequestInvalidException(Errors.CAN_NOT_SAVE_CHILDREN_MENU);
+            throw new RequestInvalidException(Errors.MAX_MENU_DEPTH_ERROR);
     }
 
     private void checkParentMenuIsUse(AdminMenuCreateRequest request, Menu parent) {
         if (request.getIsUse() && !parent.getIsUse())
             throw new RequestInvalidException(Errors.PARENT_MENU_NOT_USE);
-    }
-
-    private AdminMenuResponse convertHierarchyResponse(Menu menu) {
-        // 권한 목록
-        List<RoleResponse> roleResponseList = menu.getMenuRole().stream()
-                .map(MenuRole::getRole)
-                .map(roleService::convertRoleToResponse)
-                .toList();
-
-        AdminMenuResponse response = MenuMapper.INSTANCE.toResponse(menu, roleResponseList);
-
-        // 하위 메뉴 convert
-        List<AdminMenuResponse> childrenList = menu.getChildren().stream()
-                .map(this::convertHierarchyResponse)
-                .toList();
-
-        response.setChildren(new ArrayList<>(childrenList));
-
-        return response;
     }
 
     private Menu buildEntity(AdminMenuCreateRequest request, Menu parent) {

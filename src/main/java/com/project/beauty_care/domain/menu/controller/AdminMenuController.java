@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.menu.controller;
 
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.menu.dto.AdminMenuCreateRequest;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
 import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
@@ -91,7 +90,15 @@ public class AdminMenuController {
     }
 
     @Operation(summary = "메뉴 조회",
-            description = "등록된 모든 메뉴를 계층 형태로 조회한다."
+            description = "등록된 모든 메뉴를 계층 형태로 조회한다.",
+            parameters = @Parameter(
+                    name = "role",
+                    description = "권한",
+                    required = false,
+                    in = ParameterIn.QUERY,
+                    schema = @Schema(type = "string"),
+                    example = "ADMIN"
+            )
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 완료되었습니다.", content = @Content(
@@ -110,8 +117,8 @@ public class AdminMenuController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @GetMapping
-    public SuccessResponse<AdminMenuResponse> findMenuAll() {
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, service.findAllMenu());
+    public SuccessResponse<AdminMenuResponse> findMenuAll(@RequestParam(required = false, value = "role") String role) {
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, service.findAllMenu(role));
     }
 
     @Operation(summary = "메뉴 수정",
@@ -165,4 +172,5 @@ public class AdminMenuController {
                                                          @RequestBody @Valid AdminMenuUpdateRequest request) {
         return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, service.updateMenu(request, menuId));
     }
+
 }
