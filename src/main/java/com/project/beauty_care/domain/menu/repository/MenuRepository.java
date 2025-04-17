@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long>, MenuCustomRepository {
     Optional<Menu> findByIdAndIsUseIsTrue(Long id);
-
     Optional<Menu> findByParentIsNull();
 }

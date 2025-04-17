@@ -42,7 +42,6 @@ public class MenuBaseRequest {
     @Schema(example = "true")
     private Boolean isUse;
 
-    @NotEmpty(message = "권한을 지정하세요.")
     @Schema(example = "ADMIN")
     private List<String> roleNames = new ArrayList<>();
 }

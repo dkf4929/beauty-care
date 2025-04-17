@@ -18,6 +18,7 @@ public class AdminMenuResponse extends MenuResponse {
     @Schema(description = "메뉴 ID", example = "1")
     private Long menuId;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<RoleResponse> roles = new ArrayList<>();
 
     @Schema(description = "사용 여부", example = "true")
