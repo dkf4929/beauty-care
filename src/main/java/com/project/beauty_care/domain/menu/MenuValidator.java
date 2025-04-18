@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class MenuValidator {
     //메뉴 생성 시 메뉴 Level과 최하위 메뉴 여부 검증
     public void validateMenuLevelAndIsLeaf(AdminMenuCreateRequest request) {
-        if (request.getMenuLevel() > 2 || (request.getMenuLevel() == 2 && !request.getIsLeaf())) {
+        if (request.getMenuLevel() > 3 || (request.getMenuLevel() == 3 && !request.getIsLeaf())) {
             throw new RequestInvalidException(Errors.MAX_MENU_DEPTH_ERROR);
         }
     }

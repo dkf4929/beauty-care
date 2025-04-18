@@ -25,6 +25,10 @@ public class RoleConverter {
         return RoleMapper.INSTANCE.toResponse(role, urlPatterns);
     }
 
+    public RoleResponse toResponse(Role role) {
+        return RoleMapper.INSTANCE.toSimpleResponse(role);
+    }
+
     public Role buildEntity(RoleCreateRequest request, Map<String, Object> patternMap) {
         return Role.builder()
                 .roleName(request.getRoleName().toUpperCase())

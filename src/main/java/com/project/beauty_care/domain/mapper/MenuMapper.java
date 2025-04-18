@@ -1,10 +1,8 @@
 package com.project.beauty_care.domain.mapper;
 
-import com.project.beauty_care.domain.code.Code;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.menu.Menu;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
-import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.menu.dto.UserMenuResponse;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,4 +27,11 @@ public interface MenuMapper {
     @Mapping(target = "createdBy", source = "menu.createdBy")
     @Mapping(target = "updatedBy", source = "menu.updatedBy")
     AdminMenuResponse toResponse(Menu menu, List<RoleResponse> roles);
+
+    @Mapping(target = "menuName", source = "menu.menuName")
+    @Mapping(target = "menuPath", source = "menu.menuPath")
+    @Mapping(target = "sortNumber", source = "menu.sortNumber")
+    @Mapping(target = "isLeaf", source = "menu.isLeaf")
+    @Mapping(target = "children", ignore = true)
+    UserMenuResponse toResponse(Menu menu);
 }

@@ -1,20 +1,17 @@
 package com.project.beauty_care.domain.menu.dto;
 
-import com.project.beauty_care.domain.dto.BaseDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder
-public abstract class MenuResponse extends BaseDto {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class UserMenuResponse {
     @Schema(description = "메뉴명", example = "시스템")
     private String menuName;
 
@@ -29,5 +26,5 @@ public abstract class MenuResponse extends BaseDto {
 
     @Setter
     @Schema(description = "하위 메뉴")
-    private List<MenuResponse> children = new ArrayList<>();
+    private List<UserMenuResponse> children = new ArrayList<>();
 }

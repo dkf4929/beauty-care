@@ -1,8 +1,5 @@
 package com.project.beauty_care.domain.role.service;
 
-import com.project.beauty_care.domain.mapper.MemberMapper;
-import com.project.beauty_care.domain.mapper.RoleMapper;
-import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.MemberConverter;
 import com.project.beauty_care.domain.member.dto.MemberSummaryResponse;
 import com.project.beauty_care.domain.role.Role;
@@ -16,14 +13,13 @@ import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.CustomException;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import com.project.beauty_care.global.exception.NoAuthorityMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
@@ -61,7 +57,10 @@ public class RoleService {
     }
 
     @Transactional
-    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.ROLE_EXISTS, allEntries = true, cacheManager = "redisCacheManager")
+    })
     public RoleResponse createRole(RoleCreateRequest request) {
         // 동일한 ID가 존재하는지 확인
         checkExistsRoleName(request.getRoleName());
@@ -78,20 +77,20 @@ public class RoleService {
     }
 
     @Transactional(readOnly = true)
-    public void checkAuthority(String authority) {
-        RoleResponse role = findByRoleNameCached(authority);
-
-        if (ObjectUtils.isEmpty(role))
-            throw new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER);
+    public Role checkAuthority(String authority) {
+        return findById(authority);
     }
 
     @Transactional(readOnly = true)
-    public RoleResponse findRoleByAuthority(String authority) {
-        return findByRoleNameCached(authority);
+    public Role findRoleByAuthority(String authority) {
+        return findById(authority);
     }
 
     @Transactional
-    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.ROLE_EXISTS, allEntries = true, cacheManager = "redisCacheManager")
+    })
     public RoleResponse updateRole(RoleUpdateRequest request) {
         if (!request.getBeforeRoleName().equals(request.getAfterRoleName()))
             checkExistsRoleName(request.getAfterRoleName());
@@ -106,15 +105,10 @@ public class RoleService {
     }
 
     @Transactional
-    @Cacheable(value = RedisCacheKey.ROLE, key = "#p0", cacheManager = "redisCacheManager")
-    public RoleResponse findByRoleNameCached(String authority) {
-        Role role = findById(authority);
-
-        return converter.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
-    }
-
-    @Transactional
-    @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.ROLE, allEntries = true, cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.ROLE_EXISTS, allEntries = true, cacheManager = "redisCacheManager")
+    })
     public void hardDeleteRole(String role) {
         repository.deleteById(role);
     }
@@ -126,6 +120,11 @@ public class RoleService {
 
     public List<Role> findRoleByRoleNames(List<String> roleNames) {
         return repository.findAllById(roleNames);
+    }
+
+    @Cacheable(value = RedisCacheKey.ROLE_EXISTS, key = "#p0", cacheManager = "redisCacheManager")
+    public boolean existsByAuthority(String authority) {
+        return repository.existsByRoleNameAndIsUseIsTrue(authority);
     }
 
     private boolean isPatternMatch(String url, Role role) {

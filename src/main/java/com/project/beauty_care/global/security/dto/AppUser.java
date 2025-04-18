@@ -1,5 +1,6 @@
 package com.project.beauty_care.global.security.dto;
 
+import com.project.beauty_care.domain.menu.dto.UserMenuResponse;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class AppUser implements UserDetails {
     private String loginId;
     private String name;
     private RoleResponse role;
+    private UserMenuResponse authorityMenu;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -33,10 +35,11 @@ public class AppUser implements UserDetails {
     }
 
     @Builder
-    public AppUser(Long memberId, String loginId, String name, RoleResponse role) {
+    public AppUser(Long memberId, String loginId, String name, RoleResponse role, UserMenuResponse authorityMenu) {
         this.memberId = memberId;
         this.loginId = loginId;
         this.name = name;
         this.role = role;
+        this.authorityMenu = authorityMenu;
     }
 }
