@@ -6,6 +6,7 @@ import com.project.beauty_care.domain.menu.MenuValidator;
 import com.project.beauty_care.domain.menu.dto.AdminMenuCreateRequest;
 import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
 import com.project.beauty_care.domain.menu.dto.AdminMenuUpdateRequest;
+import com.project.beauty_care.domain.menu.dto.UserMenuResponse;
 import com.project.beauty_care.domain.menu.repository.MenuRepository;
 import com.project.beauty_care.domain.menuRole.MenuRole;
 import com.project.beauty_care.domain.menuRole.service.MenuRoleService;
@@ -23,7 +24,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -67,23 +70,26 @@ public class MenuService {
 
         // convert response
         List<RoleResponse> roleResponseList = roleList.stream()
-                .map(roleService::convertRoleToResponse)
+                .map(roleConverter::toResponse)
                 .toList();
 
         return converter.toResponse(savedEntity, roleResponseList);
     }
 
-    @Cacheable(value = RedisCacheKey.MENU, key = "#p0", cacheManager = "redisCacheManager")
+    @Cacheable(
+            value = RedisCacheKey.MENU,
+            key = "#p0 != null ? #p0 : 'all'",
+            cacheManager = "redisCacheManager"
+    )
     @Transactional(readOnly = true)
     public AdminMenuResponse findAllMenu(String role) {
-        Menu menu = repository.findByParentIsNull()
-                .orElse(null);
+        Menu menu = repository.findByParentIsNull().orElse(null);
 
         // 상위메뉴 empty => return
         if (ObjectUtils.isEmpty(menu)) return AdminMenuResponse.builder().build();
 
         // 계층형 구조 변환
-        return converter.toHierarchy(menu, role);
+        return toHierarchy(menu, role);
     }
 
     @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
@@ -95,7 +101,7 @@ public class MenuService {
         validator.validateParentMenu(request, parent);
 
         List<Role> roleList = roleService.findRoleByRoleNames(request.getRoleNames());
-        List<RoleResponse> roleResponseList = roleList.stream().map(roleService::convertRoleToResponse).toList();
+        List<RoleResponse> roleResponseList = roleList.stream().map(roleConverter::toResponse).toList();
 
         List<MenuRole> menuRoleList = menuRoleService.createMenuRoleWithMenuAndRole(menu, roleList);
 
@@ -103,6 +109,17 @@ public class MenuService {
         menu.updateMenu(request, menuRoleList);
 
         return converter.toResponse(menu, roleResponseList);
+    }
+
+    @Transactional(readOnly = true)
+    public UserMenuResponse findMenuByAuthority(String authority) {
+        Role role = roleService.findRoleByAuthority(authority);
+        Menu menu = repository.findByParentIsNullAndIsUseIsTrue().orElse(null);
+
+        // 상위메뉴 empty => return
+        if (ObjectUtils.isEmpty(menu)) return UserMenuResponse.builder().build();
+
+        return toHierarchy(menu, role);
     }
 
     @Transactional(readOnly = true)
@@ -134,5 +151,51 @@ public class MenuService {
     private Menu findByParentId(Long parentId) {
         return repository.findById(parentId)
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_PARENT_MENU));
+    }
+
+    private UserMenuResponse toHierarchy(Menu menu, Role role) {
+        // 권한 목록
+        UserMenuResponse response = converter.toResponse(menu);
+
+        // 하위 메뉴 convert
+        List<UserMenuResponse> childrenList = menu.getChildren().stream()
+                .filter(Menu::getIsUse)
+                .filter(children -> {
+                    // 하위 메뉴 아니면 권한체크 x
+                    if (!children.getIsLeaf()) return true;
+
+                    return children.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
+                })
+                .map(children -> toHierarchy(children, role))
+                .toList();
+
+        response.setChildren(new ArrayList<>(childrenList));
+
+        return response;
+    }
+
+    private AdminMenuResponse toHierarchy(Menu menu, String role) {
+        // 권한 목록
+        List<RoleResponse> roleResponseList = roleConverter.toResponseWithMenu(menu);
+
+        AdminMenuResponse response = converter.toResponse(menu, roleResponseList);
+
+        // 하위 메뉴 convert
+        List<AdminMenuResponse> childrenList = menu.getChildren().stream()
+                .filter(child -> {
+                    // 최하위 메뉴 아님 -> pass
+                    if (!child.getIsLeaf()) return true;
+
+                    // 권한이 존재하는 메뉴만 필터링
+                    return child.getMenuRole().stream()
+                            .map(menuRole -> menuRole.getRole().getRoleName())
+                            .anyMatch(roleId -> roleId.equals(role));
+                })
+                .map(child -> toHierarchy(child, role))
+                .toList();
+
+        response.setChildren(new ArrayList<>(childrenList));
+
+        return response;
     }
 }

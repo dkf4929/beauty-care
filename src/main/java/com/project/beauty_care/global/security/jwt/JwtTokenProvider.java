@@ -1,12 +1,14 @@
 package com.project.beauty_care.global.security.jwt;
 
+import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
+import com.project.beauty_care.domain.menu.dto.UserMenuResponse;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
-import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.NoAuthorityMember;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
+import com.project.beauty_care.global.security.jwt.service.JwtTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -41,8 +43,7 @@ public class JwtTokenProvider {
     private long accessTokenValidTime;
 
     @Autowired
-    private RoleService roleService;
-
+    private JwtTokenService service;
     private final Key key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
@@ -65,7 +66,11 @@ public class JwtTokenProvider {
                 .orElseThrow(() -> new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER));
 
         // 유효한 권한인지 확인
-        checkAuthority(authority);
+        if (!service.checkAuthority(authority))
+            throw new NoAuthorityMember(Errors.NO_AUTHORITY_MEMBER);
+
+        // 권한이 있는 메뉴 찾기
+        UserMenuResponse myMenu = service.findMyMenu(authority);
 
         // accessToken 생성
         String accessToken = Jwts.builder()
@@ -75,7 +80,8 @@ public class JwtTokenProvider {
                                 appUser.getLoginId(),
                                 appUser.getName(),
                                 authority,
-                                appUser.getRole().getUrlPatterns()
+                                appUser.getRole().getUrlPatterns(),
+                                myMenu
                         )
                 )
                 .setExpiration(accessTokenExpiresIn)
@@ -98,7 +104,7 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        RoleResponse role = roleService.findRoleByAuthority(Claim.AUTHORITIES.getClaimValueString(claims));
+        RoleResponse role = service.findRoleByAuthority(Claim.AUTHORITIES.getClaimValueString(claims));
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = AppUser.builder()
@@ -158,13 +164,15 @@ public class JwtTokenProvider {
                                              String loginId,
                                              String name,
                                              String authorities,
-                                             List<String> authUrlPatterns) {
+                                             List<String> authUrlPatterns,
+                                             UserMenuResponse authorityMenu) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(Claim.ID.getValue(), memberId);
         claims.put(Claim.LOGIN_ID.getValue(), loginId);
         claims.put(Claim.NAME.getValue(), name);
         claims.put(Claim.AUTHORITIES.getValue(), authorities);
-        claims.put(Claim.AUTHORITY_PATTERN.getValue(), authUrlPatterns);
+        claims.put(Claim.API_AUTHORITY_PATTERN.getValue(), authUrlPatterns);
+        claims.put(Claim.AUTHORITY_MENU.getValue(), authorityMenu);
         return claims;
     }
 
@@ -175,7 +183,8 @@ public class JwtTokenProvider {
         LOGIN_ID("login_id", String.class),
         NAME("name", String.class),
         AUTHORITIES(AUTHORITIES_KEY, String.class),
-        AUTHORITY_PATTERN("authority_pattern", List.class),;
+        API_AUTHORITY_PATTERN("api_authority_pattern", List.class),
+        AUTHORITY_MENU("authority_menu", UserMenuResponse.class);
 
         private String value;
         private Class type;
@@ -193,9 +202,5 @@ public class JwtTokenProvider {
         }
         private Boolean getClaimValueBoolean(Claims claims) { return claims.get(this.getValue(), Boolean.class); }
 
-    }
-
-    private void checkAuthority(String authority) {
-        roleService.checkAuthority(authority);
     }
 }
