@@ -1,10 +1,11 @@
-package com.project.beauty_care.global.security.jwt;
+package com.project.beauty_care.global.security.jwt.filter;
 
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.PermitSvc;
 import com.project.beauty_care.global.exception.JwtException;
 import com.project.beauty_care.global.security.dto.AppUser;
+import com.project.beauty_care.global.security.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

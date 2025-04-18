@@ -1,4 +1,4 @@
-package com.project.beauty_care.global.security.jwt;
+package com.project.beauty_care.global.security.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.beauty_care.global.exception.JwtException;
