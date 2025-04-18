@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "MENU REST API", description = "메뉴 관리")
+@Tag(name = "MENU REST API FOR ADMIN", description = "메뉴 관리")
 @RestController
 @RequestMapping("/admin/menu")
 @RequiredArgsConstructor
