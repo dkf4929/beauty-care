@@ -3,12 +3,13 @@ package com.project.beauty_care.global.security.jwt;
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.mapper.RoleMapper;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.RoleConverter;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
-import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.TokenExpiredException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.security.dto.LoginResponse;
+import com.project.beauty_care.global.security.jwt.service.JwtTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,10 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
     RoleRepository roleRepository;
 
     @MockitoBean
-    private RoleService roleService;
+    private JwtTokenService tokenService;
+
+    @Autowired
+    private RoleConverter roleConverter;
 
     @BeforeEach
     void setUp() {
@@ -52,8 +56,7 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
         // given, when
         final Role role = buildRole(USER);
 
-        when(roleRepository.findAllByRoleName(any()))
-                .thenReturn(List.of(role));
+        when(tokenService.checkAuthority(anyString())).thenReturn(Boolean.TRUE);
 
         long now = new Date().getTime();
         LoginResponse loginResponse =
@@ -75,8 +78,11 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
         // given
         final Role role = buildRole(USER);
 
-        when(roleService.findRoleByAuthority(any()))
-                .thenReturn(RoleMapper.INSTANCE.toSimpleResponse(role));
+        when(tokenService.checkAuthority(anyString()))
+                .thenReturn(Boolean.TRUE);
+
+        when(tokenService.findRoleByAuthority(any()))
+                .thenReturn(roleConverter.toResponse(role));
 
         when(roleRepository.findById(any())).thenReturn(Optional.of(role));
 
@@ -98,7 +104,8 @@ class JwtTokenProviderTest extends TestSupportWithOutRedis {
         when(roleRepository.findAllByRoleName(anyString()))
                 .thenReturn(List.of(buildRole(ADMIN)));
 
-        doNothing().when(roleService).checkAuthority(anyString());
+        when(tokenService.checkAuthority(anyString()))
+                .thenReturn(Boolean.TRUE);
 
         return List.of(
                 DynamicTest.dynamicTest("토큰 만료 시 예외가 발생한다(과거 시점)", () -> {
