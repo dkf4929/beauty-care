@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain.menu.service;
 
+import com.project.beauty_care.domain.mapper.MenuMapper;
 import com.project.beauty_care.domain.menu.Menu;
 import com.project.beauty_care.domain.menu.MenuConverter;
 import com.project.beauty_care.domain.menu.MenuValidator;
@@ -25,8 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -111,15 +113,26 @@ public class MenuService {
         return converter.toResponse(menu, roleResponseList);
     }
 
-    @Transactional(readOnly = true)
-    public UserMenuResponse findMenuByAuthority(String authority) {
-        Role role = roleService.findRoleByAuthority(authority);
-        Menu menu = repository.findByParentIsNullAndIsUseIsTrue().orElse(null);
+    public UserMenuResponse findMenuByAuthority(String role) {
+        // 최하위 메뉴
+        List<Menu> leafMenuList = repository.findByIsLeafIsTrue();
 
-        // 상위메뉴 empty => return
-        if (ObjectUtils.isEmpty(menu)) return UserMenuResponse.builder().build();
+        // 최상위 메뉴
+        Menu topMenu = repository.findByParentIsNull().orElse(null);
 
-        return toHierarchy(menu, role);
+        UserMenuResponse response = UserMenuResponse.builder().build();
+
+        Map<Long, UserMenuResponse> map = new HashMap<>();
+
+        // 최하위 메뉴에서 부터 권한이 일치하는 메뉴를 찾아서 계층형 변환한다.
+        leafMenuList.stream()
+                .filter(menu -> menu.getMenuRole()
+                        .stream()
+                        .anyMatch(menuRole -> menuRole.getRole().getRoleName().equals(role))
+                )
+                .forEach(menu -> toHierarchyReverse(menu, response, map));
+
+        return map.get(topMenu.getId());
     }
 
     @Transactional(readOnly = true)
@@ -164,7 +177,7 @@ public class MenuService {
                     // 하위 메뉴 아니면 권한체크 x
                     if (!children.getIsLeaf()) return true;
 
-                    return children.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
+                    return menuHasRole(role, children);
                 })
                 .map(children -> toHierarchy(children, role))
                 .toList();
@@ -172,6 +185,48 @@ public class MenuService {
         response.setChildren(new ArrayList<>(childrenList));
 
         return response;
+    }
+
+    private void toHierarchyReverse(Menu menu,
+                                    UserMenuResponse response,
+                                    Map<Long, UserMenuResponse> map) {
+        Menu parent = menu.getParent();
+
+        // empty -> 다음 메뉴로
+        if (ObjectUtils.isEmpty(parent)) return;
+
+        if (response.getChildren() == null) {
+            response = MenuMapper.INSTANCE.toResponse(parent);
+            UserMenuResponse childResponse = MenuMapper.INSTANCE.toResponse(menu);
+
+            // 키(부모)가 존재하면 부모에 add
+            if (map.containsKey(parent.getId())) map.get(parent.getId()).getChildren().add(childResponse);
+            else {
+                // 없으면 새로 생성하고 put
+                response.setChildren(new ArrayList<>(List.of(childResponse)));
+                map.put(parent.getId(), response);
+                toHierarchyReverse(parent, response, map);
+            }
+        } else {
+            // 계층형 구조 만든다.
+            UserMenuResponse parentResponse = null;
+
+            if (map.containsKey(parent.getId())) {
+                parentResponse = map.get(parent.getId());
+                parentResponse.getChildren().add(response);
+            } else {
+                parentResponse = MenuMapper.INSTANCE.toResponse(parent);
+                parentResponse.setChildren(new ArrayList<>(List.of(response)));
+                map.put(parent.getId(), parentResponse);
+            }
+
+            response = parentResponse;
+            toHierarchyReverse(parent, response, map);
+        }
+    }
+
+    private static boolean menuHasRole(Role role, Menu children) {
+        return children.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
     }
 
     private AdminMenuResponse toHierarchy(Menu menu, String role) {
