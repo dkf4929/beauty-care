@@ -1,9 +1,7 @@
 package com.project.beauty_care.domain.member;
 
 import com.project.beauty_care.domain.BaseEntity;
-import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
-import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

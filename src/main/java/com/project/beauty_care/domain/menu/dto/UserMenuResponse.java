@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.menu.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

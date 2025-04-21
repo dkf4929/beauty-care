@@ -7,7 +7,6 @@ import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
 import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
-import com.project.beauty_care.domain.mapper.CodeMapper;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.EntityNotFoundException;

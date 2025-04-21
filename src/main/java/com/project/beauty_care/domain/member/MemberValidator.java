@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.member;
 
-import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.PasswordMissMatchException;

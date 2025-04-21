@@ -1,6 +1,5 @@
 package com.project.beauty_care.global.security.jwt;
 
-import com.project.beauty_care.domain.menu.dto.AdminMenuResponse;
 import com.project.beauty_care.domain.menu.dto.UserMenuResponse;
 import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.global.enums.Errors;
