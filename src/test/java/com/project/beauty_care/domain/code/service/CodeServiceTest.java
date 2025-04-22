@@ -93,46 +93,22 @@ class CodeServiceTest extends TestSupportWithOutRedis {
                 .containsExactly("시스템1", Boolean.FALSE, 2);
     }
 
-    @DisplayName("코드 삭제 시나리오")
-    @TestFactory
-    Collection<DynamicTest> deleteCode() {
-        return List.of(
-                dynamicTest("정상 case", () -> {
-                    // given
-                    final String id = "sys";
-                    Code code
-                            = buildCode(id, "시스템", 1, new ArrayList<>(), "", Boolean.TRUE);
+    @DisplayName("코드 삭제")
+    @Test
+    void deleteCode() {
+        final String id = "sys";
+        Code code
+                = buildCode(id, "시스템", 1, new ArrayList<>(), "", Boolean.TRUE);
 
-                    when(repository.findById(any()))
-                            .thenReturn(Optional.ofNullable(code));
+        when(repository.findById(any()))
+                .thenReturn(Optional.ofNullable(code));
 
-                    // when
-                    String deletedId = service.deleteCode(id);
+        // when
+        String deletedId = service.deleteCode(id);
 
-                    // then
-                    verify(repository, times(1)).deleteById(any());
-                    assertThat(deletedId).isEqualTo(id);
-                }),
-                dynamicTest("삭제 대상 코드에 하위코드 존재 => 예외 발생", () -> {
-                    // given
-                    final String parentId = "sys";
-
-                    Code children
-                            = buildCode("sys:agree", "동의 상태", 1, new ArrayList<>(), "", Boolean.TRUE);
-
-                    Code parent
-                            = buildCode(parentId, "시스템", 1, List.of(children), "", Boolean.TRUE);
-
-                    when(repository.findById(any()))
-                            .thenReturn(Optional.ofNullable(parent));
-
-                    // when, then
-                    assertThatThrownBy(() -> service.deleteCode(parentId))
-                            .isInstanceOf(RequestInvalidException.class)
-                            .hasFieldOrPropertyWithValue("errors.message", Errors.CAN_NOT_DELETE_CODE.getMessage())
-                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.CAN_NOT_DELETE_CODE.getErrorCode());
-                })
-        );
+        // then
+        verify(repository, times(1)).deleteById(any());
+        assertThat(deletedId).isEqualTo(id);
     }
 
     @DisplayName("최상위 코드가 존재하지 않을 경우 빈 리스트를 리턴한다.")

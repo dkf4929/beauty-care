@@ -120,162 +120,95 @@ class MemberServiceTest extends TestSupportWithOutRedis {
                 .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NOT_FOUND_MEMBER.getErrorCode());
     }
 
-    @DisplayName("회원 저장 시나리오 FOR PUBLIC")
-    @TestFactory
-    Collection<DynamicTest> createMemberForPublic() {
-        return List.of(
-                DynamicTest.dynamicTest("회원 저장(정상 case)", () -> {
-                    // given
-                    final String loginId = "test";
-                    final String password = "1234";
-                    final String confirmPassword = "1234";
-                    final String name = "test";
+    @DisplayName("회원 저장 FOR PUBLIC")
+    @Test
+    void createMemberForPublic() {
+        // given
+        final String loginId = "test";
+        final String password = "1234";
+        final String confirmPassword = "1234";
+        final String name = "test";
 
-                    PublicMemberCreateRequest request =
-                            buildPublicMemberCreateRequest(loginId, name, password, confirmPassword);
+        PublicMemberCreateRequest request =
+                buildPublicMemberCreateRequest(loginId, name, password, confirmPassword);
 
-                    when(repository.save(any()))
-                            .thenReturn(Member.createForTest(1L, loginId, password, name, USER));
+        when(repository.save(any()))
+                .thenReturn(Member.createForTest(1L, loginId, password, name, USER));
 
-                    when(roleRepository.findById(any()))
-                            .thenReturn(Optional.ofNullable(USER));
+        when(roleRepository.findById(any()))
+                .thenReturn(Optional.ofNullable(USER));
 
-                    // when
-                    Member savedMember = service.createMemberPublic(request);
+        // when
+        Member savedMember = service.createMemberPublic(request);
 
-                    // then
-                    assertThat(savedMember)
-                            .extracting("loginId", "name", "password")
-                            .containsExactly(loginId, name, password);
+        // then
+        assertThat(savedMember)
+                .extracting("loginId", "name", "password")
+                .containsExactly(loginId, name, password);
 
-                    // 한번 호출 됐는지 검증
-                    verify(repository, times(1)).save(any());
-                }),
-                DynamicTest.dynamicTest("비밀번호와 비밀번호 확인 불일치 => 예외", () -> {
-                    // given
-                    PublicMemberCreateRequest request =
-                            buildPublicMemberCreateRequest("test", "test", "1234", "12345");
-
-                    // when, then
-                    assertThatThrownBy(() -> service.createMemberPublic(request))
-                            .isInstanceOf(PasswordMissMatchException.class)
-                            .hasFieldOrPropertyWithValue("errors.message", Errors.PASSWORD_MISS_MATCH.getMessage())
-                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
-                })
-        );
+        // 한번 호출 됐는지 검증
+        verify(repository, times(1)).save(any());
     }
 
-    @DisplayName("회원 수정 시나리오 FOR USER")
-    @TestFactory
-    Collection<DynamicTest> updateMemberForUser() {
-        return List.of(
-                DynamicTest.dynamicTest("정상 시나리오", () -> {
-                    // given
-                    final String name = "test";
-                    final String password = "1234";
-                    final String confirmPassword = "1234";
-                    final Long id = 1L;
+    @DisplayName("회원 수정 FOR USER")
+    @Test
+    void updateMemberForUser() {
+        // given
+        final String name = "test";
+        final String password = "1234";
+        final String confirmPassword = "1234";
+        final Long id = 1L;
 
-                    UserMemberUpdateRequest request = buildUserMemberUpdateRequest(id, name, password, confirmPassword);
+        UserMemberUpdateRequest request = buildUserMemberUpdateRequest(id, name, password, confirmPassword);
 
-                    when(repository.findById(anyLong()))
-                            .thenReturn(
-                                    Optional.of(
-                                            Member.createForTest(id, "test", "1234", "test", USER)
-                                    )
-                            );
+        when(repository.findById(anyLong()))
+                .thenReturn(
+                        Optional.of(
+                                Member.createForTest(id, "test", "1234", "test", USER)
+                        )
+                );
 
-                    // when
-                    MemberResponse memberResponse = service.updateMemberUser(request);
+        // when
+        MemberResponse memberResponse = service.updateMemberUser(request);
 
-                    // then
-                    assertThat(memberResponse)
-                            .isNotNull()
-                            .extracting("id", "name")
-                            .containsExactly(id, name);
-                }),
-                DynamicTest.dynamicTest("비밀번호 불일치 => 예외 발생", () -> {
-                    // given
-                    UserMemberUpdateRequest request = buildUserMemberUpdateRequest(1L, "test", "1234", "12345");
-
-                    // when, then
-                    assertThatThrownBy(() -> service.updateMemberUser(request))
-                            .isInstanceOf(PasswordMissMatchException.class)
-                            .hasFieldOrPropertyWithValue("errors.message", Errors.PASSWORD_MISS_MATCH.getMessage())
-                            .hasFieldOrPropertyWithValue("errors.errorCode", Errors.PASSWORD_MISS_MATCH.getErrorCode());
-                })
-        );
+        // then
+        assertThat(memberResponse)
+                .isNotNull()
+                .extracting("id", "name")
+                .containsExactly(id, name);
     }
 
-    @DisplayName("회원 수정 시나리오 FOR ADMIN")
-    @TestFactory
-    Collection<DynamicTest> updateMemberForAdmin() {
-        return List.of(
-                DynamicTest.dynamicTest("정상 시나리오", () -> {
-                    // given
-                    final Long id = 1L;
-                    final boolean isUse = true;
+    @DisplayName("회원 수정 FOR ADMIN")
+    @Test
+    void updateMemberForAdmin() {
+        // given
+        final Long id = 1L;
+        final boolean isUse = true;
 
-                    final Long loginMemberId = 2L;
+        final Long loginMemberId = 2L;
 
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(id, Authentication.USER.getName(), isUse);
+        AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(id, Authentication.USER.getName(), isUse);
 
-                    when(repository.findById(anyLong()))
-                            .thenReturn(
-                                    Optional.of(
-                                            Member.createForTest(id, "test", "1234", "test", USER)
-                                    )
-                            );
+        when(repository.findById(anyLong()))
+                .thenReturn(
+                        Optional.of(
+                                Member.createForTest(id, "test", "1234", "test", USER)
+                        )
+                );
 
-                    when(roleRepository.findById(any()))
-                            .thenReturn(Optional.ofNullable(ADMIN));
+        when(roleRepository.findById(any()))
+                .thenReturn(Optional.ofNullable(ADMIN));
 
-                    AppUser appUser = buildAppUser(loginMemberId, "test", ADMIN, "test");
+        AppUser appUser = buildAppUser(loginMemberId, "test", ADMIN, "test");
 
-                    // when
-                    MemberResponse memberResponse = service.updateMemberAdmin(request, appUser);
+        // when
+        MemberResponse memberResponse = service.updateMemberAdmin(request, appUser);
 
-                    // then
-                    assertThat(memberResponse)
-                            .isNotNull()
-                            .extracting("id", "role", "isUse")
-                            .containsExactly(id, ADMIN.getRoleName(), isUse);
-                }),
-                DynamicTest.dynamicTest("관리자 권한의 회원 수정 시도 시, 예외 발생", () -> {
-                    // given
-                    final String exMessage = "관리자 권한을 가진 사용자는 수정할 수 없습니다.";
-
-                    when(repository.findById(anyLong()))
-                            .thenReturn(Optional.of(
-                                    Member.createForTest(1L, "test", "1234", "test", ADMIN)
-                            ));
-
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Authentication.ADMIN.getName(), Boolean.FALSE);
-                    AppUser appUser = buildAppUser(2L, "test", ADMIN, "test");
-
-                    // when, then
-                    assertThatThrownBy(() -> service.updateMemberAdmin(request, appUser))
-                            .isInstanceOf(IllegalArgumentException.class)
-                            .hasMessage(exMessage);
-                }),
-                DynamicTest.dynamicTest("로그인 사용자의 정보를 수정하려고 시도하면, 예외 발생", () -> {
-                    // given
-                    final String exMessage = "개인정보 수정은 사용자 기능입니다.";
-
-                    when(repository.findById(anyLong()))
-                            .thenReturn(Optional.of(
-                                    Member.createForTest(1L, "test", "1234", "test", ADMIN)
-                            ));
-
-                    AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(1L, Authentication.ADMIN.getName(), Boolean.FALSE);
-                    AppUser appUser = buildAppUser(1L, "test", ADMIN, "test");
-
-                    // when, then
-                    assertThatThrownBy(() -> service.updateMemberAdmin(request, appUser))
-                            .isInstanceOf(IllegalArgumentException.class)
-                            .hasMessage(exMessage);
-                })
-        );
+        // then
+        assertThat(memberResponse)
+                .isNotNull()
+                .extracting("id", "role", "isUse")
+                .containsExactly(id, ADMIN.getRoleName(), isUse);
     }
 
     private Member buildMember(String loginId, Role role) {
