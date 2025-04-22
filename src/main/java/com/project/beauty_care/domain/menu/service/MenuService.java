@@ -95,7 +95,7 @@ public class MenuService {
         if (ObjectUtils.isEmpty(menu)) return AdminMenuResponse.builder().build();
 
         // 계층형 구조 변환
-        return toHierarchy(menu, role);
+        return toHierarchyFromParent(menu, role);
     }
 
     public AdminMenuResponse updateMenu(AdminMenuUpdateRequest request, Long menuId) {
@@ -141,7 +141,7 @@ public class MenuService {
                         .stream()
                         .anyMatch(menuRole -> menuRole.getRole().getRoleName().equals(role))
                 )
-                .forEach(menu -> toHierarchyReverse(menu, response, map));
+                .forEach(menu -> toHierarchyFromChildren(menu, response, map));
 
         // 최상위 메뉴
         return map.get(topMenu.getId());
@@ -178,9 +178,9 @@ public class MenuService {
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_PARENT_MENU));
     }
 
-    private void toHierarchyReverse(Menu menu,
-                                    UserMenuResponse response,
-                                    Map<Long, UserMenuResponse> map) {
+    private void toHierarchyFromChildren(Menu menu,
+                                         UserMenuResponse response,
+                                         Map<Long, UserMenuResponse> map) {
         Menu parent = menu.getParent();
 
         // empty or isUse = false -> 다음 메뉴로
@@ -196,7 +196,7 @@ public class MenuService {
                 // 없으면 새로 생성하고 put
                 response.setChildren(new ArrayList<>(List.of(childResponse)));
                 map.put(parent.getId(), response);
-                toHierarchyReverse(parent, response, map);
+                toHierarchyFromChildren(parent, response, map);
             }
         } else {
             // 계층형 구조 만든다.
@@ -212,7 +212,7 @@ public class MenuService {
             }
 
             response = parentResponse;
-            toHierarchyReverse(parent, response, map);
+            toHierarchyFromChildren(parent, response, map);
         }
     }
 
@@ -220,7 +220,7 @@ public class MenuService {
         return children.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
     }
 
-    private AdminMenuResponse toHierarchy(Menu menu, String role) {
+    private AdminMenuResponse toHierarchyFromParent(Menu menu, String role) {
         // 권한 목록
         List<RoleResponse> roleResponseList = roleConverter.toResponseWithMenu(menu);
 
@@ -237,7 +237,7 @@ public class MenuService {
                             .map(menuRole -> menuRole.getRole().getRoleName())
                             .anyMatch(roleId -> roleId.equals(role));
                 })
-                .map(child -> toHierarchy(child, role))
+                .map(child -> toHierarchyFromParent(child, role))
                 .toList();
 
         response.setChildren(new ArrayList<>(childrenList));
