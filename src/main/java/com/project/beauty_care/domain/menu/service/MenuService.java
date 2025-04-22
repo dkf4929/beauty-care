@@ -46,20 +46,13 @@ public class MenuService {
     @CacheEvict(value = RedisCacheKey.MENU, key = "'all'", cacheManager = "redisCacheManager")
     public AdminMenuResponse createMenu(AdminMenuCreateRequest request) {
         Menu parent = null;
-        List<MenuRole> menuRoles;
         List<Role> roleList = List.of();
 
         // 메뉴 depth 최대 3
         validator.validateMenuLevelAndIsLeaf(request);
 
-        // 상위메뉴
-        if (ObjectUtils.isNotEmpty(request.getParentMenuId())) {
-            parent = findByParentId(request.getParentMenuId());
-            // 상위 메뉴 "사용 중" 상태 아닌 경우 예외
-            validator.validateParentMenuIsUse(request, parent);
-            // parent menu leaf => ex
-            validator.validateParentMenuIsLeafFalse(parent.getIsLeaf());
-        }
+        // 상위메뉴 검증
+        parent = validateParentMenu(request, parent);
 
         Menu entity = buildEntity(request, parent);
 
@@ -67,19 +60,9 @@ public class MenuService {
         Menu savedEntity = repository.save(entity);
 
         // 연관관계 mapping
-        if (!request.getRoleNames().isEmpty()) {
-            roleList = roleService.findRoleByRoleNames(request.getRoleNames());
-            menuRoles = menuRoleService.createMenuRoleWithMenuAndRole(entity, roleList);
+        roleList = addRoleToMenu(request, roleList, entity);
 
-            menuRoleService.saveAllMenuRoles(menuRoles);
-        }
-
-        // convert response
-        List<RoleResponse> roleResponseList = roleList.stream()
-                .map(roleConverter::toResponse)
-                .toList();
-
-        return converter.toResponse(savedEntity, roleResponseList);
+        return convertResponse(roleList, savedEntity);
     }
 
     @Cacheable(
@@ -118,8 +101,7 @@ public class MenuService {
         menu.updateMenu(request, menuRoleList);
 
         // clear cache
-        utils.clearCacheByKey(RedisCacheKey.MENU, request.getRoleNames());
-        utils.clearCacheByKey(RedisCacheKey.MENU_ROLE, request.getRoleNames());
+        clearMenuCache(request);
 
         return converter.toResponse(menu, roleResponseList);
     }
@@ -244,4 +226,40 @@ public class MenuService {
 
         return response;
     }
+
+    private Menu validateParentMenu(AdminMenuCreateRequest request, Menu parent) {
+        if (ObjectUtils.isNotEmpty(request.getParentMenuId())) {
+            parent = findByParentId(request.getParentMenuId());
+            // 상위 메뉴 "사용 중" 상태 아닌 경우 예외
+            validator.validateParentMenuIsUse(request, parent);
+            // parent menu leaf => ex
+            validator.validateParentMenuIsLeafFalse(parent.getIsLeaf());
+        }
+        return parent;
+    }
+
+    private List<Role> addRoleToMenu(AdminMenuCreateRequest request, List<Role> roleList, Menu entity) {
+        List<MenuRole> menuRoles;
+        if (!request.getRoleNames().isEmpty()) {
+            roleList = roleService.findRoleByRoleNames(request.getRoleNames());
+            menuRoles = menuRoleService.createMenuRoleWithMenuAndRole(entity, roleList);
+
+            menuRoleService.saveAllMenuRoles(menuRoles);
+        }
+        return roleList;
+    }
+
+    private AdminMenuResponse convertResponse(List<Role> roleList, Menu savedEntity) {
+        List<RoleResponse> roleResponseList = roleList.stream()
+                .map(roleConverter::toResponse)
+                .toList();
+
+        return converter.toResponse(savedEntity, roleResponseList);
+    }
+
+    private void clearMenuCache(AdminMenuUpdateRequest request) {
+        utils.clearCacheByKey(RedisCacheKey.MENU, request.getRoleNames());
+        utils.clearCacheByKey(RedisCacheKey.MENU_ROLE, request.getRoleNames());
+    }
+
 }
