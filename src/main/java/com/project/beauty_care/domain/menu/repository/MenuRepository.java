@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface MenuRepository extends JpaRepository<Menu, Long>, MenuCustomRepository {
     Optional<Menu> findByParentIsNullAndIsUseIsTrue();
     Optional<Menu> findByParentIsNull();
-    List<Menu> findByIsLeafIsTrue();
+    List<Menu> findByIsLeafIsTrueAndIsUseIsTrue();
 }
