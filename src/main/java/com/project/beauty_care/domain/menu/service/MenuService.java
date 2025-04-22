@@ -18,6 +18,7 @@ import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
+import com.project.beauty_care.global.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,8 +41,9 @@ public class MenuService {
     private final MenuConverter converter;
     private final RoleConverter roleConverter;
     private final MenuValidator validator;
+    private final RedisUtils utils;
 
-    @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
+    @CacheEvict(value = RedisCacheKey.MENU, key = "'all'", cacheManager = "redisCacheManager")
     public AdminMenuResponse createMenu(AdminMenuCreateRequest request) {
         Menu parent = null;
         List<MenuRole> menuRoles;
@@ -55,6 +57,8 @@ public class MenuService {
             parent = findByParentId(request.getParentMenuId());
             // 상위 메뉴 "사용 중" 상태 아닌 경우 예외
             validator.validateParentMenuIsUse(request, parent);
+            // parent menu leaf => ex
+            validator.validateParentMenuIsLeafFalse(parent.getIsLeaf());
         }
 
         Menu entity = buildEntity(request, parent);
@@ -94,13 +98,16 @@ public class MenuService {
         return toHierarchy(menu, role);
     }
 
-    @CacheEvict(value = RedisCacheKey.MENU, allEntries = true, cacheManager = "redisCacheManager")
     public AdminMenuResponse updateMenu(AdminMenuUpdateRequest request, Long menuId) {
         Menu menu = findById(menuId);
         Menu parent = menu.getParent();
 
-        // 최하위 메뉴에 leafMenu 추가 불가.
-        validator.validateParentMenu(request, parent);
+        // leaf menu validation
+        validator.validateMenuLevelAndIsLeaf(request);
+
+        // parent menu validation
+        if (ObjectUtils.isNotEmpty(parent))
+            validator.validateParentMenuIsUse(request, parent);
 
         List<Role> roleList = roleService.findRoleByRoleNames(request.getRoleNames());
         List<RoleResponse> roleResponseList = roleList.stream().map(roleConverter::toResponse).toList();
@@ -110,12 +117,16 @@ public class MenuService {
         // update menu
         menu.updateMenu(request, menuRoleList);
 
+        // clear cache
+        utils.clearCacheByKey(RedisCacheKey.MENU, request.getRoleNames());
+        utils.clearCacheByKey(RedisCacheKey.MENU_ROLE, request.getRoleNames());
+
         return converter.toResponse(menu, roleResponseList);
     }
 
     public UserMenuResponse findMenuByAuthority(String role) {
         // 최하위 메뉴
-        List<Menu> leafMenuList = repository.findByIsLeafIsTrue();
+        List<Menu> leafMenuList = repository.findByIsLeafIsTrueAndIsUseIsTrue();
 
         // 최상위 메뉴
         Menu topMenu = repository.findByParentIsNull().orElse(null);
@@ -132,6 +143,7 @@ public class MenuService {
                 )
                 .forEach(menu -> toHierarchyReverse(menu, response, map));
 
+        // 최상위 메뉴
         return map.get(topMenu.getId());
     }
 
@@ -166,34 +178,13 @@ public class MenuService {
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_PARENT_MENU));
     }
 
-    private UserMenuResponse toHierarchy(Menu menu, Role role) {
-        // 권한 목록
-        UserMenuResponse response = converter.toResponse(menu);
-
-        // 하위 메뉴 convert
-        List<UserMenuResponse> childrenList = menu.getChildren().stream()
-                .filter(Menu::getIsUse)
-                .filter(children -> {
-                    // 하위 메뉴 아니면 권한체크 x
-                    if (!children.getIsLeaf()) return true;
-
-                    return menuHasRole(role, children);
-                })
-                .map(children -> toHierarchy(children, role))
-                .toList();
-
-        response.setChildren(new ArrayList<>(childrenList));
-
-        return response;
-    }
-
     private void toHierarchyReverse(Menu menu,
                                     UserMenuResponse response,
                                     Map<Long, UserMenuResponse> map) {
         Menu parent = menu.getParent();
 
-        // empty -> 다음 메뉴로
-        if (ObjectUtils.isEmpty(parent)) return;
+        // empty or isUse = false -> 다음 메뉴로
+        if (ObjectUtils.isEmpty(parent) || !parent.getIsUse()) return;
 
         if (response.getChildren() == null) {
             response = MenuMapper.INSTANCE.toResponse(parent);
@@ -209,7 +200,7 @@ public class MenuService {
             }
         } else {
             // 계층형 구조 만든다.
-            UserMenuResponse parentResponse = null;
+            UserMenuResponse parentResponse;
 
             if (map.containsKey(parent.getId())) {
                 parentResponse = map.get(parent.getId());
