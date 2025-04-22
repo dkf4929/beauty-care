@@ -39,6 +39,12 @@ public enum Errors {
     MAX_MENU_DEPTH_ERROR(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "메뉴는 최대 3depth 입니다."),
     PARENT_MENU_NOT_USE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴가 사용중 상태가 아닙니다."),
     DUPLICATED_ROLE(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT.getErrorCode(), "중복된 권한이 존재합니다."),
+    CAN_NOT_UPDATE_ADMIN_ROLE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "관리자 권한을 가진 사용자는 수정할 수 없습니다."),
+    MUST_UPDATE_PRIVATE_PAGE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "개인정보 수정은 사용자 기능입니다."),
+    CAN_NOT_BE_LEAF_MENU(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "메뉴는 3depth 입니다. 하위 메뉴가 될 수 없는 계층입니다."),
+
+    //redis
+    REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "서버에 오류가 발생했습니다. 관리자에게 문의하세요.");
 
