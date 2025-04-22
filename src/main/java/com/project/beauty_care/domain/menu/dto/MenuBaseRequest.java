@@ -1,9 +1,7 @@
 package com.project.beauty_care.domain.menu.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,4 +41,10 @@ public class MenuBaseRequest {
 
     @Schema(example = "ADMIN")
     private List<String> roleNames = new ArrayList<>();
+
+    @NotNull
+    @Min(0)
+    @Max(2)
+    @Schema(example = "0")
+    private Integer menuLevel;
 }

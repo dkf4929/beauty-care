@@ -15,9 +15,4 @@ import lombok.experimental.SuperBuilder;
 public class AdminMenuCreateRequest extends MenuBaseRequest {
     @Schema(example = "1")
     private Long parentMenuId;
-    @NotNull
-    @Min(0)
-    @Max(2)
-    @Schema(example = "0")
-    private Integer menuLevel;
 }
