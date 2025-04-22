@@ -9,4 +9,5 @@ public abstract class RedisCacheKey {
     public static final String ROLE = "role";
     public static final String ROLE_EXISTS = "role_exists";
     public static final String MENU = "menu";
+    public static final String MENU_ROLE = "menu_role";
 }
