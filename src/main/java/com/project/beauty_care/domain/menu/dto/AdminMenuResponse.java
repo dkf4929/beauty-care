@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -41,4 +42,19 @@ public class AdminMenuResponse extends BaseDto {
 
     @Schema(description = "사용 여부", example = "true")
     private Boolean isUse;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        AdminMenuResponse that = (AdminMenuResponse) object;
+        return Objects.equals(menuId, that.menuId) &&
+                Objects.equals(menuName, that.menuName) &&
+                Objects.equals(menuPath, that.menuPath) &&
+                Objects.equals(sortNumber, that.sortNumber) &&
+                Objects.equals(isLeaf, that.isLeaf) &&
+                Objects.equals(children, that.children) &&
+                Objects.equals(roles, that.roles) &&
+                Objects.equals(isUse, that.isUse);
+    }
 }
