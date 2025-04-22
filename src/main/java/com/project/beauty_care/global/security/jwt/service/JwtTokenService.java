@@ -9,10 +9,7 @@ import com.project.beauty_care.domain.role.service.RoleService;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +29,8 @@ public class JwtTokenService {
         return roleConverter.toResponse(role, RoleResponse.patternMapToList(role.getUrlPatterns()));
     }
 
+
+    @Cacheable(value = RedisCacheKey.MENU_ROLE, key = "#p0", cacheManager = "redisCacheManager")
     public UserMenuResponse findMyMenu(String authority) {
         return menuService.findMenuByAuthority(authority);
     }
