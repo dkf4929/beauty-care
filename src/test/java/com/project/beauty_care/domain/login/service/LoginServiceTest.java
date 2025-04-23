@@ -1,4 +1,4 @@
-package com.project.beauty_care.domain.login;
+package com.project.beauty_care.domain.login.service;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.member.Member;

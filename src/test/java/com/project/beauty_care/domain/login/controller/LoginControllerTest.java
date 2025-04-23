@@ -1,4 +1,4 @@
-package com.project.beauty_care.domain.login;
+package com.project.beauty_care.domain.login.controller;
 
 import com.project.beauty_care.ControllerTestSupport;
 import com.project.beauty_care.domain.mapper.RoleMapper;
