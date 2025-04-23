@@ -56,8 +56,11 @@ public class MenuService {
 
         Menu entity = buildEntity(request, parent);
 
-        // save
+        // save and add to children
         Menu savedEntity = repository.save(entity);
+
+        if (ObjectUtils.isNotEmpty(parent))
+            parent.getChildren().add(savedEntity);
 
         // 연관관계 mapping
         roleList = addRoleToMenu(request, roleList, entity);
