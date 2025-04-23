@@ -80,4 +80,12 @@ public class Menu extends BaseEntity {
         this.isUse = isUse;
         this.parent = parent;
     }
+
+    public void updateParent(Menu parent) {
+        this.parent = parent;
+    }
+
+    public void updateMenuRole(List<MenuRole> menuRoleList) {
+        this.menuRole.addAll(menuRoleList);
+    }
 }
