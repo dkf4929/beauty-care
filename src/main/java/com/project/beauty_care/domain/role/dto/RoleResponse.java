@@ -25,7 +25,9 @@ public class RoleResponse extends BaseDto {
     private Boolean isUse;
 
     public static List<String> patternMapToList(Map<String, Object> urlPatterns) {
-        return Optional.ofNullable(urlPatterns.get("pattern"))
+        if (urlPatterns == null) return new ArrayList<>();
+
+        return Optional.ofNullable(urlPatterns.getOrDefault("pattern", new ArrayList<>()))
                 .filter(List.class::isInstance)
                 .map(list -> (List<?>) list)
                 .orElse(Collections.emptyList())
