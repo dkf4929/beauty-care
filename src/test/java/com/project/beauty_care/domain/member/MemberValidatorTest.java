@@ -7,7 +7,6 @@ import com.project.beauty_care.global.exception.PasswordMissMatchException;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
