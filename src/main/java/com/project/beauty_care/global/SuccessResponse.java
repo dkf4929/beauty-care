@@ -23,8 +23,8 @@ public class SuccessResponse<T> {
         this.data = data;
     }
 
-    public static <T> SuccessResponse<T> success(SuccessCodes successCodes, HttpStatus httpStatus, T data) {
-        return new SuccessResponse<>(successCodes, httpStatus, data);
+    public static <T> SuccessResponse<T> success(SuccessCodes successCodes, T data) {
+        return new SuccessResponse<>(successCodes, successCodes.getCode(), data);
     }
 
     public static SuccessResponse success(SuccessCodes successCodes, HttpStatus httpStatus) {

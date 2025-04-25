@@ -44,6 +44,6 @@ public class PublicMemberController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Long> createMember(@Valid @RequestBody PublicMemberCreateRequest request) {
         Member savedMember = service.createMemberPublic(request);
-        return SuccessResponse.success(SuccessCodes.MEMBER_SAVE_SUCCESS, HttpStatus.CREATED, savedMember.getId());
+        return SuccessResponse.success(SuccessCodes.MEMBER_SAVE_SUCCESS, savedMember.getId());
     }
 }

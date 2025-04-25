@@ -55,7 +55,7 @@ public class AdminMemberController {
     @GetMapping
     public SuccessResponse<List<MemberResponse>> findAllMembers() {
         List<MemberResponse> members = service.findAllMembers();
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, members);
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, members);
     }
 
     @Operation(summary = "사용자 생성",
@@ -89,7 +89,7 @@ public class AdminMemberController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Long> createMember(@RequestBody @Valid AdminMemberCreateRequest request) {
         Member savedMember = service.createMemberAdmin(request);
-        return SuccessResponse.success(SuccessCodes.MEMBER_SAVE_SUCCESS, HttpStatus.CREATED, savedMember.getId());
+        return SuccessResponse.success(SuccessCodes.MEMBER_SAVE_SUCCESS, savedMember.getId());
     }
 
     @Operation(summary = "사용자 수정",
@@ -119,6 +119,6 @@ public class AdminMemberController {
     public SuccessResponse<MemberResponse> updateMember(@RequestBody @Valid AdminMemberUpdateRequest request,
                                                         @AuthenticationPrincipal AppUser loginUser) {
         MemberResponse response = service.updateMemberAdmin(request, loginUser);
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, response);
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, response);
     }
 }

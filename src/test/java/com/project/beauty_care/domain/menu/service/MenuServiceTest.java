@@ -51,7 +51,7 @@ class MenuServiceTest extends TestSupportWithOutRedis {
     @Test
     void createTopMenu() {
         // given
-        createRole();
+        buildRoleAndSave();
 
         final String menuName = "TOP 메뉴";
         final String menuPath = "/beauty-care";
@@ -287,7 +287,7 @@ class MenuServiceTest extends TestSupportWithOutRedis {
         return level4;
     }
 
-    private Role createRole() {
+    private Role buildRoleAndSave() {
         Role role = buildRole(Boolean.TRUE, ROLE_ADMIN);
 
         roleRepository.save(role);

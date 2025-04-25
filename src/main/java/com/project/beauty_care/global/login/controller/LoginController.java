@@ -72,10 +72,6 @@ public class LoginController {
         LoginResponse loginResponse =
                 jwtTokenProvider.generateToken(authentication, (new Date()).getTime());
 
-        return SuccessResponse.success(
-                SuccessCodes.LOGIN_SUCCESS,
-                HttpStatus.OK,
-                loginResponse
-        );
+        return SuccessResponse.success(SuccessCodes.LOGIN_SUCCESS, loginResponse);
     }
 }

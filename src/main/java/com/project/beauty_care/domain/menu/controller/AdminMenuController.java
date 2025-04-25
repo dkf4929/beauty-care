@@ -86,7 +86,7 @@ public class AdminMenuController {
     })
     @PostMapping
     public SuccessResponse<AdminMenuResponse> createMenu(@RequestBody @Valid AdminMenuCreateRequest request) {
-        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, HttpStatus.CREATED, service.createMenu(request));
+        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, service.createMenu(request));
     }
 
     @Operation(summary = "메뉴 조회",
@@ -118,7 +118,7 @@ public class AdminMenuController {
     })
     @GetMapping
     public SuccessResponse<AdminMenuResponse> findMenuAll(@RequestParam(required = false, value = "role") String role) {
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, service.findAllMenu(role));
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findAllMenu(role));
     }
 
     @Operation(summary = "메뉴 수정",
@@ -170,7 +170,7 @@ public class AdminMenuController {
     @PutMapping("/{menuId}")
     public SuccessResponse<AdminMenuResponse> updateCode(@PathVariable("menuId") Long menuId,
                                                          @RequestBody @Valid AdminMenuUpdateRequest request) {
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, service.updateMenu(request, menuId));
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, service.updateMenu(request, menuId));
     }
 
 }

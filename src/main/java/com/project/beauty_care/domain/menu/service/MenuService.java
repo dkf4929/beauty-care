@@ -124,8 +124,7 @@ public class MenuService {
         leafMenuList.stream()
                 .filter(menu -> menu.getMenuRole()
                         .stream()
-                        .anyMatch(menuRole -> menuRole.getRole().getRoleName().equals(role))
-                )
+                        .anyMatch(menuRole -> menuRole.getRole().getRoleName().equals(role)))
                 .forEach(menu -> toHierarchyFromChildren(menu, response, map));
 
         // 최상위 메뉴
@@ -201,8 +200,8 @@ public class MenuService {
         }
     }
 
-    private static boolean menuHasRole(Role role, Menu children) {
-        return children.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
+    private static boolean menuHasRole(Role role, Menu menu) {
+        return menu.getMenuRole().stream().anyMatch(menuRole -> menuRole.getRole().equals(role));
     }
 
     private AdminMenuResponse toHierarchyFromParent(Menu menu, String role) {

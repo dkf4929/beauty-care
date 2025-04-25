@@ -62,7 +62,7 @@ public class AdminCodeController {
     @GetMapping("/{codeId}")
     public SuccessResponse<AdminCodeResponse> findCodeById(@PathVariable("codeId") String codeId) {
         AdminCodeResponse code =  service.findCodeById(codeId);
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, code);
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, code);
     }
 
     @Operation(summary = "코드 조회",
@@ -87,7 +87,7 @@ public class AdminCodeController {
     @GetMapping
     public SuccessResponse<AdminCodeResponse> findAllCode() {
         AdminCodeResponse code =  service.findAllCode();
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, code);
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, code);
     }
 
     @Operation(summary = "코드 등록",
@@ -134,7 +134,7 @@ public class AdminCodeController {
     @PostMapping
     public SuccessResponse<AdminCodeResponse> createCode(@RequestBody @Valid AdminCodeCreateRequest request) {
         AdminCodeResponse response = service.createCode(request);
-        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, HttpStatus.OK, response);
+        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, response);
     }
 
     @Operation(summary = "코드 수정",
@@ -177,7 +177,7 @@ public class AdminCodeController {
     public SuccessResponse<AdminCodeResponse> updateCode(@PathVariable("codeId") String codeId,
                                                          @RequestBody @Valid AdminCodeUpdateRequest request) {
         AdminCodeResponse response = service.updateCode(codeId, request);
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, response);
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, response);
     }
 
     @Operation(summary = "코드 삭제",
@@ -219,6 +219,6 @@ public class AdminCodeController {
     @DeleteMapping("/{codeId}")
     public SuccessResponse<String> deleteCode(@PathVariable("codeId") String codeId) {
         String deleteId = service.deleteCode(codeId);
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, deleteId);
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, deleteId);
     }
 }

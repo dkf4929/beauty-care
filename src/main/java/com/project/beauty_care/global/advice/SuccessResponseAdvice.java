@@ -34,7 +34,7 @@ public class SuccessResponseAdvice implements ResponseBodyAdvice<Object> {
         }
 
         if (resolve.is2xxSuccessful() && !(body instanceof SuccessResponse)) {
-            return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, body);
+            return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, body);
         }
 
         return body;

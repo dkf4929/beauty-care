@@ -60,7 +60,7 @@ public class AdminRoleController {
     @GetMapping
     public SuccessResponse<List<RoleMemberResponse>> findAllRoles(@RequestParam(name = "roleName", required = false) String roleName) {
         List<RoleMemberResponse> roles = service.findAllRoles(roleName);
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, HttpStatus.OK, roles);
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, roles);
     }
 
     @Operation(summary = "권한 생성",
@@ -104,7 +104,7 @@ public class AdminRoleController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<RoleResponse> createRole(@RequestBody @Valid RoleCreateRequest request) {
         RoleResponse response = service.createRole(request);
-        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, HttpStatus.OK, response);
+        return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, response);
     }
 
     @Operation(summary = "권한 수정",
@@ -147,7 +147,7 @@ public class AdminRoleController {
     @PutMapping
     public SuccessResponse<RoleResponse> updateRole(@RequestBody @Valid RoleUpdateRequest request) {
         RoleResponse response = service.updateRole(request);
-        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, HttpStatus.OK, response);
+        return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, response);
     }
 
     @Operation(summary = "권한 삭제",
