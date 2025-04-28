@@ -9,6 +9,7 @@ import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
 import com.project.beauty_care.domain.member.dto.UserMemberUpdateRequest;
 import com.project.beauty_care.domain.member.repository.MemberRepository;
 import com.project.beauty_care.domain.role.Role;
+import com.project.beauty_care.domain.role.dto.RoleResponse;
 import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
@@ -16,11 +17,13 @@ import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +39,16 @@ class MemberServiceTest extends TestSupportWithOutRedis {
     private PasswordEncoder passwordEncoder;
 
     @MockitoBean
-    private MemberRepository repository;
+    private MemberRepository mockRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @MockitoBean
     private RoleRepository roleRepository;
+
+    @MockitoBean
+    private Logger logger;
 
     @Value("${initial.password}")
     private String initialPassword;
@@ -51,13 +60,41 @@ class MemberServiceTest extends TestSupportWithOutRedis {
     @Test
     void softDeleteMemberWithNotPresentMember() {
         // given
-        Long deleteMemberId = 9999L;
+        AppUser appUser = buildAppUser(9999L, "test", Role.builder().build(), "test");
 
         // when, then
-        assertThatThrownBy(() -> service.softDeleteMember(deleteMemberId))
+        assertThatThrownBy(() -> service.softDeleteMember(appUser, LocalDate.now()))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasFieldOrPropertyWithValue("errors.message", Errors.NOT_FOUND_MEMBER.getMessage())
                 .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NOT_FOUND_MEMBER.getErrorCode());
+    }
+
+    @DisplayName("회원 탈퇴")
+    @Test
+    void softDeleteMember() {
+        // given
+        LocalDate now = LocalDate.now();
+
+        Role role = buildRole(Authentication.USER.getName());
+        Member member = buildMember("test", role);
+
+        AppUser mockUser = mock(AppUser.class);
+        RoleResponse mockRoleResponse = mock(RoleResponse.class);
+
+        when(mockUser.getRole()).thenReturn(mockRoleResponse);
+        when(mockRoleResponse.getRoleName()).thenReturn(Authentication.USER.getName());
+
+        // when
+        when(mockRepository.findById(any()))
+                .thenReturn(Optional.of(member));
+
+        service.softDeleteMember(mockUser, now);
+
+        // then
+        assertThat(member)
+                .extracting("isUse", "deletedDate")
+                .containsExactly(Boolean.FALSE, now);
+
     }
 
     @DisplayName("사용자 조회(ALL)")
@@ -68,7 +105,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
         Member member2 = buildMember("test2", USER);
         Member member3 = buildMember("test3", USER);
         // when
-        when(repository.findAll()).thenReturn(List.of(member1, member2, member3));
+        when(mockRepository.findAll()).thenReturn(List.of(member1, member2, member3));
 
         List<MemberResponse> members = service.findAllMembers();
 
@@ -92,7 +129,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
         final String password = "1234";
         final String name = "test";
 
-        when(repository.findById(any()))
+        when(mockRepository.findById(any()))
                 .thenReturn(Optional.of(
                         Member.createForTest(id, loginId, password, name, USER)
                 ));
@@ -128,7 +165,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
         PublicMemberCreateRequest request =
                 buildPublicMemberCreateRequest(loginId, name, password, confirmPassword);
 
-        when(repository.save(any()))
+        when(mockRepository.save(any()))
                 .thenReturn(Member.createForTest(1L, loginId, password, name, USER));
 
         when(roleRepository.findById(any()))
@@ -143,7 +180,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
                 .containsExactly(loginId, name, password);
 
         // 한번 호출 됐는지 검증
-        verify(repository, times(1)).save(any());
+        verify(mockRepository, times(1)).save(any());
     }
 
     @DisplayName("회원 수정 FOR USER")
@@ -157,7 +194,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
 
         UserMemberUpdateRequest request = buildUserMemberUpdateRequest(id, name, password, confirmPassword);
 
-        when(repository.findById(anyLong()))
+        when(mockRepository.findById(anyLong()))
                 .thenReturn(
                         Optional.of(
                                 Member.createForTest(id, "test", "1234", "test", USER)
@@ -185,7 +222,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
 
         AdminMemberUpdateRequest request = buildAdminMemberUpdateRequest(id, Authentication.USER.getName(), isUse);
 
-        when(repository.findById(anyLong()))
+        when(mockRepository.findById(anyLong()))
                 .thenReturn(
                         Optional.of(
                                 Member.createForTest(id, "test", "1234", "test", USER)

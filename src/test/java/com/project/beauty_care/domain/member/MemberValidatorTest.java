@@ -40,6 +40,25 @@ class MemberValidatorTest extends TestSupportWithOutRedis {
         );
     }
 
+    @DisplayName("관리자 계정인지 여부 체크")
+    @TestFactory
+    Collection<DynamicTest> checkAdminRoleWhenSoftDeleteMember() {
+        return List.of(
+                DynamicTest.dynamicTest("정상 시나리오", () -> {
+                    assertDoesNotThrow(() -> validator.validIsAdminAccount(Authentication.USER.getName()));
+                }),
+                DynamicTest.dynamicTest("관리자 권한을 가진 사용자를 수정하려고 하면, 예외 발생", () -> {
+                    assertThatThrownBy(() -> validator.validIsAdminAccount(Authentication.ADMIN.getName()))
+                            .isInstanceOf(RequestInvalidException.class)
+                            .extracting("errors")
+                            .satisfies(errors -> {
+                                assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.CAN_NOT_DELETE_ADMIN_ACCOUNT.getMessage());
+                                assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.CAN_NOT_DELETE_ADMIN_ACCOUNT.getErrorCode());
+                            });
+                })
+        );
+    }
+
     @DisplayName("개인정보 수정 validation")
     @TestFactory
     Collection<DynamicTest> checkLoginUserEqualsRequest() {
