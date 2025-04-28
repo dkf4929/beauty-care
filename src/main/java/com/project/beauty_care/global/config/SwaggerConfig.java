@@ -17,6 +17,7 @@ import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -137,11 +138,27 @@ public class SwaggerConfig {
 
                     break;
                 case DELETE:
+                    String message = "";
+
+                    if (methodName.equals("deleteMember")) message = "탈퇴 완료 되었습니다.";
+                    else message = "삭제 완료 되었습니다.";
+
                     if (field.getName().equals(CODE))
                         wrapperSchema.addProperty(field.getName(), new Schema<>().example("204"));
 
                     if (field.getName().equals(MESSAGE))
-                        wrapperSchema.addProperty(field.getName(), new Schema<>().example("삭제가 완료되었습니다."));
+                        wrapperSchema.addProperty(field.getName(), new Schema<>().example(message));
+
+                    break;
+                case PATCH:
+                    if (methodName.equals("deleteCancelMember")) {
+                        if (field.getName().equals(CODE))
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example("204"));
+
+
+                        if (field.getName().equals(MESSAGE))
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example("탈퇴 취소 되었습니다."));
+                    }
 
                     break;
                 case PUT:
