@@ -22,4 +22,9 @@ public class MemberValidator {
         if (!password.equals(confirmPassword))
             throw new PasswordMissMatchException(Errors.PASSWORD_MISS_MATCH);
     }
+
+    public void validIsAdminAccount(String role) {
+        if (role.equals(Authentication.ADMIN.getName()))
+            throw new RequestInvalidException(Errors.CAN_NOT_DELETE_ADMIN_ACCOUNT);
+    }
 }

@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @Tag(name = "MEMBER REST API FOR USER", description = "사용자 API")
 @RequestMapping("/user/member")
 @RequiredArgsConstructor
@@ -81,33 +83,56 @@ public class UserMemberController {
         return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, response);
     }
 
-//    @Operation(summary = "회원 탈퇴", description = "서비스를 탈퇴한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "204", description = "탈퇴 완료되었습니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = Long.class, example = "1"))),
-//            @ApiResponse(responseCode = "400", description = "하위코드 존재", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(
-//                            example = "{ \"code\": \"E006\",\"message\": \"하위코드가 존재하는 경우, 삭제할 수 없습니다.\" }"))),
-//            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(
-//                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
-//            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(
-//                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
-//            @ApiResponse(responseCode = "404", description = "ENTITY NOT FOUND", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(
-//                            example = "{ \"code\": \"E006\", \"message\": \"등록된 사용자가 아닙니다.\" }"))),
-//            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
-//    })
-//    @DeleteMapping
-//    public SuccessResponse<Long> deleteMember(@AuthenticationPrincipal AppUser appUser) {
-//        return SuccessResponse.success(SuccessCodes.CANCEL_SUCCESS, service.);
-//    }
+    @Operation(summary = "회원 탈퇴", description = "서비스를 탈퇴한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "탈퇴 완료되었습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Long.class, example = "1"))),
+            @ApiResponse(responseCode = "400", description = "관리자 계정 삭제 불가", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E006\",\"message\": \"관리자 권한을 가진 사용자는 서비스 탈퇴가 불가능 합니다. 시스템 관리자에게 문의 하세요.\" }"))),
+            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
+    })
+    @DeleteMapping
+    public SuccessResponse<Long> deleteMember(@AuthenticationPrincipal AppUser appUser) {
+        return SuccessResponse.success(
+                SuccessCodes.CANCEL_SUCCESS, service.softDeleteMember(appUser, LocalDate.now()));
+    }
+
+    @Operation(summary = "회원 탈퇴 취소", description = "서비스를 탈퇴를 취소한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "탈퇴 취소 되었습니다.", content = @Content(
+                    mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "이미 탈퇴 처리된 회원", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E006\",\"message\": \"탈퇴 신청한지 2주가 지난 회원입니다.\" }"))),
+            @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E003\",\"message\": \"로그인 후 진행하세요.\" }"))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
+    })
+    @PatchMapping
+    public SuccessResponse<Object> deleteCancelMember(@AuthenticationPrincipal AppUser appUser) {
+        service.deleteCancel(appUser, LocalDate.now());
+        return SuccessResponse.success(SuccessCodes.CANCEL_SUCCESS, new Object());
+    }
 }

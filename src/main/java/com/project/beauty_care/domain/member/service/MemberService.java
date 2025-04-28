@@ -10,18 +10,23 @@ import com.project.beauty_care.domain.role.repository.RoleRepository;
 import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
+import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MemberService {
     private final MemberRepository repository;
     private final RoleRepository roleRepository;
@@ -58,12 +63,56 @@ public class MemberService {
         return MemberConverter.toResponse(member);
     }
 
-    // 미사용
-    public void softDeleteMember(Long memberId) {
-        Member findMember = findById(memberId);
+    // 회원 탈퇴 정책 -> 1년 개인정보 보호
+    // 스케줄러 돌면서 탈퇴한지 1년 지난 회원 hardDelete 처리
+    public Long softDeleteMember(AppUser appUser, LocalDate now) {
+        Member findMember = findById(appUser.getMemberId());
 
-        // isUse => false
-        findMember.deleteMember();
+        String role = appUser.getRole().getRoleName();
+
+        // 관리자 권한 탈퇴 불가
+        validator.validIsAdminAccount(role);
+
+        // isUse => false & deletedDate => now
+        findMember.softDelete(now);
+
+        log.info("soft delete member = {}, {}", findMember.getId(), now);
+
+        return findMember.getId();
+    }
+
+    public void hardDeleteMemberWhenAfterOneYear(LocalDate date) {
+        // + 1년
+        LocalDate expiredDate = date.plusYears(1);
+
+        // 탈퇴한 지 1년이 지난 사용자를 찾는다.
+        List<Member> memberList = repository.findAllByIsUseIsFalseAndDeletedDate(expiredDate);
+
+        // 삭제
+        repository.deleteAllInBatch(memberList);
+
+        List<Long> idList = memberList.stream()
+                .map(Member::getId)
+                .toList();
+
+        log.info("delete Member id : {}", idList);
+    }
+
+    // 탈퇴 취소
+    public void deleteCancel(AppUser appUser, LocalDate now) {
+        // 탈퇴 취소 가능 기간 => 14일
+        Optional<Member> memberOptional = repository.findByIdAndIsUseIsFalseAndDeletedDateBetween(
+                appUser.getMemberId(),
+                now.minusDays(14),
+                now);
+
+        if (memberOptional.isEmpty())
+            throw new RequestInvalidException(Errors.CAN_NOT_DELETE_CANCEL_AFTER_14_DAYS);
+
+        Member member = memberOptional.get();
+
+        // isUse => true & deletedDate => null
+        member.deleteCancel();
     }
 
     public Member createMemberAdmin(AdminMemberCreateRequest request) {

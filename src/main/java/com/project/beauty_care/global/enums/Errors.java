@@ -40,8 +40,13 @@ public enum Errors {
     PARENT_MENU_NOT_USE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴가 사용중 상태가 아닙니다."),
     DUPLICATED_ROLE(HttpStatus.CONFLICT, ErrorCodes.DB_UNSATISFIED_CONSTRAINT.getErrorCode(), "중복된 권한이 존재합니다."),
     CAN_NOT_UPDATE_ADMIN_ROLE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "관리자 권한을 가진 사용자는 수정할 수 없습니다."),
+    CAN_NOT_DELETE_ADMIN_ACCOUNT(
+            HttpStatus.BAD_REQUEST,
+            ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(),
+            "관리자 권한을 가진 사용자는 서비스 탈퇴가 불가능 합니다. 시스템 관리자에게 문의 하세요."),
     MUST_UPDATE_PRIVATE_PAGE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "개인정보 수정은 사용자 기능입니다."),
     CAN_NOT_BE_LEAF_MENU(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "메뉴는 3depth 입니다. 하위 메뉴가 될 수 없는 계층입니다."),
+    CAN_NOT_DELETE_CANCEL_AFTER_14_DAYS(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "탈퇴 신청한지 14일이 지난 회원은 취소가 불가능 합니다."),
 
     //redis
     REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),

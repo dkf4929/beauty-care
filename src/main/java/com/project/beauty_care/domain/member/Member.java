@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,6 +37,8 @@ public class Member extends BaseEntity {
 
     private Boolean isUse;
 
+    private LocalDate deletedDate;
+
     private LocalDateTime lastLoginDateTime;
 
     // FOR ADMIN
@@ -55,13 +58,20 @@ public class Member extends BaseEntity {
     }
 
     @Builder
-    public Member(String loginId, String password, String name, Role role, LocalDateTime lastLoginDateTime) {
+    public Member(String loginId,
+                  String password,
+                  String name,
+                  Role role,
+                  LocalDateTime lastLoginDateTime,
+                  LocalDate deletedDate,
+                  Boolean isUse) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.role = role;
-        this.isUse = Boolean.TRUE;
         this.lastLoginDateTime = lastLoginDateTime;
+        this.deletedDate = deletedDate;
+        this.isUse = isUse;
     }
 
     public static Member createForTest(Long id, String loginId, String password, String name, Role role) {
@@ -75,5 +85,13 @@ public class Member extends BaseEntity {
         return member;
     }
 
-    public void deleteMember() {this.isUse = Boolean.FALSE;}
+    public void softDelete(LocalDate deletedDate) {
+        this.deletedDate = deletedDate;
+        this.isUse = Boolean.FALSE;
+    }
+
+    public void deleteCancel() {
+        this.isUse = Boolean.TRUE;
+        this.deletedDate = null;
+    }
 }
