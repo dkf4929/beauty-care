@@ -20,6 +20,10 @@ jwt:
 initial:
   password: qwer1234
 
+cron:
+  member:
+    delete: 0 0 3 * * *
+
 ---
 spring:
   sql:
@@ -88,6 +92,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+# 테스트용
+cron:
+  member:
+    delete: "*/5 * * * * *"
 
 token:
   access: 3600000  # 1시간
