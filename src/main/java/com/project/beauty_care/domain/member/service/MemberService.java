@@ -95,7 +95,7 @@ public class MemberService {
                 .map(Member::getId)
                 .toList();
 
-        log.info("delete Member id : {}", idList);
+        if (!idList.isEmpty()) log.info("delete Member id : {}", idList);
     }
 
     // 탈퇴 취소
