@@ -27,7 +27,7 @@ class MemberRepositoryTest extends RepositoryTestSupport {
     @Test
     void findByLoginIdAndIsUseIsTrue() {
         //given
-        createMember("user1", null, "user1");
+        createMember("user1", null, "user1", Boolean.TRUE);
 
         //when
         Member findMember = repository.findByLoginIdAndIsUseIsTrue("user1")
@@ -41,11 +41,11 @@ class MemberRepositoryTest extends RepositoryTestSupport {
     @DisplayName("동일한 로그인 아이디로 회원 생성 => 예외 발생")
     @Test
     void createMemberWithIdenticalLoginId() {
-        createMember("user1", role, "user1");
+        createMember("user1", role, "user1", Boolean.TRUE);
 
         // when, then
         // 메시지에 제약조건을 포함하는지 확인
-        assertThatThrownBy(() -> createMember("user1", role, "user1"))
+        assertThatThrownBy(() -> createMember("user1", role, "user1", Boolean.TRUE))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining(UniqueConstraint.UQ_MEMBER_LOGIN_ID.name());
     }
@@ -56,21 +56,24 @@ class MemberRepositoryTest extends RepositoryTestSupport {
         // given
         final String name = "user1";
         final String loginId = "user1";
+        final Boolean isUse = Boolean.TRUE;
 
         // when, then
-        assertThat(createMember(name, role, loginId))
+        assertThat(createMember(name, role, loginId, isUse))
                 .extracting("loginId", "name", "role", "isUse")
-                .containsExactly(loginId, name, role, Boolean.TRUE);
+                .containsExactly(loginId, name, role, isUse);
     }
 
     private Member createMember(String name,
                                 Role role,
-                                String loginId) {
+                                String loginId,
+                                Boolean isUse) {
         Member member = Member.builder()
                 .name(name)
                 .role(role)
                 .loginId(loginId)
                 .password("1234")
+                .isUse(isUse)
                 .build();
 
         return repository.save(member);
