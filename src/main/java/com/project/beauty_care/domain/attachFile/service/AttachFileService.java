@@ -1,10 +1,9 @@
 package com.project.beauty_care.domain.attachFile.service;
 
-import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.attachFile.AttachFileConverter;
 import com.project.beauty_care.domain.attachFile.AttachFileRepository;
-import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
+import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.FileUploadException;
 import lombok.RequiredArgsConstructor;
