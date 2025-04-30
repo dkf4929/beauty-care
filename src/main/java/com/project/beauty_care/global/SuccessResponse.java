@@ -27,6 +27,10 @@ public class SuccessResponse<T> {
         return new SuccessResponse<>(successCodes, successCodes.getCode(), data);
     }
 
+    public static <T> SuccessResponse<T> success(SuccessCodes successCodes) {
+        return new SuccessResponse<>(successCodes, successCodes.getCode(), null);
+    }
+
     public static SuccessResponse success(SuccessCodes successCodes, HttpStatus httpStatus) {
         return new SuccessResponse<>(successCodes, httpStatus, null);
     }

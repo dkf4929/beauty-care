@@ -18,7 +18,9 @@ public enum SuccessCodes {
     UPDATE_SUCCESS(HttpStatus.OK, "수정 완료 되었습니다."),
 
     // member
-    MEMBER_SAVE_SUCCESS(HttpStatus.CREATED, "회원 저장이 완료 되었습니다.");
+    MEMBER_SAVE_SUCCESS(HttpStatus.CREATED, "회원 저장이 완료 되었습니다."),
+    FILE_UPLOAD_SUCCESS(HttpStatus.CREATED, "파일 업로드 완료 되었습니다."),
+    ;
 
     private final HttpStatus code;
     private final String message;

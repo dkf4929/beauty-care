@@ -48,6 +48,9 @@ public enum Errors {
     CAN_NOT_BE_LEAF_MENU(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "메뉴는 3depth 입니다. 하위 메뉴가 될 수 없는 계층입니다."),
     CAN_NOT_DELETE_CANCEL_AFTER_14_DAYS(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "탈퇴 신청한지 14일이 지난 회원은 취소가 불가능 합니다."),
 
+    // file
+    FILE_NOT_SAVED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 업로드 중 오류가 발생했습니다."),
+
     //redis
     REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),
 
