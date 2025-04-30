@@ -1,16 +1,16 @@
 package com.project.beauty_care.domain.attachFile.service;
 
-import com.project.beauty_care.domain.attachFile.AttachContext;
+import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.attachFile.AttachFileConverter;
 import com.project.beauty_care.domain.attachFile.AttachFileRepository;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.FileUploadException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -30,39 +30,39 @@ public class AttachFileService {
     @Value("${file.upload.dir}")
     private String uploadDir;
 
-    public void createFile(List<MultipartFile> files, AttachContext attachContext) {
-        List<AttachFile> attachFileList = uploadFile(files, attachContext);
+    public void createFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
+        List<AttachFile> attachFileList = uploadFile(files, mappedEntity, id);
 
         if (!attachFileList.isEmpty()) repository.saveAll(attachFileList);
     }
 
-    // TODO : 파일명 중복 문제, 파일 정합성 스케줄러 처리?
-    private List<AttachFile> uploadFile(List<MultipartFile> files, AttachContext attachContext) {
+    // TODO : 파일명 중복 문제, 파일 정합성 스케줄러 처리?, 파일에 대한 업무 단위 문제..
+    private List<AttachFile> uploadFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
         return files.stream()
                 .map(file -> {
                     String fileName = file.getOriginalFilename();
-
-                    Path directory = Paths.get(uploadDir, attachContext.toString());
+                    Path directory = Paths.get(uploadDir, mappedEntity.toString());
                     Path fileFullPath = directory.resolve(fileName);
 
                     long size = file.getSize();
 
-                    Path path = Paths.get(uploadDir + "/" + attachContext).resolve(fileName);
-
-                    if (Files.exists(path)) return null;
-
+                    Path path = Paths.get(uploadDir + "/" + mappedEntity).resolve(fileName);
                     String extension = extractExtension(fileName);
 
                     try {
                         Files.createDirectories(path.getParent());
                         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                     } catch (java.io.IOException e) {
-                        e.printStackTrace();
                         log.error(e.getMessage());
                         throw new FileUploadException(Errors.FILE_NOT_SAVED);
                     }
 
-                    return converter.buildEntity(attachContext, fileName, fileFullPath.toString(), extension, size);
+                    return converter.buildEntity(mappedEntity,
+                            id,
+                            fileName,
+                            fileFullPath.toString(),
+                            extension,
+                            size);
                 })
                 .filter(Objects::nonNull)
                 .toList();

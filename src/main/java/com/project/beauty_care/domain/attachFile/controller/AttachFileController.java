@@ -1,6 +1,6 @@
 package com.project.beauty_care.domain.attachFile.controller;
 
-import com.project.beauty_care.domain.attachFile.AttachContext;
+import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.domain.attachFile.service.AttachFileService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
@@ -21,12 +21,13 @@ import java.util.List;
 public class AttachFileController {
     private final AttachFileService service;
 
-    @PostMapping(value = "/{attachContext}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/mapped/{mappedEntity}/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public SuccessResponse uploadFile(@RequestPart("file")
                                           @Parameter(description = "업로드할 파일", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
                                           List<MultipartFile> files,
-                                      @PathVariable("attachContext") AttachContext attachContext) {
-        service.createFile(files, attachContext);
+                                      @PathVariable("mappedEntity") MappedEntity mappedEntity,
+                                      @PathVariable("id") String id) {
+        service.createFile(files, mappedEntity, id);
         return SuccessResponse.success(SuccessCodes.FILE_UPLOAD_SUCCESS);
     }
 }

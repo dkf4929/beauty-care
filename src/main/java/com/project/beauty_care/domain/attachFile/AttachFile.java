@@ -17,8 +17,12 @@ public class AttachFile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
-    private AttachContext attachContext;
+    private MappedEntity mappedEntity;
+
+    @NotBlank
+    private String mappedEntityId;
 
     @NotBlank
     private String fileName;
@@ -33,7 +37,9 @@ public class AttachFile extends BaseEntity {
     private Long fileSize;
 
     @Builder
-    public AttachFile(AttachContext attachContext, String fileName, String filePath, String extension, Long fileSize) {        this.attachContext = attachContext;
+    public AttachFile(MappedEntity mappedEntity, String mappedEntityId, String fileName, String filePath, String extension, Long fileSize) {
+        this.mappedEntity = mappedEntity;
+        this.mappedEntityId = mappedEntityId;
         this.fileName = fileName;
         this.filePath = filePath;
         this.extension = extension;
