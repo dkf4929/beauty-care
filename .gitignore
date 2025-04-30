@@ -7,6 +7,8 @@ build/
 
 /src/main/generated/**
 
+/upload/**
+
 ### STS ###
 .apt_generated
 .classpath
