@@ -16,11 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.DynamicTest.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class MemberIntegrationServiceTest extends TestSupportWithOutRedis {
     @Autowired
