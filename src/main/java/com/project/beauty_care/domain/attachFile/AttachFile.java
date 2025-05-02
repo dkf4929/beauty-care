@@ -22,7 +22,7 @@ public class AttachFile extends BaseEntity {
     private MappedEntity mappedEntity;
 
     @NotBlank
-    private String mappedEntityId;
+    private String mappedId;
 
     @NotBlank
     private String fileName;
@@ -42,14 +42,14 @@ public class AttachFile extends BaseEntity {
 
     @Builder
     public AttachFile(MappedEntity mappedEntity,
-                      String mappedEntityId,
+                      String mappedId,
                       String fileName,
                       String storedFileName,
                       String filePath,
                       String extension,
                       Long fileSize) {
         this.mappedEntity = mappedEntity;
-        this.mappedEntityId = mappedEntityId;
+        this.mappedId = mappedId;
         this.fileName = fileName;
         this.storedFileName = storedFileName;
         this.filePath = filePath;

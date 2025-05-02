@@ -58,7 +58,10 @@ token:
 
 file:
   upload:
-    dir: ./upload/file
+    real:
+      dir: ./UPLOAD/FILE/
+    temp:
+      dir: ./UPLOAD/TEMP/FILE
 
 ---
 spring:

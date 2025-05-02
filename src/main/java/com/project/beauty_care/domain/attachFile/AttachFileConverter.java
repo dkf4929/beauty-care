@@ -1,11 +1,12 @@
 package com.project.beauty_care.domain.attachFile;
 
+import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AttachFileConverter {
     public AttachFile buildEntity(MappedEntity mappedEntity,
-                                  String mappedEntityId,
+                                  String mappedId,
                                   String fileName,
                                   String storedFileName,
                                   String fileFullPath,
@@ -13,12 +14,21 @@ public class AttachFileConverter {
                                   long size) {
         return AttachFile.builder()
                 .mappedEntity(mappedEntity)
-                .mappedEntityId(mappedEntityId)
+                .mappedId(mappedId)
                 .fileName(fileName)
                 .storedFileName(storedFileName)
                 .filePath(fileFullPath)
                 .extension(extension)
                 .fileSize(size)
+                .build();
+    }
+
+    public TempFileDto toDto(String tempFileFullPath, String originalFileName, Long size, String storedFileName) {
+        return TempFileDto.builder()
+                .tempFileFullPath(tempFileFullPath)
+                .originalFileName(originalFileName)
+                .size(size)
+                .storedFileName(storedFileName)
                 .build();
     }
 }

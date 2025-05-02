@@ -4,23 +4,19 @@ import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.attachFile.AttachFileConverter;
 import com.project.beauty_care.domain.attachFile.AttachFileRepository;
 import com.project.beauty_care.domain.attachFile.MappedEntity;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
+import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import com.project.beauty_care.global.exception.FileUploadException;
 import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +26,11 @@ public class AttachFileService {
     private final AttachFileConverter converter;
     private final FileUtils fileUtils;
 
-    @Value("${file.upload.dir}")
-    private String uploadDir;
-
     @Transactional
-    public void createFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
-        List<AttachFile> attachFileList = uploadFile(files, mappedEntity, id);
-
-        if (!attachFileList.isEmpty()) repository.saveAll(attachFileList);
+    public List<TempFileDto> uploadTempFile(List<MultipartFile> files) {
+        return files.stream()
+                .map(fileUtils::uploadFileToServer)
+                .toList();
     }
 
     @Transactional
@@ -47,34 +40,37 @@ public class AttachFileService {
         // from db
         repository.delete(file);
 
-        fileUtils.deleteFileFromServer(
-                Paths.get(file.getFilePath(), file.getStoredFileName()));
+        fileUtils.deleteFileFromServer(file.getFilePath(), file.getStoredFileName());
     }
 
-    private List<AttachFile> uploadFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
-        return files.stream()
-                .map(file -> {
-                    String originalFilename = file.getOriginalFilename();
+    @Transactional
+    public void uploadFile(AttachFileCreateRequest request) {
+        request.getTempFileList()
+                .forEach(tempFile -> {
+                    Map<String, String> fileInfoMap = fileUtils.fileNameToMap(tempFile.getOriginalFileName());
+                    MappedEntity mappedEntity = request.getMappedEntity();
+                    String mappedId = request.getMappedId();
 
-                    if (originalFilename == null)
-                        throw new FileUploadException(Errors.FILE_NOT_SAVED);
+                    String directory =
+                            fileInfoMap.getOrDefault(FileUtils.FILE_PATH, "") + mappedEntity.name() + "/" + mappedId;
 
-                    Path directory = Paths.get(uploadDir, mappedEntity.name());
-                    final long size = file.getSize();
+                    AttachFile file = converter.buildEntity(
+                            mappedEntity,
+                            mappedId,
+                            fileInfoMap.getOrDefault(FileUtils.FILE_NAME, ""),
+                            tempFile.getStoredFileName(),
+                            directory,
+                            fileInfoMap.getOrDefault(FileUtils.EXTENSION, ""),
+                            tempFile.getSize());
 
-                    Map<String, String> map =
-                            fileUtils.uploadFileToServer(directory.toString(), originalFilename, file);
+                    // 파일과 DB 정합성을 위해 bulk insert 하지 않는다.
+                    repository.save(file);
 
-                    return converter.buildEntity(mappedEntity,
-                            id,
-                            map.getOrDefault("fileName", ""),
-                            map.get("storedFileName"),
-                            directory.toString(),
-                            map.getOrDefault("extension", ""),
-                            size);
-                })
-                .filter(Objects::nonNull)
-                .toList();
+                    fileUtils.moveTempFileToRealServer(
+                            tempFile.getTempFileFullPath(),
+                            request.getMappedEntity(),
+                            request.getMappedId());
+                });
     }
 
     private AttachFile findById(Long fileId) {
