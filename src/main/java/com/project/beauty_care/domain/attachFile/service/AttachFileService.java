@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,10 @@ public class AttachFileService {
                             request.getMappedEntity(),
                             request.getMappedId());
                 });
+    }
+
+    public void deleteTempFile(LocalDateTime now) {
+        fileUtils.deleteTempFileAfterOneDay(now.minusDays(1));
     }
 
     private AttachFile findById(Long fileId) {

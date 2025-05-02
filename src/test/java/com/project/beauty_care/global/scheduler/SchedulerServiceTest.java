@@ -2,6 +2,7 @@ package com.project.beauty_care.global.scheduler;
 
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.member.service.MemberService;
+import com.project.beauty_care.global.scheduler.service.SchedulerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

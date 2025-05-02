@@ -21,6 +21,8 @@ initial:
   password: qwer1234
 
 cron:
+  temp-file:
+    delete: 0 0 5 * * *
   member:
     delete: 0 0 3 * * *
 

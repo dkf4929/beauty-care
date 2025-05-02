@@ -20,6 +20,9 @@ public enum SuccessCodes {
     // member
     MEMBER_SAVE_SUCCESS(HttpStatus.CREATED, "회원 저장이 완료 되었습니다."),
     FILE_UPLOAD_SUCCESS(HttpStatus.CREATED, "파일 업로드 완료 되었습니다."),
+
+    // scheduler
+    SCHEDULER_EXECUTE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄러 실행이 완료 되었습니다.")
     ;
 
     private final HttpStatus code;
