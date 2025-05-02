@@ -7,6 +7,7 @@ public class AttachFileConverter {
     public AttachFile buildEntity(MappedEntity mappedEntity,
                                   String mappedEntityId,
                                   String fileName,
+                                  String storedFileName,
                                   String fileFullPath,
                                   String extension,
                                   long size) {
@@ -14,6 +15,7 @@ public class AttachFileConverter {
                 .mappedEntity(mappedEntity)
                 .mappedEntityId(mappedEntityId)
                 .fileName(fileName)
+                .storedFileName(storedFileName)
                 .filePath(fileFullPath)
                 .extension(extension)
                 .fileSize(size)

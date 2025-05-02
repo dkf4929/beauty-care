@@ -5,19 +5,22 @@ import com.project.beauty_care.domain.attachFile.AttachFileConverter;
 import com.project.beauty_care.domain.attachFile.AttachFileRepository;
 import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.global.enums.Errors;
+import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.FileUploadException;
+import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,54 +28,57 @@ import java.util.Objects;
 public class AttachFileService {
     private final AttachFileRepository repository;
     private final AttachFileConverter converter;
+    private final FileUtils fileUtils;
 
     @Value("${file.upload.dir}")
     private String uploadDir;
 
+    @Transactional
     public void createFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
         List<AttachFile> attachFileList = uploadFile(files, mappedEntity, id);
 
         if (!attachFileList.isEmpty()) repository.saveAll(attachFileList);
     }
 
-    // TODO : 파일명 중복 문제, 파일 정합성 스케줄러 처리?, 파일에 대한 업무 단위 문제..
+    @Transactional
+    public void deleteFile(Long fileId) {
+        AttachFile file = findById(fileId);
+
+        // from db
+        repository.delete(file);
+
+        fileUtils.deleteFileFromServer(
+                Paths.get(file.getFilePath(), file.getStoredFileName()));
+    }
+
     private List<AttachFile> uploadFile(List<MultipartFile> files, MappedEntity mappedEntity, String id) {
         return files.stream()
                 .map(file -> {
-                    String fileName = file.getOriginalFilename();
-                    Path directory = Paths.get(uploadDir, mappedEntity.toString());
-                    Path fileFullPath = directory.resolve(fileName);
+                    String originalFilename = file.getOriginalFilename();
 
-                    long size = file.getSize();
-
-                    Path path = Paths.get(uploadDir + "/" + mappedEntity).resolve(fileName);
-                    String extension = extractExtension(fileName);
-
-                    try {
-                        Files.createDirectories(path.getParent());
-                        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (java.io.IOException e) {
-                        log.error(e.getMessage());
+                    if (originalFilename == null)
                         throw new FileUploadException(Errors.FILE_NOT_SAVED);
-                    }
+
+                    Path directory = Paths.get(uploadDir, mappedEntity.name());
+                    final long size = file.getSize();
+
+                    Map<String, String> map =
+                            fileUtils.uploadFileToServer(directory.toString(), originalFilename, file);
 
                     return converter.buildEntity(mappedEntity,
                             id,
-                            fileName,
-                            fileFullPath.toString(),
-                            extension,
+                            map.getOrDefault("fileName", ""),
+                            map.get("storedFileName"),
+                            directory.toString(),
+                            map.getOrDefault("extension", ""),
                             size);
                 })
                 .filter(Objects::nonNull)
                 .toList();
     }
 
-    private String extractExtension(String fileName) {
-        int index = fileName.lastIndexOf('.');
-
-        if (index > 0 && index < fileName.length() - 1)
-            return fileName.substring(index + 1);
-
-        return "";
+    private AttachFile findById(Long fileId) {
+        return repository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_FILE));
     }
 }

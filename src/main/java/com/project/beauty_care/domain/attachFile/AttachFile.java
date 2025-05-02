@@ -31,16 +31,27 @@ public class AttachFile extends BaseEntity {
     private String filePath;
 
     @NotBlank
+    @Column(unique = true)
+    private String storedFileName;
+
+    @NotBlank
     private String extension;
 
     @NotNull
     private Long fileSize;
 
     @Builder
-    public AttachFile(MappedEntity mappedEntity, String mappedEntityId, String fileName, String filePath, String extension, Long fileSize) {
+    public AttachFile(MappedEntity mappedEntity,
+                      String mappedEntityId,
+                      String fileName,
+                      String storedFileName,
+                      String filePath,
+                      String extension,
+                      Long fileSize) {
         this.mappedEntity = mappedEntity;
         this.mappedEntityId = mappedEntityId;
         this.fileName = fileName;
+        this.storedFileName = storedFileName;
         this.filePath = filePath;
         this.extension = extension;
         this.fileSize = fileSize;

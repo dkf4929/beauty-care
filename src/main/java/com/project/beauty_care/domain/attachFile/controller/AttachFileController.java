@@ -30,4 +30,10 @@ public class AttachFileController {
         service.createFile(files, mappedEntity, id);
         return SuccessResponse.success(SuccessCodes.FILE_UPLOAD_SUCCESS);
     }
+
+    @DeleteMapping("{fileId}")
+    public SuccessResponse deleteFile(@RequestParam("fileId") Long fileId) {
+        service.deleteFile(fileId);
+        return SuccessResponse.success(SuccessCodes.DELETE_SUCCESS);
+    }
 }

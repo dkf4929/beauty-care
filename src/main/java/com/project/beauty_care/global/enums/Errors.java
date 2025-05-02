@@ -31,6 +31,7 @@ public enum Errors {
     NOT_FOUND_PARENT_CODE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 코드를 찾을 수 없습니다."),
     NOT_FOUND_ROLE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 권한이 아닙니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 메뉴가 아닙니다."),
+    NOT_FOUND_FILE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "파일을 찾을 수 없습니다."),
     NOT_FOUND_PARENT_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴를 찾을 수 없습니다."),
 
     // request invalid
@@ -50,6 +51,7 @@ public enum Errors {
 
     // file
     FILE_NOT_SAVED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 업로드 중 오류가 발생했습니다."),
+    CAN_NOT_DELETE_FILE(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 삭제 중 오류가 발생했습니다."),
 
     //redis
     REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),
