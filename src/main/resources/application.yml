@@ -107,5 +107,13 @@ cron:
   member:
     delete: "*/5 * * * * *"
 
+# 사용 안함.
+file:
+  upload:
+    real:
+      dir: ./TEST/UPLOAD/FILE/
+    temp:
+      dir: ./TEST/UPLOAD/TEMP/FILE
+
 token:
   access: 3600000  # 1시간
