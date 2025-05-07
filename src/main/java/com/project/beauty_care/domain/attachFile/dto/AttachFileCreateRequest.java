@@ -1,6 +1,7 @@
 package com.project.beauty_care.domain.attachFile.dto;
 
 import com.project.beauty_care.domain.attachFile.MappedEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,5 +22,6 @@ public class AttachFileCreateRequest {
     private MappedEntity mappedEntity;
 
     @NotBlank
+    @Schema(description = "매핑 ID", example = "1")
     private String mappedId;
 }
