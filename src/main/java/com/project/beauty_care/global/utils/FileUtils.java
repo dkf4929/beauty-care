@@ -13,15 +13,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -29,17 +29,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileUtils {
     private final AttachFileConverter converter;
-
-    @Value("${file.upload.real.dir}")
-    private String realDir;
-
-    @Value("${file.upload.temp.dir}")
-    private String tempDir;
-
     public static final String FILE_NAME = "fileName";
     public static final String EXTENSION = "extension";
     public static final String STORED_FILE_NAME = "storedFileName";
     public static final String FILE_PATH = "filePath";
+
+    private final Set<String> extensionSet = Set.of(
+            "png", "jpg", "jpeg", "gif", "txt", "pdf", "docx", "xlsx"
+    );
 
     public void deleteFileFromServer(String filePath, String storedFileName) {
         Path path = Paths.get(filePath, storedFileName);
@@ -56,7 +53,10 @@ public class FileUtils {
     }
 
     // 파일을 실제 경로로 옮긴다.
-    public void moveTempFileToRealServer(String tempFileFullPath, MappedEntity mappedEntity, String mappedId) {
+    public void moveTempFileToRealServer(String tempFileFullPath,
+                                         MappedEntity mappedEntity,
+                                         String mappedId,
+                                         String realDir) {
         String fileName = getFileNameFromFullPath(tempFileFullPath);
         Path realFullPath = Paths.get(realDir, mappedEntity.name(), mappedId).resolve(fileName);
         Path tempFullPath = Paths.get(tempFileFullPath);
@@ -74,15 +74,19 @@ public class FileUtils {
         }
     }
 
-    public TempFileDto uploadFileToServer(MultipartFile file) {
+    public TempFileDto uploadFileToServer(MultipartFile file, String tempDir) {
         Path filePath = Paths.get(tempDir);
 
         String originalFilename = file.getOriginalFilename();
 
-        if (originalFilename == null)
+        if (Objects.requireNonNull(originalFilename).isEmpty())
             throw new FileUploadException(Errors.FILE_NOT_SAVED);
 
         String extension = getExtensionFromFileName(originalFilename);
+
+        if (!extensionSet.contains(extension))
+            throw new FileUploadException(Errors.NOT_SUPPORTED_EXTENSION);
+
         String storedFileName = createStoredFileName(extension);
 
         Path path = filePath.resolve(storedFileName);
@@ -101,7 +105,7 @@ public class FileUtils {
                 storedFileName);
     }
 
-    public Map<String, String> fileNameToMap(String fileName) {
+    public Map<String, String> fileNameToMap(String fileName, String realDir) {
         int lastIndex = fileName.lastIndexOf(".");
 
         String extension = fileName.substring(lastIndex + 1);
@@ -116,17 +120,7 @@ public class FileUtils {
         );
     }
 
-    public String getFileNameFromFullPath(String tempFileFullPath) {
-        return tempFileFullPath.substring(tempFileFullPath.lastIndexOf("/") + 1);
-    }
-
-    public String getExtensionFromFileName(String fileName) {
-        int lastIndex = fileName.lastIndexOf(".");
-
-        return fileName.substring(lastIndex + 1);
-    }
-
-    public void deleteTempFileAfterOneDay(LocalDateTime time) {
+    public void deleteTempFileAfterOneDay(LocalDateTime time, String tempDir) {
         try {
             Files.walk(Paths.get(tempDir))
                     .filter(Files::isRegularFile)
@@ -161,5 +155,15 @@ public class FileUtils {
 
     private String createStoredFileName(String extension) {
         return UUID.randomUUID() + "." + extension;
+    }
+
+    private String getFileNameFromFullPath(String tempFileFullPath) {
+        return tempFileFullPath.substring(tempFileFullPath.lastIndexOf("/") + 1);
+    }
+
+    private String getExtensionFromFileName(String fileName) {
+        int lastIndex = fileName.lastIndexOf(".");
+
+        return fileName.substring(lastIndex + 1);
     }
 }

@@ -11,6 +11,7 @@ import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,10 +28,16 @@ public class AttachFileService {
     private final AttachFileConverter converter;
     private final FileUtils fileUtils;
 
+    @Value("${file.upload.real.dir}")
+    private String realDir;
+
+    @Value("${file.upload.temp.dir}")
+    private String tempDir;
+
     @Transactional
     public List<TempFileDto> uploadTempFile(List<MultipartFile> files) {
         return files.stream()
-                .map(fileUtils::uploadFileToServer)
+                .map(file -> fileUtils.uploadFileToServer(file, tempDir))
                 .toList();
     }
 
@@ -48,7 +55,7 @@ public class AttachFileService {
     public void uploadFile(AttachFileCreateRequest request) {
         request.getTempFileList()
                 .forEach(tempFile -> {
-                    Map<String, String> fileInfoMap = fileUtils.fileNameToMap(tempFile.getOriginalFileName());
+                    Map<String, String> fileInfoMap = fileUtils.fileNameToMap(tempFile.getOriginalFileName(), realDir);
                     MappedEntity mappedEntity = request.getMappedEntity();
                     String mappedId = request.getMappedId();
 
@@ -70,12 +77,14 @@ public class AttachFileService {
                     fileUtils.moveTempFileToRealServer(
                             tempFile.getTempFileFullPath(),
                             request.getMappedEntity(),
-                            request.getMappedId());
+                            request.getMappedId(),
+                            realDir);
                 });
     }
 
+    // 스케줄러 -> 하루가 지난 임시 파일 삭제
     public void deleteTempFile(LocalDateTime now) {
-        fileUtils.deleteTempFileAfterOneDay(now.minusDays(1));
+        fileUtils.deleteTempFileAfterOneDay(now.minusDays(1), tempDir);
     }
 
     private AttachFile findById(Long fileId) {
