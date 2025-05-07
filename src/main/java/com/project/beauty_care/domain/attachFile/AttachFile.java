@@ -17,11 +17,9 @@ public class AttachFile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private MappedEntity mappedEntity;
 
-    @NotBlank
     private String mappedId;
 
     @NotBlank
