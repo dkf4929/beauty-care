@@ -54,6 +54,9 @@ public enum Errors {
     CAN_NOT_DELETE_FILE(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 삭제 중 오류가 발생했습니다."),
     NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "지원하는 파일 형식이 아닙니다."),
 
+    // board
+    CAN_NOT_WRITE_BOARD(HttpStatus.FORBIDDEN, ErrorCodes.FORBIDDEN.getErrorCode(), "공지 작성은 관리자만 가능합니다."),
+
     //redis
     REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),
 
