@@ -52,9 +52,9 @@ public class AttachFileService {
     }
 
     @Transactional
-    public void uploadFile(AttachFileCreateRequest request) {
-        request.getTempFileList()
-                .forEach(tempFile -> {
+    public List<AttachFile> uploadFile(AttachFileCreateRequest request) {
+        return request.getTempFileList().stream()
+                .map(tempFile -> {
                     Map<String, String> fileInfoMap = fileUtils.fileNameToMap(tempFile.getOriginalFileName(), realDir);
                     MappedEntity mappedEntity = request.getMappedEntity();
                     String mappedId = request.getMappedId();
@@ -72,14 +72,17 @@ public class AttachFileService {
                             tempFile.getSize());
 
                     // 파일과 DB 정합성을 위해 bulk insert 하지 않는다.
-                    repository.save(file);
+                    AttachFile savedEntity = repository.save(file);
 
                     fileUtils.moveTempFileToRealServer(
                             tempFile.getTempFileFullPath(),
                             request.getMappedEntity(),
                             request.getMappedId(),
                             realDir);
-                });
+
+                    return savedEntity;
+                })
+                .toList();
     }
 
     // 스케줄러 -> 하루가 지난 임시 파일 삭제
