@@ -82,7 +82,7 @@ class CacheManagerTest extends TestSupportWithRedis {
 
         // 캐시 저장
         codeService.findAllCode();
-        codeService.findCodeById(codeId);
+        codeService.findCodeByIdCache(codeId);
 
         Cache cache = cacheManager.getCache(RedisCacheKey.CODE);
 

@@ -3,7 +3,7 @@ package com.project.beauty_care.domain.code.service;
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
 import com.project.beauty_care.global.enums.Errors;
@@ -50,7 +50,7 @@ class CodeServiceTest extends TestSupportWithOutRedis {
                 .thenReturn(Optional.ofNullable(parent));
 
         // when
-        AdminCodeResponse response = service.findAllCode();
+        CodeResponse response = service.findAllCode();
 
         // then
         assertThat(response.getChildren())
@@ -82,7 +82,7 @@ class CodeServiceTest extends TestSupportWithOutRedis {
                 .thenReturn(Optional.ofNullable(parent));
 
         // when
-        AdminCodeResponse response = service.updateCode(parentId, request);
+        CodeResponse response = service.updateCode(parentId, request);
 
         // then
         // 하위 코드 변경 되었는지 확인
@@ -118,11 +118,11 @@ class CodeServiceTest extends TestSupportWithOutRedis {
         when(repository.findByParentIsNull())
                 .thenReturn(Optional.empty());
 
-        final AdminCodeResponse emptyResponse
-                = AdminCodeResponse.builder().build();
+        final CodeResponse emptyResponse
+                = CodeResponse.builder().build();
 
         // when
-        AdminCodeResponse response = service.findAllCode();
+        CodeResponse response = service.findAllCode();
 
         // then
         assertThat(response)
@@ -154,7 +154,7 @@ class CodeServiceTest extends TestSupportWithOutRedis {
                             );
 
                     // when
-                    AdminCodeResponse response = service.createCode(request);
+                    CodeResponse response = service.createCode(request);
 
                     // then
                     assertThat(response)

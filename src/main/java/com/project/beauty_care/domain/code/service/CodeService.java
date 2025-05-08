@@ -4,7 +4,7 @@ import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.CodeValidator;
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
 import com.project.beauty_care.global.enums.Errors;
@@ -33,30 +33,35 @@ public class CodeService {
     // 조회 ALL
     @Cacheable(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
-    public AdminCodeResponse findAllCode() {
+    public CodeResponse findAllCode() {
         Optional<Code> codeOptional = repository.findByParentIsNull();
 
         if (codeOptional.isPresent()) {
             Code entity = codeOptional.get();
-            List<AdminCodeResponse> childList = entity.getChildren().stream()
+            List<CodeResponse> childList = entity.getChildren().stream()
                     .map(converter::toHierarchy)
                     .toList();
 
             return converter.toResponse(entity, childList);
         } else
-            return AdminCodeResponse.builder().build();
+            return CodeResponse.builder().build();
     }
 
     // 조회 BY ID
     @Cacheable(value = RedisCacheKey.CODE, key = "#p0", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
-    public AdminCodeResponse findCodeById(String codeId) {
+    public CodeResponse findCodeByIdCache(String codeId) {
         Code entity = findById(codeId);
         return converter.toResponse(entity);
     }
 
+    @Transactional(readOnly = true)
+    public Code findCodeById(String codeId) {
+        return findById(codeId);
+    }
+
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
-    public AdminCodeResponse createCode(AdminCodeCreateRequest request) {
+    public CodeResponse createCode(AdminCodeCreateRequest request) {
         Code parent = null;
         checkExistsId(request.getCodeId());
 
@@ -70,7 +75,7 @@ public class CodeService {
     }
 
     @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
-    public AdminCodeResponse updateCode(String codeId, AdminCodeUpdateRequest request) {
+    public CodeResponse updateCode(String codeId, AdminCodeUpdateRequest request) {
         Code entity = findById(codeId);
 
         if (!request.getIsUse()) entity.getChildren().forEach(this::updateIsUseFalse);

@@ -15,13 +15,13 @@ import java.util.Objects;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AdminCodeResponse extends BaseTimeDto {
+public class CodeResponse extends BaseTimeDto {
     @Schema(description = "코드 ID", example = "sys:agree:Y")
     private String id;
 
     @Setter
     @Schema(description = "하위 코드")
-    private List<AdminCodeResponse> children = new ArrayList<>();
+    private List<CodeResponse> children = new ArrayList<>();
 
     @Schema(description = "코드명", example = "동의")
     private String name;
@@ -39,7 +39,7 @@ public class AdminCodeResponse extends BaseTimeDto {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        AdminCodeResponse that = (AdminCodeResponse) obj;
+        CodeResponse that = (CodeResponse) obj;
         return Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&

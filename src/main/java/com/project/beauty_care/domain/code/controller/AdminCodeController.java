@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.code.controller;
 
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.SuccessResponse;
@@ -41,7 +41,7 @@ public class AdminCodeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 완료되었습니다.", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = AdminCodeResponse.class))),
+                    schema = @Schema(implementation = CodeResponse.class))),
             @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
@@ -59,8 +59,8 @@ public class AdminCodeController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @GetMapping("/{codeId}")
-    public SuccessResponse<AdminCodeResponse> findCodeById(@PathVariable("codeId") String codeId) {
-        AdminCodeResponse code =  service.findCodeById(codeId);
+    public SuccessResponse<CodeResponse> findCodeById(@PathVariable("codeId") String codeId) {
+        CodeResponse code =  service.findCodeByIdCache(codeId);
         return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, code);
     }
 
@@ -70,7 +70,7 @@ public class AdminCodeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 완료되었습니다.", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = AdminCodeResponse.class))),
+                    schema = @Schema(implementation = CodeResponse.class))),
             @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
@@ -84,8 +84,8 @@ public class AdminCodeController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @GetMapping
-    public SuccessResponse<AdminCodeResponse> findAllCode() {
-        AdminCodeResponse code =  service.findAllCode();
+    public SuccessResponse<CodeResponse> findAllCode() {
+        CodeResponse code =  service.findAllCode();
         return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, code);
     }
 
@@ -95,7 +95,7 @@ public class AdminCodeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "코드 저장이 완료 되었습니다.", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = AdminCodeResponse.class))),
+                    schema = @Schema(implementation = CodeResponse.class))),
             @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
@@ -131,8 +131,8 @@ public class AdminCodeController {
             )
     })
     @PostMapping
-    public SuccessResponse<AdminCodeResponse> createCode(@RequestBody @Valid AdminCodeCreateRequest request) {
-        AdminCodeResponse response = service.createCode(request);
+    public SuccessResponse<CodeResponse> createCode(@RequestBody @Valid AdminCodeCreateRequest request) {
+        CodeResponse response = service.createCode(request);
         return SuccessResponse.success(SuccessCodes.SAVE_SUCCESS, response);
     }
 
@@ -151,7 +151,7 @@ public class AdminCodeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 완료되었습니다.", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = AdminCodeResponse.class))),
+                    schema = @Schema(implementation = CodeResponse.class))),
             @ApiResponse(responseCode = "401", description = "로그인 인증 에러", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(
@@ -173,9 +173,9 @@ public class AdminCodeController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @PutMapping("/{codeId}")
-    public SuccessResponse<AdminCodeResponse> updateCode(@PathVariable("codeId") String codeId,
-                                                         @RequestBody @Valid AdminCodeUpdateRequest request) {
-        AdminCodeResponse response = service.updateCode(codeId, request);
+    public SuccessResponse<CodeResponse> updateCode(@PathVariable("codeId") String codeId,
+                                                    @RequestBody @Valid AdminCodeUpdateRequest request) {
+        CodeResponse response = service.updateCode(codeId, request);
         return SuccessResponse.success(SuccessCodes.UPDATE_SUCCESS, response);
     }
 

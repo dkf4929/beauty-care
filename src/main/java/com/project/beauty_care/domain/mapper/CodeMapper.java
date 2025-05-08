@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.mapper;
 
 import com.project.beauty_care.domain.code.Code;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,7 +20,7 @@ public interface CodeMapper {
     @Mapping(target = "isUse", source = "code.isUse")
     @Mapping(target = "createdDateTime", source = "code.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "code.updatedDateTime")
-    AdminCodeResponse toResponse(Code code, List<AdminCodeResponse> children);
+    CodeResponse toResponse(Code code, List<CodeResponse> children);
 
     @Mapping(target = "id", source = "code.id")
     @Mapping(target = "name", source = "code.name")
@@ -30,5 +30,5 @@ public interface CodeMapper {
     @Mapping(target = "isUse", source = "code.isUse")
     @Mapping(target = "createdDateTime", source = "createdDateTime")
     @Mapping(target = "updatedDateTime", source = "updatedDateTime")
-    AdminCodeResponse toResponse(Code code);
+    CodeResponse toResponse(Code code);
 }

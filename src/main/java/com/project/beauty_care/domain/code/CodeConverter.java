@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.code;
 
 import com.project.beauty_care.domain.code.dto.AdminCodeCreateRequest;
-import com.project.beauty_care.domain.code.dto.AdminCodeResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.mapper.CodeMapper;
 import org.springframework.stereotype.Component;
 
@@ -9,10 +9,10 @@ import java.util.List;
 
 @Component
 public class CodeConverter {
-    public AdminCodeResponse toHierarchy(Code code) {
-        AdminCodeResponse dto = CodeMapper.INSTANCE.toResponse(code);
+    public CodeResponse toHierarchy(Code code) {
+        CodeResponse dto = CodeMapper.INSTANCE.toResponse(code);
 
-        List<AdminCodeResponse> childrenList = code.getChildren().stream()
+        List<CodeResponse> childrenList = code.getChildren().stream()
                 .map(CodeMapper.INSTANCE::toResponse)
                 .toList();
 
@@ -20,11 +20,11 @@ public class CodeConverter {
         return dto;
     }
 
-    public AdminCodeResponse toResponse(Code code) {
+    public CodeResponse toResponse(Code code) {
         return CodeMapper.INSTANCE.toResponse(code);
     }
 
-    public AdminCodeResponse toResponse(Code code, List<AdminCodeResponse> children) {
+    public CodeResponse toResponse(Code code, List<CodeResponse> children) {
         return CodeMapper.INSTANCE.toResponse(code, children);
     }
 
