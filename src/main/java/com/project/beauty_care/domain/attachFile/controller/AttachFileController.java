@@ -138,7 +138,7 @@ public class AttachFileController {
                     mediaType = "application/json",
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"파일 삭제 중 오류가 발생했습니다.\" }"))),
     })
-    @DeleteMapping("{fileId}")
+    @DeleteMapping("/temp")
     public SuccessResponse deleteTempFile(@RequestParam("tempFileFullPath") String tempFileFullPath) {
         service.deleteTempFile(tempFileFullPath);
         return SuccessResponse.success(SuccessCodes.DELETE_SUCCESS);
