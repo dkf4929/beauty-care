@@ -24,6 +24,6 @@ public class SchedulerService {
     // 하루에 한번 임시 파일을 삭제한다.
     @Scheduled(cron = "${cron.temp-file.delete}")
     public void deleteTempFileSchedule() {
-        attachFileService.deleteTempFile(LocalDateTime.now());
+        attachFileService.deleteTempFileSchedule(LocalDateTime.now());
     }
 }
