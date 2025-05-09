@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,6 @@ import java.util.Optional;
 @Transactional
 public class CodeService {
     private final CodeRepository repository;
-    private static final String KEY = "all";
     private final CodeValidator validator;
     private final CodeConverter converter;
 
@@ -55,12 +55,27 @@ public class CodeService {
         return converter.toResponse(entity);
     }
 
+    // 하위 코드 조회
+    @Cacheable(value = RedisCacheKey.CODE_PARENT, key = "#p0", cacheManager = "redisCacheManager")
+    @Transactional(readOnly = true)
+    public List<CodeResponse> findCodeByParentId(String parentId) {
+        Code parent = findById(parentId);
+
+        return parent.getChildren().stream()
+                .map(converter::toResponse)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Code findCodeById(String codeId) {
         return findById(codeId);
     }
 
-    @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE, key = "#request.codeId", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE_PARENT, key = "#request.codeId", cacheManager = "redisCacheManager"),
+    })
     public CodeResponse createCode(AdminCodeCreateRequest request) {
         Code parent = null;
         checkExistsId(request.getCodeId());
@@ -74,7 +89,11 @@ public class CodeService {
         return converter.toResponse(repository.save(entity));
     }
 
-    @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE, key = "#p0", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE_PARENT, key = "#p0", cacheManager = "redisCacheManager"),
+    })
     public CodeResponse updateCode(String codeId, AdminCodeUpdateRequest request) {
         Code entity = findById(codeId);
 
@@ -83,7 +102,11 @@ public class CodeService {
         return converter.toResponse(entity.update(request));
     }
 
-    @CacheEvict(value = RedisCacheKey.CODE, allEntries = true, cacheManager = "redisCacheManager")
+    @Caching(evict = {
+            @CacheEvict(value = RedisCacheKey.CODE, key = "'all'", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE, key = "#p0", cacheManager = "redisCacheManager"),
+            @CacheEvict(value = RedisCacheKey.CODE_PARENT, key = "#p0", cacheManager = "redisCacheManager"),
+    })
     public String deleteCode(String codeId) {
         Code entity = findById(codeId);
 
