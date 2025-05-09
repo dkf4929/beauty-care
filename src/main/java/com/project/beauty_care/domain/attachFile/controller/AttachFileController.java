@@ -112,4 +112,35 @@ public class AttachFileController {
         service.deleteFile(fileId);
         return SuccessResponse.success(SuccessCodes.DELETE_SUCCESS);
     }
+
+    @Operation(summary = "delete temp file",
+            description = "임시 저장된 파일을 삭제한다.",
+            parameters = @Parameter(
+                    name = "tempFileFullPath",
+                    description = "임시 파일 경로",
+                    required = true,
+                    in = ParameterIn.QUERY,
+                    example = "./UPLOAD/TEMP/FILE/0232b309-7b60-402e-8976-9aebb58f0d98.png"
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "삭제 완료 되었습니다.", content = @Content(
+                    mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "요청값 에러", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E006\",\"message\": \"Request Invalid Message\" }"))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            example = "{ \"code\": \"E004\", \"message\": \"해당 API를 호출할 권한이 없습니다.\" }"))),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"파일 삭제 중 오류가 발생했습니다.\" }"))),
+    })
+    @DeleteMapping("{fileId}")
+    public SuccessResponse deleteTempFile(@RequestParam("tempFileFullPath") String tempFileFullPath) {
+        service.deleteTempFile(tempFileFullPath);
+        return SuccessResponse.success(SuccessCodes.DELETE_SUCCESS);
+    }
 }

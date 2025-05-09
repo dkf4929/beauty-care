@@ -48,7 +48,9 @@ public class AttachFileService {
         // from db
         repository.delete(file);
 
-        fileUtils.deleteFileFromServer(file.getFilePath(), file.getStoredFileName());
+        String fileFullPath = file.getFilePath() + "/" + file.getStoredFileName();
+
+        fileUtils.deleteFileFromServer(fileFullPath);
     }
 
     @Transactional
@@ -85,8 +87,13 @@ public class AttachFileService {
                 .toList();
     }
 
+    // 임시 파일 삭제
+    public void deleteTempFile(String tempFileFullPath) {
+        fileUtils.deleteFileFromServer(tempFileFullPath);
+    }
+
     // 스케줄러 -> 하루가 지난 임시 파일 삭제
-    public void deleteTempFile(LocalDateTime now) {
+    public void deleteTempFileSchedule(LocalDateTime now) {
         fileUtils.deleteTempFileAfterOneDay(now.minusDays(1), tempDir);
     }
 
