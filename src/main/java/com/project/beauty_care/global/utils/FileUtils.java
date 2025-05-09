@@ -38,8 +38,8 @@ public class FileUtils {
             "png", "jpg", "jpeg", "gif", "txt", "pdf", "docx", "xlsx"
     );
 
-    public void deleteFileFromServer(String filePath, String storedFileName) {
-        Path path = Paths.get(filePath, storedFileName);
+    public void deleteFileFromServer(String fileFullPath) {
+        Path path = Paths.get(fileFullPath);
 
         try {
             boolean isDelete = Files.deleteIfExists(path);
