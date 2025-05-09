@@ -1,13 +1,13 @@
 package com.project.beauty_care.domain.attachFile.service;
 
-import com.project.beauty_care.domain.attachFile.AttachFile;
-import com.project.beauty_care.domain.attachFile.AttachFileConverter;
-import com.project.beauty_care.domain.attachFile.AttachFileRepository;
-import com.project.beauty_care.domain.attachFile.MappedEntity;
+import com.project.beauty_care.domain.attachFile.*;
 import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
+import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
+import com.project.beauty_care.global.exception.FileUploadException;
 import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,10 @@ import java.util.Map;
 public class AttachFileService {
     private final AttachFileRepository repository;
     private final AttachFileConverter converter;
+    private final AttachFileValidator validator;
     private final FileUtils fileUtils;
+    private final CodeService codeService;
+    private final String EXTENSION_CODE_ID = "user:file:extension";
 
     @Value("${file.upload.real.dir}")
     private String realDir;
@@ -36,8 +42,24 @@ public class AttachFileService {
 
     @Transactional
     public List<TempFileDto> uploadTempFile(List<MultipartFile> files) {
+        List<CodeResponse> extensionCodeList = codeService.findCodeByParentId(EXTENSION_CODE_ID);
+
+        // 파일 형식을 조회한다.
+        final Set<String> extensionSet = extensionCodeList.stream()
+                .map(CodeResponse::getName)
+                .collect(Collectors.toSet());
+
         return files.stream()
-                .map(file -> fileUtils.uploadFileToServer(file, tempDir))
+                .map(file -> {
+                    // 파일 확장자 추출
+                    String extension
+                            = fileUtils.getExtensionFromFileName(Objects.requireNonNull(file.getOriginalFilename()));
+
+                    // 확장자 검사
+                    validator.validExtension(extensionSet, extension);
+
+                    return fileUtils.uploadFileToServer(file, tempDir, extension);
+                })
                 .toList();
     }
 
