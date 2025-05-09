@@ -3,6 +3,8 @@ package com.project.beauty_care.global.utils;
 import com.project.beauty_care.TestSupportWithOutRedis;
 import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
+import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.FileUploadException;
 import org.junit.jupiter.api.DisplayName;
@@ -12,17 +14,21 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.Mockito.*;
 
 class FileUtilsTest extends TestSupportWithOutRedis {
     @Autowired
@@ -34,6 +40,9 @@ class FileUtilsTest extends TestSupportWithOutRedis {
     @TempDir
     private Path realDir;
 
+    @MockitoBean
+    private CodeService codeService;
+
     final MockMultipartFile file = new MockMultipartFile(
             "file",
             "test.txt",
@@ -43,8 +52,14 @@ class FileUtilsTest extends TestSupportWithOutRedis {
     @DisplayName("파일을 서버에 업로드한다.")
     @Test
     void uploadFileToServer() {
+        // given
+        when(codeService.findCodeByParentId(anyString()))
+                .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
+
         // when
-        TempFileDto tempFileDto = fileUtils.uploadFileToServer(file, tempDir.toString());
+        TempFileDto tempFileDto = fileUtils.uploadFileToServer(
+                file, tempDir.toString(), fileUtils.getExtensionFromFileName(file.getOriginalFilename())
+        );
 
         // then
         Path expectedFullPath = tempDir.resolve(tempFileDto.getStoredFileName()).normalize().toAbsolutePath();
@@ -62,55 +77,49 @@ class FileUtilsTest extends TestSupportWithOutRedis {
                 );
 
         // 업로드된 파일 삭제
-        fileUtils.deleteFileFromServer(tempDir.toString(), tempFileDto.getStoredFileName());
+        String fileFullPath = tempDir.toString() + "/" + tempFileDto.getStoredFileName();
+
+        fileUtils.deleteFileFromServer(fileFullPath);
 
         // 파일이 실제로 삭제되었는지 검증
         boolean exists = isExists(tempDir.resolve(tempFileDto.getStoredFileName()));
         assertThat(exists).isFalse();
     }
 
-    @DisplayName("업로드 예외 발생 케이스")
-    @TestFactory
-    Collection<DynamicTest> uploadFileShouldInvokeError() {
-        return List.of(
-            dynamicTest("파일명이 없는 경우 예외 발생", () -> {
-                // given
-                MockMultipartFile fileWithBlankFileName = new MockMultipartFile(
-                        "test", "", "text/plain", "test content".getBytes()
-                );
+    @DisplayName("파일명이 없는 파일 -> 예외 발생")
+    @Test
+    void uploadFileWithEmptyNameShouldInvokeError() {
+        when(codeService.findCodeByParentId(anyString()))
+                .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
 
-                // when, then
-                assertThatThrownBy(() -> fileUtils.uploadFileToServer(fileWithBlankFileName, tempDir.toString()))
-                        .isInstanceOf(FileUploadException.class)
-                        .extracting("errors")
-                        .satisfies(errors -> {
-                            assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.FILE_NOT_SAVED.getMessage());
-                            assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.FILE_NOT_SAVED.getErrorCode());
-                        });
-            }),
-            dynamicTest("지원하지 않는 확장자 -> 예외 발생", () -> {
-                // given
-                MockMultipartFile fileWithBlankFileName = new MockMultipartFile(
-                        "test", "test.json", "text/plain", "test content".getBytes()
-                );
-
-                // when, then
-                assertThatThrownBy(() -> fileUtils.uploadFileToServer(fileWithBlankFileName, tempDir.toString()))
-                        .isInstanceOf(FileUploadException.class)
-                        .extracting("errors")
-                        .satisfies(errors -> {
-                            assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.NOT_SUPPORTED_EXTENSION.getMessage());
-                            assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.NOT_SUPPORTED_EXTENSION.getErrorCode());
-                        });
-            })
+        // given
+        MockMultipartFile fileWithBlankFileName = new MockMultipartFile(
+                "test", "", "text/plain", "test content".getBytes()
         );
+
+        // when, then
+        assertThatThrownBy(() -> fileUtils.uploadFileToServer(fileWithBlankFileName, tempDir.toString(), fileUtils.getExtensionFromFileName(fileWithBlankFileName.getOriginalFilename())))
+                .isInstanceOf(FileUploadException.class)
+                .extracting("errors")
+                .satisfies(errors -> {
+                    assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.FILE_NOT_SAVED.getMessage());
+                    assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.FILE_NOT_SAVED.getErrorCode());
+                });
     }
 
     @DisplayName("임시 파일을 실제 파일 경로로 이동시킨다.")
     @Test
     void moveTempFileToRealServer() {
         // given
-        TempFileDto tempFileDto = fileUtils.uploadFileToServer(file, tempDir.toString());
+        when(codeService.findCodeByParentId(anyString()))
+                .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
+
+        TempFileDto tempFileDto =
+                fileUtils.uploadFileToServer(
+                        file,
+                        tempDir.toString(),
+                        fileUtils.getExtensionFromFileName(file.getOriginalFilename())
+                );
 
         Path expectedFullPath = tempDir.resolve(tempFileDto.getStoredFileName()).normalize().toAbsolutePath();
 
@@ -154,6 +163,14 @@ class FileUtilsTest extends TestSupportWithOutRedis {
                     // 임시 파일을 하나 저장한다.
                     TempFileDto tempFileDto = uploadAndAssertTempFileExists();
 
+                    Path filePath = Paths.get(tempFileDto.getTempFileFullPath());
+
+                    // 파일 생성 시간 => 이틀전으로 설정.
+                    FileTime fileTime
+                            = FileTime.from(LocalDateTime.now().minusDays(2).atZone(ZoneId.systemDefault()).toInstant());
+
+                    Files.setLastModifiedTime(filePath, fileTime);
+
                     // when
                     fileUtils.deleteTempFileAfterOneDay(LocalDateTime.now(), tempFileDto.getTempFileFullPath());
 
@@ -179,7 +196,15 @@ class FileUtilsTest extends TestSupportWithOutRedis {
     }
 
     private TempFileDto uploadAndAssertTempFileExists() {
-        TempFileDto tempFileDto = fileUtils.uploadFileToServer(file, tempDir.toString());
+        when(codeService.findCodeByParentId(anyString()))
+                .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
+
+        TempFileDto tempFileDto =
+                fileUtils.uploadFileToServer(
+                        file,
+                        tempDir.toString(),
+                        fileUtils.getExtensionFromFileName(file.getOriginalFilename())
+                );
 
         // then
         Path expectedFullPath = tempDir.resolve(tempFileDto.getStoredFileName()).normalize().toAbsolutePath();
@@ -197,6 +222,12 @@ class FileUtilsTest extends TestSupportWithOutRedis {
                 );
 
         return tempFileDto;
+    }
+
+    private CodeResponse buildCodeResponseOnlyWithCodeName() {
+        return CodeResponse.builder()
+                .name("txt")
+                .build();
     }
 
     private static boolean isExists(Path fullPath) {
