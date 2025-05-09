@@ -34,10 +34,6 @@ public class FileUtils {
     public static final String STORED_FILE_NAME = "storedFileName";
     public static final String FILE_PATH = "filePath";
 
-    private final Set<String> extensionSet = Set.of(
-            "png", "jpg", "jpeg", "gif", "txt", "pdf", "docx", "xlsx"
-    );
-
     public void deleteFileFromServer(String fileFullPath) {
         Path path = Paths.get(fileFullPath);
 
@@ -74,18 +70,13 @@ public class FileUtils {
         }
     }
 
-    public TempFileDto uploadFileToServer(MultipartFile file, String tempDir) {
+    public TempFileDto uploadFileToServer(MultipartFile file, String tempDir, String extension) {
         Path filePath = Paths.get(tempDir);
 
         String originalFilename = file.getOriginalFilename();
 
         if (Objects.requireNonNull(originalFilename).isEmpty())
             throw new FileUploadException(Errors.FILE_NOT_SAVED);
-
-        String extension = getExtensionFromFileName(originalFilename);
-
-        if (!extensionSet.contains(extension))
-            throw new FileUploadException(Errors.NOT_SUPPORTED_EXTENSION);
 
         String storedFileName = createStoredFileName(extension);
 
@@ -103,6 +94,12 @@ public class FileUtils {
                 originalFilename,
                 file.getSize(),
                 storedFileName);
+    }
+
+    public String getExtensionFromFileName(String fileName) {
+        int lastIndex = fileName.lastIndexOf(".");
+
+        return fileName.substring(lastIndex + 1);
     }
 
     public Map<String, String> fileNameToMap(String fileName, String realDir) {
@@ -159,11 +156,5 @@ public class FileUtils {
 
     private String getFileNameFromFullPath(String tempFileFullPath) {
         return tempFileFullPath.substring(tempFileFullPath.lastIndexOf("/") + 1);
-    }
-
-    private String getExtensionFromFileName(String fileName) {
-        int lastIndex = fileName.lastIndexOf(".");
-
-        return fileName.substring(lastIndex + 1);
     }
 }
