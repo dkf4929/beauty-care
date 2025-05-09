@@ -8,7 +8,6 @@ import com.project.beauty_care.global.exception.FileUploadException;
 import com.project.beauty_care.global.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -53,16 +51,23 @@ public class FileUtils {
                                          MappedEntity mappedEntity,
                                          String mappedId,
                                          String realDir) {
+        // 파일명
         String fileName = getFileNameFromFullPath(tempFileFullPath);
+
+        // 파일 경로
         Path realFullPath = Paths.get(realDir, mappedEntity.name(), mappedId).resolve(fileName);
         Path tempFullPath = Paths.get(tempFileFullPath);
 
         try {
+            // 파일 존재 여부
             boolean isExists = Files.exists(tempFullPath);
 
             if (!isExists) throw new FileUploadException(Errors.FILE_NOT_SAVED);
 
+            // 폴더 x -> 생성
             Files.createDirectories(realFullPath.getParent());
+
+            // 임시 경로 -> 실제 파일 경로 이동
             Files.move(tempFullPath, realFullPath);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -75,9 +80,11 @@ public class FileUtils {
 
         String originalFilename = file.getOriginalFilename();
 
+        // 파일명 x -> 예외
         if (Objects.requireNonNull(originalFilename).isEmpty())
             throw new FileUploadException(Errors.FILE_NOT_SAVED);
 
+        // 서버 파일명
         String storedFileName = createStoredFileName(extension);
 
         Path path = filePath.resolve(storedFileName);
@@ -117,15 +124,18 @@ public class FileUtils {
         );
     }
 
+    // 하루가 지난 임시파일들을 삭제한다.
     public void deleteTempFileAfterOneDay(LocalDateTime time, String tempDir) {
         try {
             Files.walk(Paths.get(tempDir))
                     .filter(Files::isRegularFile)
                     .forEach(path -> {
+                        // 파일 업로드 시간
                         LocalDateTime fileUploadTime = getFileUploadTime(path);
 
                         if (fileUploadTime.isBefore(time)) {
                             try {
+                                // 파일 삭제 (존재하면)
                                 Files.deleteIfExists(path);
                             } catch (IOException e) {
                                 throw new SystemException(Errors.CAN_NOT_DELETE_FILE);
