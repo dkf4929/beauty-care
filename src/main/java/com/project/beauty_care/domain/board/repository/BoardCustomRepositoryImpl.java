@@ -1,0 +1,84 @@
+package com.project.beauty_care.domain.board.repository;
+
+import com.project.beauty_care.domain.attachFile.QAttachFile;
+import com.project.beauty_care.domain.board.Board;
+import com.project.beauty_care.domain.board.QBoard;
+import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.enums.BoardType;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+public class BoardCustomRepositoryImpl implements BoardCustomRepository {
+    private final JPAQueryFactory queryFactory;
+    private final QBoard board;
+
+    public BoardCustomRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+        this.board = QBoard.board;
+    }
+
+
+    @Override
+    public Page<Board> findAllByCriteriaPage(BoardCriteria criteria, Pageable pageable) {
+        List<Board> content = queryFactory
+                .selectFrom(board)
+                .where(
+                        eqBoardType(criteria.getBoardType()),
+                        containsTitle(criteria.getTitle()),
+                        containsContent(criteria.getContent()),
+                        eqGrade(criteria.getGrade()),
+                        eqCreatedBy(criteria.getCreatedBy())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(board.count())
+                .from(board)
+                .where(
+                        eqBoardType(criteria.getBoardType()),
+                        containsTitle(criteria.getTitle()),
+                        containsContent(criteria.getContent()),
+                        eqGrade(criteria.getGrade()),
+                        eqCreatedBy(criteria.getCreatedBy())
+                ).fetchOne();
+
+        return new PageImpl<>(content, pageable, totalCount);
+    }
+
+    private BooleanExpression eqCreatedBy(Long createdBy) {
+        if (createdBy == null) return null;
+
+        return board.createdBy.eq(createdBy);
+    }
+
+    private BooleanExpression eqGrade(String grade) {
+        if (grade.isEmpty()) return null;
+
+        return board.grade.id.eq(grade);
+    }
+
+    private BooleanExpression containsContent(String content) {
+        if (content.isEmpty()) return null;
+
+        return board.content.contains(content);
+    }
+
+    private BooleanExpression containsTitle(String title) {
+        if (title.isEmpty()) return null;
+
+        return board.title.contains(title);
+    }
+
+    private BooleanExpression eqBoardType(BoardType boardType) {
+        if (boardType == null) return null;
+
+        return board.boardType.eq(boardType);
+    }
+}

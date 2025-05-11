@@ -33,6 +33,7 @@ public enum Errors {
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "등록된 메뉴가 아닙니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "파일을 찾을 수 없습니다."),
     NOT_FOUND_PARENT_MENU(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "상위 메뉴를 찾을 수 없습니다."),
+    NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "게시물을 찾을 수 없습니다."),
 
     // request invalid
     CAN_NOT_DELETE_CODE(HttpStatus.BAD_REQUEST, ErrorCodes.API_REQUEST_INVALID_VALUE.getErrorCode(), "하위코드가 존재하는 경우, 삭제할 수 없습니다."),
@@ -52,10 +53,12 @@ public enum Errors {
     // file
     FILE_NOT_SAVED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 업로드 중 오류가 발생했습니다."),
     CAN_NOT_DELETE_FILE(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 삭제 중 오류가 발생했습니다."),
+    EXCEED_MAX_FILE_SIZE(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "파일 최대 크기는 5MB 입니다."),
     NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "지원하는 파일 형식이 아닙니다."),
 
     // board
-    CAN_NOT_WRITE_BOARD(HttpStatus.FORBIDDEN, ErrorCodes.FORBIDDEN.getErrorCode(), "공지 작성은 관리자만 가능합니다."),
+    CAN_NOT_WRITE_BOARD_NOTIFICATION(HttpStatus.FORBIDDEN, ErrorCodes.FORBIDDEN.getErrorCode(), "공지 작성은 관리자만 가능합니다."),
+    MUST_WRITE_BOARD_AFTER_ONE_MINUTE(HttpStatus.BAD_REQUEST, ErrorCodes.FORBIDDEN.getErrorCode(), "게시물을 작성한 지 1분 이내에 새로운 게시물을 작성할 수 없습니다."),
 
     //redis
     REDIS_CACHE_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), "캐시 키가 없습니다."),

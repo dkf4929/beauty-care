@@ -27,6 +27,7 @@ public class Board extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,7 +42,8 @@ public class Board extends BaseEntity {
     private String content;
 
     @OneToMany(mappedBy = "mappedId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @SQLRestriction("mapped_entity = BOARD")
+    @SQLRestriction("mapped_entity = 'BOARD'")
+    @BatchSize(size = 10)
     private List<AttachFile> attachFiles = new ArrayList<>();
 
     @ColumnDefault("0")
