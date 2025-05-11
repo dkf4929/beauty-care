@@ -31,7 +31,7 @@ public class SwaggerResponseSchemaProvider {
             switch (requestMethod) {
                 case GET:
                     if (field.getName().equals(CODE)) {
-                        wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.RETRIEVE_SUCCESS.getCode()));
+                        wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.RETRIEVE_SUCCESS.getCode().value()));
                     }
 
                     if (field.getName().equals(MESSAGE)) {
@@ -42,7 +42,7 @@ public class SwaggerResponseSchemaProvider {
                     if (methodName.contains("create")) {
                         // 저장 - 201
                         if (field.getName().equals(CODE))
-                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.SAVE_SUCCESS.getCode()));
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.SAVE_SUCCESS.getCode().value()));
                         else if (field.getName().equals(MESSAGE)) {
                             String entity = methodName.replaceAll("^[a-z]+", "");
                             String localizedEntity = messageSource.getMessage(entity, null, Locale.KOREA);
@@ -53,26 +53,26 @@ public class SwaggerResponseSchemaProvider {
                     } else if (methodName.equals("login")) {
                         // 로그인 - 200
                         if (field.getName().equals(CODE))
-                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.LOGIN_SUCCESS.getCode()));
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.LOGIN_SUCCESS.getCode().value()));
                         else if (field.getName().equals(MESSAGE)) {
                             wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.LOGIN_SUCCESS.getMessage()));
                         }
                     } else if (methodName.contains("find")) {
                         // 조회 - 200
                         if (field.getName().equals(CODE))
-                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.RETRIEVE_SUCCESS.getCode()));
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.RETRIEVE_SUCCESS.getCode().value()));
                         else if (field.getName().equals(MESSAGE)) {
                             wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.RETRIEVE_SUCCESS.getMessage()));
                         }
                     } else if (methodName.equals("uploadTempFile") || methodName.equals("uploadFile")) {
                         if (field.getName().equals(CODE))
-                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.FILE_UPLOAD_SUCCESS.getCode()));
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.FILE_UPLOAD_SUCCESS.getCode().value()));
                         else if (field.getName().equals(MESSAGE)) {
                             wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.FILE_UPLOAD_SUCCESS.getMessage()));
                         }
                     } else if (methodName.contains("scheduler")) {
                         if (field.getName().equals(CODE))
-                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.SCHEDULER_EXECUTE_SUCCESS.getCode()));
+                            wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.SCHEDULER_EXECUTE_SUCCESS.getCode().value()));
                         else if (field.getName().equals(MESSAGE)) {
                             wrapperSchema.addProperty(field.getName(), new Schema<>().example(SuccessCodes.SCHEDULER_EXECUTE_SUCCESS.getMessage()));
                         }
