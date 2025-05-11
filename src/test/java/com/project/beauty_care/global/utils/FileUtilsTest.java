@@ -28,7 +28,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 
 class FileUtilsTest extends TestSupportWithOutRedis {
     @Autowired
@@ -43,47 +44,77 @@ class FileUtilsTest extends TestSupportWithOutRedis {
     @MockitoBean
     private CodeService codeService;
 
+    final byte[] MAX_FILE_SIZE = new byte[(int) (5 * 1024 * 1024)];
+
     final MockMultipartFile file = new MockMultipartFile(
             "file",
             "test.txt",
             "text/plain",
-            "test content".getBytes());
+            MAX_FILE_SIZE);
 
     @DisplayName("파일을 서버에 업로드한다.")
-    @Test
-    void uploadFileToServer() {
-        // given
-        when(codeService.findCodeByParentId(anyString()))
-                .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
+    @TestFactory
+    Collection<DynamicTest> uploadFileToServer() {
+        return List.of(
+                dynamicTest("정상 시나리오", () -> {
+                    // given
+                    when(codeService.findCodeByParentId(anyString()))
+                            .thenReturn(List.of(buildCodeResponseOnlyWithCodeName()));
 
-        // when
-        TempFileDto tempFileDto = fileUtils.uploadFileToServer(
-                file, tempDir.toString(), fileUtils.getExtensionFromFileName(file.getOriginalFilename())
+                    // when
+                    TempFileDto tempFileDto = fileUtils.uploadFileToServer(
+                            file, tempDir.toString(), fileUtils.getExtensionFromFileName(file.getOriginalFilename())
+                    );
+
+                    // then
+                    Path expectedFullPath = tempDir.resolve(tempFileDto.getStoredFileName()).normalize().toAbsolutePath();
+
+                    assertThat(tempFileDto).isNotNull()
+                            .extracting(
+                                    dto -> Paths.get(dto.getTempFileFullPath()).toAbsolutePath().normalize(),
+                                    TempFileDto::getOriginalFileName,
+                                    TempFileDto::getSize
+                            )
+                            .containsExactly(
+                                    expectedFullPath,
+                                    file.getOriginalFilename(),
+                                    file.getSize()
+                            );
+
+                    // 업로드된 파일 삭제
+                    String fileFullPath = tempDir.toString() + "/" + tempFileDto.getStoredFileName();
+
+                    fileUtils.deleteFileFromServer(fileFullPath);
+
+                    // 파일이 실제로 삭제되었는지 검증
+                    boolean exists = isExists(tempDir.resolve(tempFileDto.getStoredFileName()));
+                    assertThat(exists).isFalse();
+                }),
+                dynamicTest("파일 최대 사이즈 초과 -> 예외 발생", () -> {
+                    // given
+                    final byte[] exceedMaxFileSize = new byte[(int) (5 * 1024 * 1024) + 1];
+
+                    MockMultipartFile invalidFile = new MockMultipartFile(
+                            "file",
+                            "large_file.txt",
+                            "text/plain",
+                            exceedMaxFileSize
+                    );
+
+                    // when & then
+                    assertThatThrownBy(() -> fileUtils.uploadFileToServer(
+                            invalidFile,
+                            tempDir.toString(),
+                            fileUtils.getExtensionFromFileName(invalidFile.getOriginalFilename())
+                    ))
+                            .isInstanceOf(FileUploadException.class)
+                            .extracting("errors")
+                            .satisfies(errors -> {
+                                assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.EXCEED_MAX_FILE_SIZE.getMessage());
+                                assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.EXCEED_MAX_FILE_SIZE.getErrorCode());
+                            });
+                })
         );
-
-        // then
-        Path expectedFullPath = tempDir.resolve(tempFileDto.getStoredFileName()).normalize().toAbsolutePath();
-
-        assertThat(tempFileDto).isNotNull()
-                .extracting(
-                        dto -> Paths.get(dto.getTempFileFullPath()).toAbsolutePath().normalize(),
-                        TempFileDto::getOriginalFileName,
-                        TempFileDto::getSize
-                )
-                .containsExactly(
-                        expectedFullPath,
-                        file.getOriginalFilename(),
-                        file.getSize()
-                );
-
-        // 업로드된 파일 삭제
-        String fileFullPath = tempDir.toString() + "/" + tempFileDto.getStoredFileName();
-
-        fileUtils.deleteFileFromServer(fileFullPath);
-
-        // 파일이 실제로 삭제되었는지 검증
-        boolean exists = isExists(tempDir.resolve(tempFileDto.getStoredFileName()));
-        assertThat(exists).isFalse();
     }
 
     @DisplayName("파일명이 없는 파일 -> 예외 발생")
