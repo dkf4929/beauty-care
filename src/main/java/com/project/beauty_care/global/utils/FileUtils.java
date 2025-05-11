@@ -31,6 +31,7 @@ public class FileUtils {
     public static final String EXTENSION = "extension";
     public static final String STORED_FILE_NAME = "storedFileName";
     public static final String FILE_PATH = "filePath";
+    private static final long FILE_MAX_SIZE = 5 * 1024 * 1024;
 
     public void deleteFileFromServer(String fileFullPath) {
         Path path = Paths.get(fileFullPath);
@@ -76,6 +77,9 @@ public class FileUtils {
     }
 
     public TempFileDto uploadFileToServer(MultipartFile file, String tempDir, String extension) {
+        // file size 검증
+        validFileSize(file.getSize());
+
         Path filePath = Paths.get(tempDir);
 
         String originalFilename = file.getOriginalFilename();
@@ -166,5 +170,10 @@ public class FileUtils {
 
     private String getFileNameFromFullPath(String tempFileFullPath) {
         return tempFileFullPath.substring(tempFileFullPath.lastIndexOf("/") + 1);
+    }
+
+    private void validFileSize(long size) {
+        if (size > FILE_MAX_SIZE)
+            throw new FileUploadException(Errors.EXCEED_MAX_FILE_SIZE);
     }
 }
