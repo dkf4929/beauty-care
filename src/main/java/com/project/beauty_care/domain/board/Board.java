@@ -65,4 +65,8 @@ public class Board extends BaseEntity {
         this.isUse = isUse;
         this.readCount = 0;
     }
+
+    public void updateReadCount(int readCount) {
+        this.readCount = readCount;
+    }
 }

@@ -37,7 +37,7 @@ public class UserBoardController {
                     description = "게시물 ID",
                     required = true,
                     in = ParameterIn.PATH,
-                    schema = @Schema(type = "Long")
+                    schema = @Schema(type = "integer")
             )
     )
     @ApiResponses(value = {
@@ -61,8 +61,9 @@ public class UserBoardController {
                     schema = @Schema(example = "{ \"code\": \"E007\", \"message\": \"서버에 오류가 발생했습니다. 관리자에게 문의하세요.\" }"))),
     })
     @GetMapping("{boardId}")
-    public SuccessResponse<BoardResponse> findBoardById(@PathVariable("boardId") Long boardId) {
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findBoardById(boardId));
+    public SuccessResponse<BoardResponse> findBoardById(@PathVariable("boardId") Long boardId,
+                                                        @AuthenticationPrincipal AppUser loginUser) {
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findBoardById(boardId, loginUser));
     }
 
     @Operation(summary = "게시물 등록",

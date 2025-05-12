@@ -12,6 +12,7 @@ import com.project.beauty_care.domain.board.BoardValidator;
 import com.project.beauty_care.domain.board.dto.BoardCreateRequest;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
+import com.project.beauty_care.domain.boardRead.service.BoardReadService;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
@@ -46,6 +47,7 @@ public class BoardService {
 
     private final AttachFileService fileService;
     private final CodeService codeService;
+    private final BoardReadService boardReadService;
 
     @Transactional
     public BoardResponse createBoard(BoardCreateRequest request, AppUser user) {
@@ -86,17 +88,23 @@ public class BoardService {
         return converter.toResponse(savedEntity, fileFullPathList, codeConverter.toResponse(grade));
     }
 
-    @Transactional(readOnly = true)
-    public BoardResponse findBoardById(Long boardId) {
-        Board board = findById(boardId);
+    @Transactional
+    public BoardResponse findBoardById(Long boardId, AppUser loginUser) {
+        Board entity = findById(boardId);
 
-        CodeResponse grade = codeConverter.toResponse(board.getGrade());
+        CodeResponse grade = codeConverter.toResponse(entity.getGrade());
 
-        List<String> fileFullPathList = board.getAttachFiles().stream()
+        List<String> fileFullPathList = entity.getAttachFiles().stream()
                 .map(fileConverter::extractFileFullPath)
                 .toList();
 
-        return converter.toResponse(board, fileFullPathList, grade);
+        int readCount = boardReadService.getReadCountAndSaveRedis(boardId,
+                loginUser.getMemberId(), entity.getReadCount());
+
+        // 조회 수 업데이트
+        entity.updateReadCount(readCount);
+
+        return converter.toResponse(entity, fileFullPathList, grade);
     }
 
     public Page<BoardResponse> findBoardAllPageByCriteria(BoardCriteria criteria, Pageable pageable) {
