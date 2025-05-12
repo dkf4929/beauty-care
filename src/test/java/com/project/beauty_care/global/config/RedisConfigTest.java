@@ -20,12 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 class RedisConfigTest extends TestSupportWithRedis {
-    @Autowired
-    private RedisConnectionFactory connectionFactory;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
     @DisplayName("redis ping test")
     @Test
     void connectRedis() {
