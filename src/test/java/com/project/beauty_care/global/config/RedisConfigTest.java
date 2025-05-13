@@ -3,11 +3,8 @@ package com.project.beauty_care.global.config;
 import com.project.beauty_care.TestSupportWithRedis;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 
@@ -20,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 class RedisConfigTest extends TestSupportWithRedis {
+
     @DisplayName("redis ping test")
     @Test
     void connectRedis() {

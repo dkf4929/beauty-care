@@ -1,5 +1,6 @@
 package com.project.beauty_care.global.utils;
 
+import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.attachFile.AttachFileConverter;
 import com.project.beauty_care.domain.attachFile.MappedEntity;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
@@ -150,6 +151,10 @@ public class FileUtils {
         } catch (IOException e) {
             throw new SystemException(Errors.CAN_NOT_DELETE_FILE);
         }
+    }
+
+    public String extractFileFullPath(AttachFile attachFile) {
+        return attachFile.getFilePath() + "/" + attachFile.getStoredFileName();
     }
 
     public LocalDateTime getFileUploadTime(Path path) {

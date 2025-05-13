@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.board.repository;
 
-import com.project.beauty_care.domain.attachFile.QAttachFile;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.QBoard;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
