@@ -1,13 +1,9 @@
 package com.project.beauty_care.domain.mapper;
 
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
-import com.project.beauty_care.domain.member.Member;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
-import com.project.beauty_care.domain.member.dto.MemberRoleResponse;
-import com.project.beauty_care.domain.member.dto.MemberSummaryResponse;
-import com.project.beauty_care.domain.role.dto.RoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -30,5 +26,5 @@ public interface BoardMapper {
     @Mapping(target = "updatedBy", source = "board.updatedBy")
     @Mapping(target = "createdDateTime", source = "board.createdDateTime")
     @Mapping(target = "updatedDateTime", source = "board.updatedDateTime")
-    BoardResponse toResponse(Board board, List<String> attachFiles, CodeResponse grade);
+    BoardResponse toResponse(Board board, List<AttachFileResponse> attachFiles, CodeResponse grade);
 }
