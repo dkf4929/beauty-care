@@ -1,17 +1,16 @@
 package com.project.beauty_care.domain.board.service;
 
-import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.attachFile.AttachFileConverter;
-import com.project.beauty_care.domain.attachFile.MappedEntity;
-import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.attachFile.service.AttachFileService;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.BoardConverter;
-import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.board.BoardValidator;
 import com.project.beauty_care.domain.board.dto.BoardCreateRequest;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
+import com.project.beauty_care.domain.board.dto.BoardUpdateRequest;
+import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.boardRead.service.BoardReadService;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.CodeConverter;
@@ -23,6 +22,7 @@ import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
 import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.security.dto.AppUser;
+import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -48,6 +48,7 @@ public class BoardService {
     private final AttachFileService fileService;
     private final CodeService codeService;
     private final BoardReadService boardReadService;
+    private final FileUtils fileUtils;
 
     @Transactional
     public BoardResponse createBoard(BoardCreateRequest request, AppUser user) {
@@ -69,23 +70,33 @@ public class BoardService {
         Board savedEntity = repository.save(entity);
         Long entityId = savedEntity.getId();
 
-        List<String> fileFullPathList = new ArrayList<>();
+        List<AttachFileResponse> fileList = new ArrayList<>();
 
         // build file request
         if (!request.getAttachFiles().isEmpty()) {
-            AttachFileCreateRequest fileCreateRequest
-                    = fileConverter.buildRequest(MappedEntity.BOARD, String.valueOf(entityId), request.getAttachFiles());
-
-            List<AttachFile> attachFileList = fileService.uploadFile(fileCreateRequest);
-
-            fileFullPathList = attachFileList.stream()
-                    .map(fileConverter::extractFileFullPath)
-                    .toList();
-
-            savedEntity.getAttachFiles().addAll(attachFileList);
+            fileList = fileService.saveFileAndConvertResponse(request.getAttachFiles(), entityId, savedEntity);
         }
 
-        return converter.toResponse(savedEntity, fileFullPathList, codeConverter.toResponse(grade));
+        return converter.toResponse(savedEntity, fileList, codeConverter.toResponse(grade));
+    }
+
+    @Transactional
+    public BoardResponse updateBoard(Long boardId, BoardUpdateRequest request) {
+        Board entity = findById(boardId);
+
+        // save
+        Board savedEntity = repository.save(entity);
+        Long entityId = savedEntity.getId();
+
+        List<AttachFileResponse> fileList = new ArrayList<>();
+
+        // build file request
+        if (!request.getAttachFiles().isEmpty())
+            fileList = fileService.saveFileAndConvertResponse(request.getAttachFiles(), entityId, savedEntity);
+
+        entity.updateBoard(request);
+
+        return converter.toResponse(savedEntity, fileList, codeConverter.toResponse(entity.getGrade()));
     }
 
     @Transactional
@@ -94,8 +105,12 @@ public class BoardService {
 
         CodeResponse grade = codeConverter.toResponse(entity.getGrade());
 
-        List<String> fileFullPathList = entity.getAttachFiles().stream()
-                .map(fileConverter::extractFileFullPath)
+        List<AttachFileResponse> fileList = entity.getAttachFiles().stream()
+                .map(file -> {
+                    String fileFullPath = fileUtils.extractFileFullPath(file);
+
+                    return fileConverter.toResponse(file, fileFullPath);
+                })
                 .toList();
 
         int readCount = boardReadService.getReadCountAndSaveRedis(boardId,
@@ -104,7 +119,7 @@ public class BoardService {
         // 조회 수 업데이트
         entity.updateReadCount(readCount);
 
-        return converter.toResponse(entity, fileFullPathList, grade);
+        return converter.toResponse(entity, fileList, grade);
     }
 
     public Page<BoardResponse> findBoardAllPageByCriteria(BoardCriteria criteria, Pageable pageable) {
@@ -114,11 +129,15 @@ public class BoardService {
                 .map(board -> {
                     CodeResponse grade = codeConverter.toResponse(board.getGrade());
 
-                    List<String> fileFullPathList = board.getAttachFiles().stream()
-                            .map(fileConverter::extractFileFullPath)
+                    List<AttachFileResponse> fileList = board.getAttachFiles().stream()
+                            .map(file -> {
+                                String fileFullPath = fileUtils.extractFileFullPath(file);
+
+                                return fileConverter.toResponse(file, fileFullPath);
+                            })
                             .toList();
 
-                    return converter.toResponse(board, fileFullPathList, grade);
+                    return converter.toResponse(board, fileList, grade);
                 })
                 .toList();
 

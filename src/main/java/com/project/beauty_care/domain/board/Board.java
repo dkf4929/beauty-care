@@ -2,18 +2,19 @@ package com.project.beauty_care.domain.board;
 
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.attachFile.AttachFile;
-import com.project.beauty_care.domain.attachFile.MappedEntity;
+import com.project.beauty_care.domain.board.dto.BoardUpdateRequest;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.enums.BoardType;
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,5 +69,10 @@ public class Board extends BaseEntity {
 
     public void updateReadCount(int readCount) {
         this.readCount = readCount;
+    }
+
+    public void updateBoard(BoardUpdateRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
     }
 }
