@@ -4,8 +4,6 @@ import com.project.beauty_care.domain.board.dto.BoardCreateRequest;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
 import com.project.beauty_care.domain.board.service.BoardService;
-import com.project.beauty_care.domain.code.dto.CodeResponse;
-import com.project.beauty_care.domain.member.dto.MemberResponse;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -17,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/user/board")
+@Tag(name = "BOARD REST API FOR USER", description = "게시판 API")
 @RestController
 public class UserBoardController {
     private final BoardService service;

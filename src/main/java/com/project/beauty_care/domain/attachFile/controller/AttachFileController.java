@@ -87,7 +87,7 @@ public class AttachFileController {
                     description = "파일 ID",
                     required = true,
                     in = ParameterIn.PATH,
-                    schema = @Schema(type = "Long",
+                    schema = @Schema(type = "integer",
                             allowableValues = {}
                     )
             )
