@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain.board;
 
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.board.dto.BoardCreateRequest;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
 import com.project.beauty_care.domain.code.Code;
@@ -22,7 +23,7 @@ public class BoardConverter {
     }
 
     public BoardResponse toResponse(Board board,
-                                    List<String> attachFiles,
+                                    List<AttachFileResponse> attachFiles,
                                     CodeResponse grade) {
         return BoardMapper.INSTANCE.toResponse(board, attachFiles, grade);
     }

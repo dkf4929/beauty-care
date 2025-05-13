@@ -2,12 +2,13 @@ package com.project.beauty_care.domain.attachFile.service;
 
 import com.project.beauty_care.domain.attachFile.*;
 import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
+import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import com.project.beauty_care.global.exception.FileUploadException;
 import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,6 +108,25 @@ public class AttachFileService {
                     return savedEntity;
                 })
                 .toList();
+    }
+
+    public List<AttachFileResponse> saveFileAndConvertResponse(List<TempFileDto> tempFileList, Long entityId, Board savedEntity) {
+        List<AttachFileResponse> fileList;
+        AttachFileCreateRequest fileCreateRequest
+                = converter.buildRequest(MappedEntity.BOARD, String.valueOf(entityId), tempFileList);
+
+        List<AttachFile> attachFileList = uploadFile(fileCreateRequest);
+
+        fileList = attachFileList.stream()
+                .map(file -> {
+                    String fileFullPath = fileUtils.extractFileFullPath(file);
+
+                    return converter.toResponse(file, fileFullPath);
+                })
+                .toList();
+
+        savedEntity.getAttachFiles().addAll(attachFileList);
+        return fileList;
     }
 
     // 임시 파일 삭제
