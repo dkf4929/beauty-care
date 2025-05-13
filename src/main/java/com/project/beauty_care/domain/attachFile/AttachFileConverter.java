@@ -1,7 +1,9 @@
 package com.project.beauty_care.domain.attachFile;
 
 import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
+import com.project.beauty_care.domain.mapper.AttachFileMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,15 +37,10 @@ public class AttachFileConverter {
     }
 
     public TempFileDto toDto(String tempFileFullPath, String originalFileName, Long size, String storedFileName) {
-        return TempFileDto.builder()
-                .tempFileFullPath(tempFileFullPath)
-                .originalFileName(originalFileName)
-                .size(size)
-                .storedFileName(storedFileName)
-                .build();
+        return AttachFileMapper.INSTANCE.toDto(tempFileFullPath, originalFileName, size, storedFileName);
     }
 
-    public String extractFileFullPath(AttachFile attachFile) {
-        return attachFile.getFilePath() + "/" + attachFile.getStoredFileName();
+    public AttachFileResponse toResponse(AttachFile file, String fileFullPath) {
+        return AttachFileMapper.INSTANCE.toResponse(file, fileFullPath);
     }
 }
