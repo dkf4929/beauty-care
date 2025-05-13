@@ -1,27 +1,28 @@
 package com.project.beauty_care.domain.boardRead.service;
 
 import com.project.beauty_care.TestSupportWithRedis;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.DynamicTest.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoardReadServiceTest extends TestSupportWithRedis {
     @Autowired
     private BoardReadService service;
 
-    private final String REDIS_KEY = "board_read";
+    private final String REDIS_KEY_PREFIX = "board_read";
     private static final long BOARD_ID = 1;
     private static final long MEMBER_ID = 1;
+
+    @BeforeEach
+    void setUp() {
+        String redisKey = REDIS_KEY_PREFIX + ":" + BOARD_ID + ":" + MEMBER_ID;
+        redisTemplate.delete(redisKey);
+    }
 
     @DisplayName("게시물 조회 카운트 증가 테스트")
     @Test
@@ -52,7 +53,7 @@ class BoardReadServiceTest extends TestSupportWithRedis {
         assertEquals(1, readCount);
 
         // redis ttl 초기화 => 카운트 증가
-        String key = REDIS_KEY + ":" + BOARD_ID + ":" + MEMBER_ID;
+        String key = REDIS_KEY_PREFIX + ":" + BOARD_ID + ":" + MEMBER_ID;
 
         // ttl 초기화
         redisTemplate.expire(key, Duration.ZERO);
