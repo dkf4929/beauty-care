@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -14,8 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity extends BaseTimeEntity {
     @CreatedBy
     @Column(updatable = false)
-    private Long createdBy;
+    protected Long createdBy;
 
     @LastModifiedBy
-    private Long updatedBy;
+    protected Long updatedBy;
 }

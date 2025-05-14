@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -16,9 +17,9 @@ import java.time.LocalDateTime;
 public abstract class BaseTimeEntity {
     @Column(updatable = false, name = "created_date_time")
     @CreatedDate
-    private LocalDateTime createdDateTime;
+    protected LocalDateTime createdDateTime;
 
     @LastModifiedDate
     @Column(name = "updated_date_time")
-    private LocalDateTime updatedDateTime;
+    protected LocalDateTime updatedDateTime;
 }
