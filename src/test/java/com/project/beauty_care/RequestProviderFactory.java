@@ -1,15 +1,15 @@
 package com.project.beauty_care;
 
-import com.project.beauty_care.domain.member.dto.AdminMemberCreateRequest;
+import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.enums.BoardType;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.member.dto.PublicMemberCreateRequest;
-import com.project.beauty_care.domain.role.Role;
 import com.project.beauty_care.global.enums.Authentication;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
-public class RequestProviderFactory {
+public abstract class RequestProviderFactory {
     // MemberController
     public static Stream<Arguments> validProvider() {
         return Stream.of(
@@ -50,24 +50,22 @@ public class RequestProviderFactory {
         );
     }
 
-    public static Stream<Arguments> invalidAdminMemberCreateRequestProvider() {
+    public static Stream<Arguments> boardRequestProvider() {
         return Stream.of(
-                Arguments.of(new AdminMemberCreateRequest("", "", Authentication.USER.getName(), true))
+                Arguments.of(Authentication.USER.name(), true, true),   // 사용자 + 1분 내 작성글 o → 예외
+                Arguments.of(Authentication.USER.name(), false, false), // 사용자 + 1분 내 작성글 x → 정상
+                Arguments.of(Authentication.ADMIN.name(), true, false)  // 관리자 → 정상
         );
     }
 
-    public static Stream<Arguments> roleProvider() {
-        Role role1 = Role.builder().
-                roleName(Authentication.ADMIN.getName())
-                .isUse(Boolean.TRUE)
-                .build();
-
-        Role role2 = Role.builder().
-                roleName(Authentication.ADMIN.getName())
-                .isUse(Boolean.FALSE)
-                .build();
-
-        return Stream.of(Arguments.of(role1), Arguments.of(role2));
+    public static Stream<Arguments> boardCriteriaRequestProvider() {
+        return Stream.of(
+                Arguments.of(buildBoardCriteria(BoardType.FREE, "내용1", "제목1", 1L), 1),
+                Arguments.of(buildBoardCriteria(BoardType.FREE, "", "", null), 2),
+                Arguments.of(buildBoardCriteria(BoardType.NOTIFICATION, "공지", "공지사항", null), 1),
+                Arguments.of(buildBoardCriteria(null, "내용", "", null), 2),
+                Arguments.of(buildBoardCriteria(null, "NOT FOUND", "", null), 0)
+        );
     }
 
     public static Stream<Arguments> invalidAdminMemberUpdateRequestProvider() {
@@ -87,5 +85,17 @@ public class RequestProviderFactory {
                 Arguments.of(idEmpty, "사용자 ID를 입력하세요."),
                 Arguments.of(isUseEmpty, "계정 사용 여부를 입력하세요.")
         );
+    }
+
+    private static BoardCriteria buildBoardCriteria(BoardType type,
+                                             String content,
+                                             String title,
+                                             Long createdBy) {
+        return BoardCriteria.builder()
+                .boardType(type)
+                .content(content)
+                .title(title)
+                .createdBy(createdBy)
+                .build();
     }
 }
