@@ -1,9 +1,10 @@
-package com.project.beauty_care.domain.code.service;
+package com.project.beauty_care.global.config;
 
 import com.project.beauty_care.TestSupportWithRedis;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.code.dto.AdminCodeUpdateRequest;
 import com.project.beauty_care.domain.code.repository.CodeRepository;
+import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.enums.RedisCacheKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
