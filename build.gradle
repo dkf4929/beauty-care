@@ -42,6 +42,7 @@ dependencies {
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.0'
+	implementation 'com.google.guava:guava:33.4.8-jre'
 	// https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.5'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.4'
