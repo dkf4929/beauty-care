@@ -4,6 +4,7 @@ import com.project.beauty_care.domain.attachFile.*;
 import com.project.beauty_care.domain.attachFile.dto.AttachFileCreateRequest;
 import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
+import com.project.beauty_care.domain.attachFile.repository.AttachFileRepository;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.service.CodeService;

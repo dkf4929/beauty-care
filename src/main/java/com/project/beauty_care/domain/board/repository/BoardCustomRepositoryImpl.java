@@ -6,6 +6,8 @@ import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -58,19 +60,19 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
     }
 
     private BooleanExpression eqGrade(String grade) {
-        if (grade.isEmpty()) return null;
+        if (StringUtils.isEmpty(grade)) return null;
 
         return board.grade.id.eq(grade);
     }
 
     private BooleanExpression containsContent(String content) {
-        if (content.isEmpty()) return null;
+        if (StringUtils.isEmpty(content)) return null;
 
         return board.content.contains(content);
     }
 
     private BooleanExpression containsTitle(String title) {
-        if (title.isEmpty()) return null;
+        if (StringUtils.isEmpty(title)) return null;
 
         return board.title.contains(title);
     }
