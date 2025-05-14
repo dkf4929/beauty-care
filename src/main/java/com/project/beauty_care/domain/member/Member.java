@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain.member;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
 import com.project.beauty_care.domain.role.Role;
@@ -74,6 +75,8 @@ public class Member extends BaseEntity {
         this.isUse = isUse;
     }
 
+    // 테스트용 호출 x
+    @VisibleForTesting
     public static Member createForTest(Long id, String loginId, String password, String name, Role role) {
         Member member = new Member();
         member.id = id;

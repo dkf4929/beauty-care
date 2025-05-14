@@ -1,5 +1,6 @@
 package com.project.beauty_care.domain.board;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.board.dto.BoardUpdateRequest;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,5 +76,17 @@ public class Board extends BaseEntity {
     public void updateBoard(BoardUpdateRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();
+    }
+
+    // 테스트용 메서드 호출 x
+    @VisibleForTesting
+    void setCreatedDateTimeForTest(LocalDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
+    // 테스트용 메서드 호출 x
+    @VisibleForTesting
+    void setCreatedByForTest(Long createdBy) {
+        this.createdBy = createdBy;
     }
 }
