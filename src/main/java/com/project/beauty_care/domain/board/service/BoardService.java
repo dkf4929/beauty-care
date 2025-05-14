@@ -55,9 +55,10 @@ public class BoardService {
         BoardType boardType = request.getBoardType();
         String role = user.getRole().getRoleName();
 
-        validCreatedDateTime(user.getRole().getRoleName(), user.getMemberId());
+        // 사용자의 이전 게시물 생성 시간 체크
+        validator.validCreatedDateTime(user.getRole().getRoleName(), user.getMemberId());
 
-        // 게시물 유형 validation check
+        // 게시물 유형 validation 체크
         validator.validBoardType(boardType, role);
 
         // find code
@@ -147,21 +148,5 @@ public class BoardService {
     private Board findById(Long boardId) {
         return repository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_BOARD));
-    }
-
-    // 관리자가 아닐 경우, 1분에 하나의 게시물만 작성 가능.
-    private void validCreatedDateTime(String roleName, Long memberId) {
-        if (!roleName.equals(Authentication.ADMIN.name())) {
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime nowMinusOneMinute = now.minusMinutes(1);
-
-            // 1분 이내에 작성한 게시물이 있는지 찾는다.
-            Boolean isExists =
-                    repository.existsBoardByCreatedByAndCreatedDateTimeBetween(memberId, nowMinusOneMinute, now);
-
-            // 있으면 예외
-            if (isExists)
-                throw new RequestInvalidException(Errors.MUST_WRITE_BOARD_AFTER_ONE_MINUTE);
-        }
     }
 }
