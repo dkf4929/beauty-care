@@ -51,7 +51,7 @@ public class UserMemberController {
     })
     @GetMapping
     public SuccessResponse<MemberResponse> findMemberById(@AuthenticationPrincipal AppUser appUser) {
-        MemberResponse response = service.findMemberById(appUser.getMemberId());
+        MemberResponse response = service.findMemberByIdAndConvertResponse(appUser.getMemberId());
         return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, response);
     }
 

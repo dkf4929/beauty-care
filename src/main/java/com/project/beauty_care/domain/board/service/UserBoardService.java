@@ -17,10 +17,8 @@ import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.domain.enums.BoardType;
-import com.project.beauty_care.global.enums.Authentication;
 import com.project.beauty_care.global.enums.Errors;
 import com.project.beauty_care.global.exception.EntityNotFoundException;
-import com.project.beauty_care.global.exception.RequestInvalidException;
 import com.project.beauty_care.global.security.dto.AppUser;
 import com.project.beauty_care.global.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +28,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BoardService {
+public class UserBoardService {
     private final BoardRepository repository;
 
     private final BoardConverter converter;
@@ -100,19 +97,31 @@ public class BoardService {
         return converter.toResponse(savedEntity, fileList, codeConverter.toResponse(entity.getGrade()));
     }
 
+    // 내가 작성한 게시물 조회
+    @Transactional(readOnly = true)
+    public Page<BoardResponse> findBoardsByLoginUserAndIsUse(AppUser loginUser, Boolean isUse, Pageable pageable) {
+        Page<Board> pageResult = repository.findByCreatedByAndIsUse(loginUser.getMemberId(), isUse, pageable);
+
+        List<BoardResponse> contents = pageResult.getContent().stream()
+                .map(board -> {
+                    CodeResponse grade = codeConverter.toResponse(board.getGrade());
+
+                    List<AttachFileResponse> fileList = getFileResponseListFromBoard(board);
+
+                    return converter.toResponse(board, fileList, grade);
+                })
+                .toList();
+
+        return new PageImpl<>(contents, pageable, pageResult.getTotalElements());
+    }
+
     @Transactional
-    public BoardResponse findBoardById(Long boardId, AppUser loginUser) {
+    public BoardResponse findBoardByIdAndConvertResponse(Long boardId, AppUser loginUser) {
         Board entity = findById(boardId);
 
         CodeResponse grade = codeConverter.toResponse(entity.getGrade());
 
-        List<AttachFileResponse> fileList = entity.getAttachFiles().stream()
-                .map(file -> {
-                    String fileFullPath = fileUtils.extractFileFullPath(file);
-
-                    return fileConverter.toResponse(file, fileFullPath);
-                })
-                .toList();
+        List<AttachFileResponse> fileList = getFileResponseListFromBoard(entity);
 
         int readCount = boardReadService.getReadCountAndSaveRedis(boardId,
                 loginUser.getMemberId(), entity.getReadCount());
@@ -123,6 +132,10 @@ public class BoardService {
         return converter.toResponse(entity, fileList, grade);
     }
 
+    public Board findBoardById(Long boardId) {
+        return findById(boardId);
+    }
+
     public Page<BoardResponse> findBoardAllPageByCriteria(BoardCriteria criteria, Pageable pageable) {
         Page<Board> result = repository.findAllByCriteriaPage(criteria, pageable);
 
@@ -130,13 +143,7 @@ public class BoardService {
                 .map(board -> {
                     CodeResponse grade = codeConverter.toResponse(board.getGrade());
 
-                    List<AttachFileResponse> fileList = board.getAttachFiles().stream()
-                            .map(file -> {
-                                String fileFullPath = fileUtils.extractFileFullPath(file);
-
-                                return fileConverter.toResponse(file, fileFullPath);
-                            })
-                            .toList();
+                    List<AttachFileResponse> fileList = getFileResponseListFromBoard(board);
 
                     return converter.toResponse(board, fileList, grade);
                 })
@@ -148,5 +155,15 @@ public class BoardService {
     private Board findById(Long boardId) {
         return repository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException(Errors.NOT_FOUND_BOARD));
+    }
+
+    private List<AttachFileResponse> getFileResponseListFromBoard(Board board) {
+        return board.getAttachFiles().stream()
+                .map(file -> {
+                    String fileFullPath = fileUtils.extractFileFullPath(file);
+
+                    return fileConverter.toResponse(file, fileFullPath);
+                })
+                .toList();
     }
 }

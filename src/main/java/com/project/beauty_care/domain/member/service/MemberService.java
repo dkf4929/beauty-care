@@ -57,11 +57,14 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberResponse findMemberById(Long id) {
+    public MemberResponse findMemberByIdAndConvertResponse(Long id) {
         Member member = findById(id);
 
         return MemberConverter.toResponse(member);
     }
+
+    @Transactional(readOnly = true)
+    public Member findMemberById(Long id) {return findById(id);}
 
     // 회원 탈퇴 정책 -> 1년 개인정보 보호
     // 스케줄러 돌면서 탈퇴한지 1년 지난 회원 hardDelete 처리

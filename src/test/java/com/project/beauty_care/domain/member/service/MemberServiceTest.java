@@ -122,7 +122,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
 
     @DisplayName("특정 사용자 조회")
     @Test
-    void findMemberById() {
+    void findMemberByIdAndConvertResponse() {
         // given
         final Long id = 1L;
         final String loginId = "test";
@@ -135,7 +135,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
                 ));
 
         // when
-        MemberResponse findMember = service.findMemberById(id);
+        MemberResponse findMember = service.findMemberByIdAndConvertResponse(id);
 
         // then
         assertThat(findMember)
@@ -147,7 +147,7 @@ class MemberServiceTest extends TestSupportWithOutRedis {
     @Test
     void findMemberByNotPresentId() {
         // given, when, then
-        assertThatThrownBy(() -> service.findMemberById(1L))
+        assertThatThrownBy(() -> service.findMemberByIdAndConvertResponse(1L))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasFieldOrPropertyWithValue("errors.message", Errors.NOT_FOUND_MEMBER.getMessage())
                 .hasFieldOrPropertyWithValue("errors.errorCode", Errors.NOT_FOUND_MEMBER.getErrorCode());

@@ -22,7 +22,7 @@ class UserMemberControllerTest extends ControllerTestSupport {
     @WithMockCustomUser
     void myInfo() throws Exception {
         // given
-        when(memberService.findMemberById(anyLong()))
+        when(memberService.findMemberByIdAndConvertResponse(anyLong()))
                 .thenReturn(MemberResponse.builder()
                         .isUse(Boolean.TRUE)
                         .id(1L)
