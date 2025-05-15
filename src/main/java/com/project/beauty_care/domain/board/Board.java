@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.project.beauty_care.domain.BaseEntity;
 import com.project.beauty_care.domain.attachFile.AttachFile;
 import com.project.beauty_care.domain.board.dto.BoardUpdateRequest;
+import com.project.beauty_care.domain.boardReport.BoardReport;
 import com.project.beauty_care.domain.code.Code;
 import com.project.beauty_care.domain.enums.BoardType;
 import jakarta.persistence.*;
@@ -19,7 +20,9 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -49,10 +52,15 @@ public class Board extends BaseEntity {
     @BatchSize(size = 10)
     private List<AttachFile> attachFiles = new ArrayList<>();
 
+    // 조회 수
     @ColumnDefault("0")
     private Integer readCount;
 
-    @ColumnDefault("true")
+    // 게시물 신고
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BoardReport> boardReports = new HashSet<>();
+
+    @ColumnDefault("false")
     private Boolean isUse;
 
     @Builder
@@ -76,6 +84,7 @@ public class Board extends BaseEntity {
     public void updateBoard(BoardUpdateRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();
+        this.isUse = request.getIsUse();
     }
 
     // 테스트용 메서드 호출 x
