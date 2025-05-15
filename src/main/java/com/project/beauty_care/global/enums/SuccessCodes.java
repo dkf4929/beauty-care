@@ -21,6 +21,10 @@ public enum SuccessCodes {
     MEMBER_SAVE_SUCCESS(HttpStatus.CREATED, "회원 저장이 완료 되었습니다."),
     FILE_UPLOAD_SUCCESS(HttpStatus.CREATED, "파일이 업로드 되었습니다."),
 
+    // report
+    REPORT_SUCCESS(HttpStatus.CREATED, "신고 완료 되었습니다."),
+    REPORT_CANCEL(HttpStatus.CREATED, "신고 취소 되었습니다."),
+
     // scheduler
     SCHEDULER_EXECUTE_SUCCESS(HttpStatus.NO_CONTENT, "스케줄러 실행이 완료 되었습니다.")
     ;
