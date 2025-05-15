@@ -3,7 +3,7 @@ package com.project.beauty_care.domain.board.controller;
 import com.project.beauty_care.domain.board.dto.BoardCreateRequest;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardResponse;
-import com.project.beauty_care.domain.board.service.BoardService;
+import com.project.beauty_care.domain.board.service.UserBoardService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
 import com.project.beauty_care.global.security.dto.AppUser;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "BOARD REST API FOR USER", description = "게시판 API")
 @RestController
 public class UserBoardController {
-    private final BoardService service;
+    private final UserBoardService service;
 
     @Operation(summary = "게시물 조회",
             description = "게시물 정보를 조회합니다.",
@@ -63,7 +63,7 @@ public class UserBoardController {
     @GetMapping("{boardId}")
     public SuccessResponse<BoardResponse> findBoardById(@PathVariable("boardId") Long boardId,
                                                         @AuthenticationPrincipal AppUser loginUser) {
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findBoardById(boardId, loginUser));
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findBoardByIdAndConvertResponse(boardId, loginUser));
     }
 
     @Operation(summary = "게시물 등록",
