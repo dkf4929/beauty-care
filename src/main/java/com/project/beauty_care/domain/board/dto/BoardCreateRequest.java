@@ -33,4 +33,7 @@ public class BoardCreateRequest {
 
     @Schema(description = "임시 파일 정보")
     private List<TempFileDto> attachFiles = new ArrayList<>();
+
+    @Schema(description = "게시물 사용(숨김) 여부", example = "false")
+    private Boolean isUse;
 }

@@ -21,6 +21,9 @@ public class BoardUpdateRequest {
     @Schema(description = "내용", example = "안녕하세요.")
     private String content;
 
+    @Schema(description = "게시물 사용 여부", example = "true")
+    private Boolean isUse;
+
     @Schema(description = "임시 파일 정보")
     private List<TempFileDto> attachFiles = new ArrayList<>();
 }

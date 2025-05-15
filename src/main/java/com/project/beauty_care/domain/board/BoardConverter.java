@@ -18,7 +18,7 @@ public class BoardConverter {
                 .grade(grade)
                 .title(request.getTitle())
                 .content(request.getContent())
-                .isUse(Boolean.TRUE)
+                .isUse(request.getIsUse())
                 .build();
     }
 

@@ -33,7 +33,8 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
                         containsTitle(criteria.getTitle()),
                         containsContent(criteria.getContent()),
                         eqGrade(criteria.getGrade()),
-                        eqCreatedBy(criteria.getCreatedBy())
+                        eqCreatedBy(criteria.getCreatedBy()),
+                        board.isUse.isTrue() // 숨김 처리 안된 게시물만
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
