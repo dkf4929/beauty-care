@@ -6,7 +6,6 @@ import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

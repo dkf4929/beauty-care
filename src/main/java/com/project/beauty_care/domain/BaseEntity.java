@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain;
 
-import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

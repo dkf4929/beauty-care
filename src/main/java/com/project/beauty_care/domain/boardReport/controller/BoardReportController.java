@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.boardReport.controller;
 
-import com.project.beauty_care.domain.boardReport.BoardReport;
 import com.project.beauty_care.domain.boardReport.dto.BoardReportCreateRequest;
 import com.project.beauty_care.domain.boardReport.service.BoardReportService;
 import com.project.beauty_care.global.SuccessResponse;
