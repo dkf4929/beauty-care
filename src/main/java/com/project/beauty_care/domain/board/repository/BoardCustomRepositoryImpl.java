@@ -3,6 +3,7 @@ package com.project.beauty_care.domain.board.repository;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.QBoard;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.boardReport.QBoardReport;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,6 +23,35 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
         this.board = QBoard.board;
     }
 
+    @Override
+    public Page<Board> findAllByCriteriaAndBoardReportsIsNotEmpty(BoardCriteria criteria, Pageable pageable) {
+        List<Board> content = queryFactory
+                .selectFrom(board)
+                .where(
+                        board.boardReports.isNotEmpty(),
+                        eqBoardType(criteria.getBoardType()),
+                        containsTitle(criteria.getTitle()),
+                        containsContent(criteria.getContent()),
+                        eqGrade(criteria.getGrade()),
+                        eqCreatedBy(criteria.getCreatedBy())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(board.count())
+                .from(board)
+                .where(
+                        eqBoardType(criteria.getBoardType()),
+                        containsTitle(criteria.getTitle()),
+                        containsContent(criteria.getContent()),
+                        eqGrade(criteria.getGrade()),
+                        eqCreatedBy(criteria.getCreatedBy())
+                ).fetchOne();
+
+        return new PageImpl<>(content, pageable, totalCount);
+    }
 
     @Override
     public Page<Board> findAllByCriteriaPage(BoardCriteria criteria, Pageable pageable) {

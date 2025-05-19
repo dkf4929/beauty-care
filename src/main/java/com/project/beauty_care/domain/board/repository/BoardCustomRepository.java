@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface BoardCustomRepository {
     Page<Board> findAllByCriteriaPage(BoardCriteria criteria, Pageable pageable);
+
+    Page<Board> findAllByCriteriaAndBoardReportsIsNotEmpty(BoardCriteria criteria, Pageable pageable);
 }

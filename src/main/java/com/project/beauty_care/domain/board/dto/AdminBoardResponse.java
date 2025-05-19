@@ -1,4 +1,53 @@
 package com.project.beauty_care.domain.board.dto;
 
-public class AdminBoardResponse {
+import com.project.beauty_care.domain.BaseTimeEntity;
+import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
+import com.project.beauty_care.domain.code.dto.CodeResponse;
+import com.project.beauty_care.domain.dto.BaseTimeDto;
+import com.project.beauty_care.domain.enums.BoardType;
+import com.project.beauty_care.domain.member.dto.MemberResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@SuperBuilder
+public class AdminBoardResponse extends BaseTimeDto {
+    @Schema(description = "ID", example = "1")
+    private Long id;
+
+    @Schema(description = "게시글 타입", example = "BOARD")
+    private BoardType boardType;
+
+    @Schema(description = "게시글 등급", example = "일반")
+    private CodeResponse grade;
+
+    @Schema(description = "제목", example = "게시물1")
+    private String title;
+
+    @Schema(description = "내용", example = "안녕하세요.")
+    private String content;
+
+    @Schema(description = "파일 경로")
+    private List<AttachFileResponse> attachFiles = new ArrayList<>();
+
+    @Schema(description = "사용 여부", example = "true")
+    private Boolean isUse;
+
+    @Schema(description = "조회 수", example = "0")
+    private Integer readCount;
+
+    @Schema(description = "게시물 신고 수", example = "0")
+    private Integer reportCount;
+
+    @Schema(description = "게시물 작성자")
+    private MemberResponse createMember;
 }
