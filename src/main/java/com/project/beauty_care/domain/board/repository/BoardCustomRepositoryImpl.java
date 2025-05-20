@@ -3,7 +3,6 @@ package com.project.beauty_care.domain.board.repository;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.QBoard;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
-import com.project.beauty_care.domain.boardReport.QBoardReport;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

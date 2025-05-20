@@ -9,7 +9,6 @@ import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
-import com.project.beauty_care.domain.mapper.BoardMapper;
 import com.project.beauty_care.domain.member.Member;
 import com.project.beauty_care.domain.member.MemberConverter;
 import com.project.beauty_care.domain.member.service.MemberService;

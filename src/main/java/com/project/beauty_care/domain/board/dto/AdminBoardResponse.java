@@ -1,6 +1,5 @@
 package com.project.beauty_care.domain.board.dto;
 
-import com.project.beauty_care.domain.BaseTimeEntity;
 import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.dto.BaseTimeDto;
