@@ -32,6 +32,7 @@ public class AdminBoardService {
     private final MemberConverter memberConverter;
     private final MemberService memberService;
 
+    // TODO: 전체 조회 API 랑 합칠지 (isReport)?
     // 신고 게시물 보기
     public Page<AdminBoardResponse> findReportedBoards(Pageable pageable, BoardCriteria criteria) {
         Page<Board> pageResults =
