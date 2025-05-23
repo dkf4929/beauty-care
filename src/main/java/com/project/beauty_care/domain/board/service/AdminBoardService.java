@@ -6,6 +6,7 @@ import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.BoardConverter;
 import com.project.beauty_care.domain.board.dto.AdminBoardResponse;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.board.dto.BoardCriteriaAdmin;
 import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
@@ -32,17 +33,20 @@ public class AdminBoardService {
     private final MemberConverter memberConverter;
     private final MemberService memberService;
 
-    // TODO: 전체 조회 API 랑 합칠지 (isReport)?
-    // 신고 게시물 보기
-    public Page<AdminBoardResponse> findReportedBoards(Pageable pageable, BoardCriteria criteria) {
+    // 조건에 따른 조회
+    public Page<AdminBoardResponse> findAllBoards(Pageable pageable, BoardCriteriaAdmin criteria) {
         Page<Board> pageResults =
-                repository.findAllByCriteriaAndBoardReportsIsNotEmpty(criteria, pageable);
+                repository.findAllByCriteriaAdmin(criteria, pageable);
 
         List<AdminBoardResponse> contents = pageResults.stream()
                 .map(board -> {
+                    // 게시물 신고 count
                     int reportCount = board.getBoardReports().size();
 
+                    // 게시물 등급
                     CodeResponse grade = codeConverter.toResponse(board.getGrade());
+
+                    // 첨부 파일
                     List<AttachFileResponse> fileList = getFileResponseListFromBoard(board);
 
                     Member createMember = memberService.findMemberById(board.getCreatedBy());
@@ -59,11 +63,6 @@ public class AdminBoardService {
     // hard-delete
     public void deleteById(Long id) {
         repository.deleteById(id);
-    }
-
-    // 전체 게시물 조회
-    public Page<AdminBoardResponse> findAllBoards(Pageable pageable) {
-        return null;
     }
 
     private List<AttachFileResponse> getFileResponseListFromBoard(Board board) {

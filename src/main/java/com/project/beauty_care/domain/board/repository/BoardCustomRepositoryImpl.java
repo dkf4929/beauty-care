@@ -3,7 +3,9 @@ package com.project.beauty_care.domain.board.repository;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.QBoard;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.board.dto.BoardCriteriaAdmin;
 import com.project.beauty_care.domain.enums.BoardType;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -23,15 +25,16 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
     }
 
     @Override
-    public Page<Board> findAllByCriteriaAndBoardReportsIsNotEmpty(BoardCriteria criteria, Pageable pageable) {
+    public Page<Board> findAllByCriteriaAdmin(BoardCriteriaAdmin criteria, Pageable pageable) {
         List<Board> content = queryFactory
                 .selectFrom(board)
                 .where(
-                        board.boardReports.isNotEmpty(),
+                        isContainReported(criteria.getIsReport()),
                         eqBoardType(criteria.getBoardType()),
                         containsTitle(criteria.getTitle()),
                         containsContent(criteria.getContent()),
                         eqGrade(criteria.getGrade()),
+                        eqIsUse(criteria.getIsUse()),
                         eqCreatedBy(criteria.getCreatedBy())
                 )
                 .offset(pageable.getOffset())
@@ -110,5 +113,15 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
         if (boardType == null) return null;
 
         return board.boardType.eq(boardType);
+    }
+
+    private BooleanExpression isContainReported(Boolean isReport) {
+        if (!isReport) return board.boardReports.isEmpty();
+
+        return board.boardReports.isNotEmpty();
+    }
+
+    private BooleanExpression eqIsUse(Boolean isUse) {
+        return board.isUse.eq(isUse);
     }
 }

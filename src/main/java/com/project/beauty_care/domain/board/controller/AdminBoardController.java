@@ -2,6 +2,7 @@ package com.project.beauty_care.domain.board.controller;
 
 import com.project.beauty_care.domain.board.dto.AdminBoardResponse;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
+import com.project.beauty_care.domain.board.dto.BoardCriteriaAdmin;
 import com.project.beauty_care.domain.board.service.AdminBoardService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
@@ -20,8 +21,8 @@ public class AdminBoardController {
     private final AdminBoardService service;
 
     @PostMapping
-    public SuccessResponse<Page<AdminBoardResponse>> findReportBoardsByCriteria(Pageable pageable,
-                                                                                @RequestBody BoardCriteria criteria) {
-        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findReportedBoards(pageable, criteria));
+    public SuccessResponse<Page<AdminBoardResponse>> findAllByCriteria(Pageable pageable,
+                                                                                @RequestBody BoardCriteriaAdmin criteria) {
+        return SuccessResponse.success(SuccessCodes.RETRIEVE_SUCCESS, service.findAllBoards(pageable, criteria));
     }
 }
