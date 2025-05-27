@@ -3,10 +3,11 @@ package com.project.beauty_care.domain.board.repository;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.QBoard;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
-import com.project.beauty_care.domain.board.dto.BoardCriteriaAdmin;
+import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
 import com.project.beauty_care.domain.enums.BoardType;
-import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,10 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
     }
 
     @Override
-    public Page<Board> findAllByCriteriaAdmin(BoardCriteriaAdmin criteria, Pageable pageable) {
-        List<Board> content = queryFactory
+    public Page<Board> findAllByCriteriaAdmin(AdminBoardCriteria criteria, Pageable pageable) {
+        OrderSpecifier<?> orderSpecifier = sortIsReport(criteria.getIsReport());
+
+        JPAQuery<Board> query = queryFactory
                 .selectFrom(board)
                 .where(
                         isContainReported(criteria.getIsReport()),
@@ -36,7 +39,12 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
                         eqGrade(criteria.getGrade()),
                         eqIsUse(criteria.getIsUse()),
                         eqCreatedBy(criteria.getCreatedBy())
-                )
+                );
+
+        // 신고 여부 true => 신고 횟수로 descending
+        if (orderSpecifier != null) query.orderBy(orderSpecifier);
+
+        List<Board> content = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -52,7 +60,13 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
                         eqCreatedBy(criteria.getCreatedBy())
                 ).fetchOne();
 
-        return new PageImpl<>(content, pageable, totalCount);
+        return new PageImpl<>(content, pageable, totalCount != null ? totalCount : 0L);
+    }
+
+    private OrderSpecifier<?> sortIsReport(Boolean isReport) {
+        if (isReport) return board.boardReports.size().desc();
+
+        return null;
     }
 
     @Override
@@ -122,6 +136,8 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
     }
 
     private BooleanExpression eqIsUse(Boolean isUse) {
+        if (isUse == null) return null;
+
         return board.isUse.eq(isUse);
     }
 }
