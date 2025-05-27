@@ -1,5 +1,6 @@
 package com.project.beauty_care;
 
+import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;
@@ -11,7 +12,7 @@ import java.util.stream.Stream;
 
 public abstract class RequestProviderFactory {
     // MemberController
-    public static Stream<Arguments> validProvider() {
+    public static Stream<Arguments> memberCreateRequest() {
         return Stream.of(
                 Arguments.of(new PublicMemberCreateRequest("admin", "qwer1234", "qwer1234", "admin")),
                 Arguments.of(new PublicMemberCreateRequest("user", "qwer12345", "qwer12345", "user")),
@@ -19,7 +20,7 @@ public abstract class RequestProviderFactory {
         );
     }
 
-    public static Stream<Arguments> invalidPasswordPatternProvider() {
+    public static Stream<Arguments> invalidMemberCreateRequest() {
         return Stream.of(
                 Arguments.of(new PublicMemberCreateRequest("admin", "12345", "qwer1234", "admin")),
                 Arguments.of(new PublicMemberCreateRequest("admin", "12345678", "qwer1234", "admin")),
@@ -29,13 +30,13 @@ public abstract class RequestProviderFactory {
         );
     }
 
-    public static Stream<Arguments> emptyFieldProvider() {
+    public static Stream<Arguments> MemberCreateRequestWithEmptyField() {
         return Stream.of(
                 Arguments.of(new PublicMemberCreateRequest("", "", "", ""))
         );
     }
 
-    public static Stream<Arguments> invalidLoginIdProvider() {
+    public static Stream<Arguments> MemberCreateRequestWithInvalidLoginId() {
         return Stream.of(
                 Arguments.of(new PublicMemberCreateRequest("dd", "qwer1234", "qwer1234", "user")),
                 Arguments.of(new PublicMemberCreateRequest("ddddddddddd", "qwer1234", "qwer1234", "user"))
@@ -43,14 +44,14 @@ public abstract class RequestProviderFactory {
     }
 
     // token test
-    public static Stream<Arguments> invalidNameProvider() {
+    public static Stream<Arguments> MemberCreateRequestWithInvalidName() {
         return Stream.of(
                 Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "qwer1234", "d")),
                 Arguments.of(new PublicMemberCreateRequest("user", "qwer1234", "qwer1234", "ddddddddddddddddddddd"))
         );
     }
 
-    public static Stream<Arguments> boardRequestProvider() {
+    public static Stream<Arguments> boardRequestValidTime() {
         return Stream.of(
                 Arguments.of(Authentication.USER.name(), true, true),   // 사용자 + 1분 내 작성글 o → 예외
                 Arguments.of(Authentication.USER.name(), false, false), // 사용자 + 1분 내 작성글 x → 정상
@@ -58,17 +59,17 @@ public abstract class RequestProviderFactory {
         );
     }
 
-    public static Stream<Arguments> boardCriteriaRequestProvider() {
+    public static Stream<Arguments> boardCriteria() {
         return Stream.of(
                 Arguments.of(buildBoardCriteria(BoardType.FREE, "내용1", "제목1", 1L), 1),
-                Arguments.of(buildBoardCriteria(BoardType.FREE, "", "", null), 2),
+                Arguments.of(buildBoardCriteria(BoardType.FREE, "", "", null), 3),
                 Arguments.of(buildBoardCriteria(BoardType.NOTIFICATION, "공지", "공지사항", null), 1),
-                Arguments.of(buildBoardCriteria(null, "내용", "", null), 2),
+                Arguments.of(buildBoardCriteria(null, "내용", "", null), 3),
                 Arguments.of(buildBoardCriteria(null, "NOT FOUND", "", null), 0)
         );
     }
 
-    public static Stream<Arguments> invalidAdminMemberUpdateRequestProvider() {
+    public static Stream<Arguments> invalidAdminMemberUpdateRequest() {
         AdminMemberUpdateRequest idEmpty = AdminMemberUpdateRequest.builder()
                 .id(null)
                 .role(Authentication.USER.getName())

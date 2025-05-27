@@ -47,7 +47,7 @@ class BoardValidatorTest extends TestSupportWithOutRedis {
 
     @DisplayName("게시물 작성 시간 검증")
     @ParameterizedTest(name = "[{index}] role={0}, exists={1}, shouldThrow={2}")
-    @MethodSource("com.project.beauty_care.RequestProviderFactory#boardRequestProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#boardRequestValidTime")
     void validCreatedDateTime(String role, boolean isExists, boolean isException) {
         // given
         when(repository.existsBoardByCreatedByAndCreatedDateTimeBetween(any(), any(), any()))

@@ -5,8 +5,7 @@ import com.project.beauty_care.domain.attachFile.dto.AttachFileResponse;
 import com.project.beauty_care.domain.board.Board;
 import com.project.beauty_care.domain.board.BoardConverter;
 import com.project.beauty_care.domain.board.dto.AdminBoardResponse;
-import com.project.beauty_care.domain.board.dto.BoardCriteria;
-import com.project.beauty_care.domain.board.dto.BoardCriteriaAdmin;
+import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
 import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.code.CodeConverter;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
@@ -34,7 +33,7 @@ public class AdminBoardService {
     private final MemberService memberService;
 
     // 조건에 따른 조회
-    public Page<AdminBoardResponse> findAllBoards(Pageable pageable, BoardCriteriaAdmin criteria) {
+    public Page<AdminBoardResponse> findAllBoards(Pageable pageable, AdminBoardCriteria criteria) {
         Page<Board> pageResults =
                 repository.findAllByCriteriaAdmin(criteria, pageable);
 

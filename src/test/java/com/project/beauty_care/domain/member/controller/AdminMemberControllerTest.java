@@ -186,7 +186,7 @@ class AdminMemberControllerTest extends ControllerTestSupport {
 
     @DisplayName("회원 수정 시나리오")
     @ParameterizedTest
-    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidAdminMemberUpdateRequestProvider")
+    @MethodSource("com.project.beauty_care.RequestProviderFactory#invalidAdminMemberUpdateRequest")
     void updateMemberWithInvalidRequest(AdminMemberUpdateRequest request, String message) throws Exception {
         mockMvc.perform(
                         put("/admin/member")

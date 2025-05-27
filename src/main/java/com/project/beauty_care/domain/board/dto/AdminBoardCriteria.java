@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class BoardCriteriaAdmin {
+public class AdminBoardCriteria {
     @Schema(description = "게시물 제목", example = "제목")
     private String title;
 
