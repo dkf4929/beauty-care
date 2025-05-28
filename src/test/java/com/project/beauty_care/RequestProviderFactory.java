@@ -1,6 +1,5 @@
 package com.project.beauty_care;
 
-import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
 import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.enums.BoardType;
 import com.project.beauty_care.domain.member.dto.AdminMemberUpdateRequest;

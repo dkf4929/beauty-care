@@ -1,18 +1,16 @@
 package com.project.beauty_care.domain.board;
 
 import com.project.beauty_care.RepositoryTestSupport;
-import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
+import com.project.beauty_care.domain.board.dto.BoardCriteria;
 import com.project.beauty_care.domain.board.repository.BoardRepository;
 import com.project.beauty_care.domain.boardReport.BoardReport;
 import com.project.beauty_care.domain.boardReport.repository.BoardReportRepository;
 import com.project.beauty_care.domain.enums.BoardType;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,13 +18,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.groups.Tuple.*;
-import static org.junit.jupiter.api.DynamicTest.*;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 // 테스트 메서드 사용을 위해 엔티티와 동일 패키지로 지정

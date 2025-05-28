@@ -1,7 +1,7 @@
 package com.project.beauty_care.domain.board.controller;
 
-import com.project.beauty_care.domain.board.dto.AdminBoardResponse;
 import com.project.beauty_care.domain.board.dto.AdminBoardCriteria;
+import com.project.beauty_care.domain.board.dto.AdminBoardResponse;
 import com.project.beauty_care.domain.board.service.AdminBoardService;
 import com.project.beauty_care.global.SuccessResponse;
 import com.project.beauty_care.global.enums.SuccessCodes;
