@@ -38,7 +38,7 @@ public class MenuCustomRepositoryImpl implements MenuCustomRepository {
         return queryFactory.selectFrom(menu)
                 .join(menu.menuRole, menuRole).fetchJoin() // menu → menuRoles
                 .join(menuRole.role, role).fetchJoin()
-                .where(eqRole(roleName).and(menu.parent.isNull()))
+                .where(eqRole(roleName), menu.parent.isNull())
                 .fetchOne();
     }
 
