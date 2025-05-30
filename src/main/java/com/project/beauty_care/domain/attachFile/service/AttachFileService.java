@@ -39,9 +39,11 @@ public class AttachFileService {
     private final CodeService codeService;
     private final String EXTENSION_CODE_ID = "user:file:extension";
 
+    // 실제 파일 저장 경로
     @Value("${file.upload.real.dir}")
     private String realDir;
 
+    // 임시 파일 경로 (하루마다 삭제)
     @Value("${file.upload.temp.dir}")
     private String tempDir;
 
