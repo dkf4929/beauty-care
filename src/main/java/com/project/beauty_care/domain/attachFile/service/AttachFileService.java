@@ -47,6 +47,7 @@ public class AttachFileService {
     @Value("${file.upload.temp.dir}")
     private String tempDir;
 
+    // TODO : 파일 롤백 전략..
     @Transactional
     public List<TempFileDto> uploadTempFile(List<MultipartFile> files) {
         List<CodeResponse> extensionCodeList = codeService.findCodeByParentId(EXTENSION_CODE_ID);
