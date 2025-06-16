@@ -43,7 +43,7 @@ public class AttachFileService {
     @Value("${file.upload.real.dir}")
     private String realDir;
 
-    // 임시 파일 경로 (하루마다 삭제)
+    // 임시 파일 경로 (하루마다 삭제 -> 스케줄러)
     @Value("${file.upload.temp.dir}")
     private String tempDir;
 
