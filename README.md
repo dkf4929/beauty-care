@@ -1,5 +1,16 @@
 # beauty-care
 
+# 사용자 관리 (FOR ADMIN)
+- 모든 사용자 조회
+- 사용자 생성
+- 사용자 정보 수정
+
+# 사용자 관리 (FOR USE)
+- 내 정보 조회
+- 내 정보 수정
+- 회원 탈퇴
+- 회원 탈퇴 취소
+
 EC2 보안그룹 설명
 > https://velog.io/@youngho0620/EC2-%EB%B3%B4%EC%95%88-%EA%B7%B8%EB%A3%B9
 
