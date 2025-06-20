@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,25 +25,36 @@ class AttachFileValidatorTest extends TestSupportWithOutRedis {
     @DisplayName("파일 확장자 검증 시나리오")
     @TestFactory
     public Collection<DynamicTest> validExtensionScenario() {
-        final Set<String> extionsionSet = Set.of("txt");
+        AtomicReference<Set<String>> extensionSet = new AtomicReference<>(Set.of("txt"));
 
         return List.of(
                 dynamicTest("정상 시나리오", () -> {
                     final String extension = "txt";
 
-                    assertDoesNotThrow(() -> validator.validExtension(extionsionSet, extension));
+                    assertDoesNotThrow(() -> validator.validExtension(extensionSet.get(), extension));
                 }),
-                dynamicTest("예외 발생 케이스", () -> {
-                    final String extension = "gif";
+                dynamicTest("유효하지 않은 확장자 -> 예외발생", () -> {
+                    assertExtension(extensionSet.get());
+                }),
+                dynamicTest("사용 가능한 확장자 없음 -> 예외발생", () -> {
+                    // given
+                    extensionSet.set(Set.of());
 
-                    assertThatThrownBy(() -> validator.validExtension(extionsionSet, extension))
-                            .isInstanceOf(FileUploadException.class)
-                            .extracting("errors")
-                            .satisfies(errors -> {
-                                assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.NOT_SUPPORTED_EXTENSION.getMessage());
-                                assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.NOT_SUPPORTED_EXTENSION.getErrorCode());
-                            });
+                    // then
+                    assertExtension(extensionSet.get());
                 })
         );
+    }
+
+    private void assertExtension(Set<String> extionsionSet) {
+        final String extension = "gif";
+
+        assertThatThrownBy(() -> validator.validExtension(extionsionSet, extension))
+                .isInstanceOf(FileUploadException.class)
+                .extracting("errors")
+                .satisfies(errors -> {
+                    assertThat(errors).hasFieldOrPropertyWithValue("message", Errors.NOT_SUPPORTED_EXTENSION.getMessage());
+                    assertThat(errors).hasFieldOrPropertyWithValue("errorCode", Errors.NOT_SUPPORTED_EXTENSION.getErrorCode());
+                });
     }
 }
