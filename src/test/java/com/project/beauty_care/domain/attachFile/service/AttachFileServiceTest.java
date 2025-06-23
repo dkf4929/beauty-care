@@ -6,22 +6,18 @@ import com.project.beauty_care.domain.attachFile.dto.TempFileDto;
 import com.project.beauty_care.domain.code.dto.CodeResponse;
 import com.project.beauty_care.domain.code.service.CodeService;
 import com.project.beauty_care.global.utils.FileUtils;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.SequencedCollection;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class AttachFileServiceTest extends TestSupportWithOutRedis {
