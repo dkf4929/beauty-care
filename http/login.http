@@ -1,8 +1,0 @@
-### 로그인
-POST localhost:8080/login
-Content-Type: application/json
-
-{
-  "loginId": "admin",
-  "password": "qwer1234"
-}
